@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireParentInFamily } from "@/lib/permissions";
+import { Prisma } from "@prisma/client";
 
 // PUT /api/redemptions/[id]/approve - Parent approves a redemption
 export async function PUT(
@@ -61,7 +62,7 @@ export async function PUT(
     // Use a transaction to:
     // 1. Update redemption status
     // 2. Create negative point entry
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // Update redemption
       const updatedRedemption = await tx.redemption.update({
         where: { id },
