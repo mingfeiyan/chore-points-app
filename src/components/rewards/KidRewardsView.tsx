@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 type Reward = {
   id: string;
@@ -27,6 +28,8 @@ export default function KidRewardsView({ kidId }: KidRewardsViewProps) {
   const [redemptions, setRedemptions] = useState<Redemption[]>([]);
   const [totalPoints, setTotalPoints] = useState(0);
   const [loading, setLoading] = useState(true);
+  const t = useTranslations("rewards");
+  const tCommon = useTranslations("common");
 
   useEffect(() => {
     fetchRewards();
@@ -75,7 +78,7 @@ export default function KidRewardsView({ kidId }: KidRewardsViewProps) {
   const handleRedeem = async (rewardId: string, rewardTitle: string) => {
     if (
       !confirm(
-        `Redeem "${rewardTitle}"? This will create a pending request for your parent to approve.`
+        `${t("confirmRedeem", { title: rewardTitle })} ${t("confirmRedeemDesc")}`
       )
     )
       return;
@@ -90,14 +93,14 @@ export default function KidRewardsView({ kidId }: KidRewardsViewProps) {
       const data = await response.json();
 
       if (response.ok) {
-        alert("Redemption request submitted! Waiting for parent approval.");
+        alert(t("redemptionSubmitted"));
         fetchRedemptions();
       } else {
-        alert(data.error || "Failed to request redemption");
+        alert(data.error || t("redemptionFailed"));
       }
     } catch (error) {
       console.error("Failed to request redemption:", error);
-      alert("Failed to request redemption");
+      alert(t("redemptionFailed"));
     }
   };
 
@@ -110,8 +113,17 @@ export default function KidRewardsView({ kidId }: KidRewardsViewProps) {
     return styles[status as keyof typeof styles] || "bg-gray-100 text-gray-800";
   };
 
+  const getStatusText = (status: string) => {
+    const statusMap: Record<string, string> = {
+      PENDING: t("pending"),
+      APPROVED: t("approved"),
+      DENIED: t("denied"),
+    };
+    return statusMap[status] || status;
+  };
+
   if (loading) {
-    return <div className="text-center py-8">Loading...</div>;
+    return <div className="text-center py-8">{tCommon("loading")}</div>;
   }
 
   return (
@@ -120,10 +132,10 @@ export default function KidRewardsView({ kidId }: KidRewardsViewProps) {
       <div className="mb-8">
         <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg shadow-lg p-8 text-white">
           <div className="text-center">
-            <p className="text-lg font-medium opacity-90">Available Points</p>
+            <p className="text-lg font-medium opacity-90">{t("availablePoints")}</p>
             <p className="text-6xl font-bold mt-2">{totalPoints}</p>
             <p className="text-sm mt-4 opacity-75">
-              Save up to redeem awesome rewards!
+              {t("saveUp")}
             </p>
           </div>
         </div>
@@ -132,13 +144,13 @@ export default function KidRewardsView({ kidId }: KidRewardsViewProps) {
       {/* Available Rewards */}
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          Available Rewards
+          {t("availableRewards")}
         </h2>
 
         {rewards.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-lg shadow">
             <p className="text-gray-500">
-              No rewards available yet. Ask your parent to add some!
+              {t("noRewardsYet")}
             </p>
           </div>
         ) : (
@@ -167,15 +179,15 @@ export default function KidRewardsView({ kidId }: KidRewardsViewProps) {
                     </h3>
                     <div className="flex items-center justify-between mb-4">
                       <span className="text-2xl font-bold text-purple-600">
-                        {reward.costPoints} pts
+                        {reward.costPoints} {tCommon("points")}
                       </span>
                       {canAfford ? (
                         <span className="text-sm text-green-600 font-medium">
-                          You can afford this!
+                          {t("youCanAfford")}
                         </span>
                       ) : (
                         <span className="text-sm text-gray-500">
-                          Need {reward.costPoints - totalPoints} more
+                          {t("needMore", { count: reward.costPoints - totalPoints })}
                         </span>
                       )}
                     </div>
@@ -188,7 +200,7 @@ export default function KidRewardsView({ kidId }: KidRewardsViewProps) {
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"
                       }`}
                     >
-                      {canAfford ? "Redeem" : "Not Enough Points"}
+                      {canAfford ? t("redeemButton") : t("notEnoughPoints")}
                     </button>
                   </div>
                 </div>
@@ -201,13 +213,13 @@ export default function KidRewardsView({ kidId }: KidRewardsViewProps) {
       {/* Redemption History */}
       <div>
         <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          My Redemption History
+          {t("myRedemptionHistory")}
         </h2>
 
         {redemptions.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-lg shadow">
             <p className="text-gray-500">
-              No redemptions yet. Earn points and redeem rewards!
+              {t("noRedemptionsYet")}
             </p>
           </div>
         ) : (
@@ -216,19 +228,19 @@ export default function KidRewardsView({ kidId }: KidRewardsViewProps) {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Reward
+                    {t("reward")}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Cost
+                    {t("cost")}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
+                    {t("status")}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Requested
+                    {t("requested")}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Resolved
+                    {t("resolved")}
                   </th>
                 </tr>
               </thead>
@@ -239,7 +251,7 @@ export default function KidRewardsView({ kidId }: KidRewardsViewProps) {
                       {redemption.reward.title}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {redemption.reward.costPoints} pts
+                      {redemption.reward.costPoints} {tCommon("points")}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
@@ -247,7 +259,7 @@ export default function KidRewardsView({ kidId }: KidRewardsViewProps) {
                           redemption.status
                         )}`}
                       >
-                        {redemption.status}
+                        {getStatusText(redemption.status)}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

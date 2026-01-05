@@ -3,15 +3,34 @@
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useLocale } from "@/components/LocaleProvider";
 
 export default function NavBar() {
   const { data: session, status } = useSession();
   const pathname = usePathname();
+  const t = useTranslations("nav");
+  const { locale, setLocale } = useLocale();
+
+  const toggleLanguage = () => {
+    setLocale(locale === "en" ? "zh" : "en");
+  };
 
   // Don't show navbar on login/signup pages
   if (pathname === "/login" || pathname === "/signup") {
     return null;
   }
+
+  // Language toggle button component
+  const LanguageToggle = () => (
+    <button
+      onClick={toggleLanguage}
+      className="text-sm px-2 py-1 rounded border border-gray-600 hover:border-gray-400 transition"
+      title={t("language")}
+    >
+      {locale === "en" ? "中文" : "EN"}
+    </button>
+  );
 
   // Show loading state
   if (status === "loading") {
@@ -19,9 +38,12 @@ export default function NavBar() {
       <nav className="bg-gray-800 text-white px-4 py-3">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link href="/" className="text-xl font-bold">
-            Chore Points
+            {t("appName")}
           </Link>
-          <div className="text-sm text-gray-400">Loading...</div>
+          <div className="flex items-center gap-3">
+            <LanguageToggle />
+            <div className="text-sm text-gray-400">{t("loading") || "Loading..."}</div>
+          </div>
         </div>
       </nav>
     );
@@ -33,20 +55,21 @@ export default function NavBar() {
       <nav className="bg-gray-800 text-white px-4 py-3">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link href="/" className="text-xl font-bold">
-            Chore Points
+            {t("appName")}
           </Link>
-          <div className="flex gap-4">
+          <div className="flex items-center gap-3">
+            <LanguageToggle />
             <Link
               href="/login"
               className="text-sm hover:text-gray-300 transition"
             >
-              Log in
+              {t("login")}
             </Link>
             <Link
               href="/signup"
               className="text-sm bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded transition"
             >
-              Sign up
+              {t("signup")}
             </Link>
           </div>
         </div>
@@ -61,7 +84,7 @@ export default function NavBar() {
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <div className="flex items-center gap-6">
           <Link href="/dashboard" className="text-xl font-bold">
-            Chore Points
+            {t("appName")}
           </Link>
 
           {/* Navigation links */}
@@ -73,7 +96,7 @@ export default function NavBar() {
                   pathname === "/dashboard" ? "text-blue-400" : ""
                 }`}
               >
-                Dashboard
+                {t("dashboard")}
               </Link>
 
               {isParent ? (
@@ -84,7 +107,7 @@ export default function NavBar() {
                       pathname === "/chores" ? "text-blue-400" : ""
                     }`}
                   >
-                    Chores
+                    {t("chores")}
                   </Link>
                   <Link
                     href="/ledger"
@@ -92,7 +115,7 @@ export default function NavBar() {
                       pathname === "/ledger" ? "text-blue-400" : ""
                     }`}
                   >
-                    Points
+                    {t("pointsNav")}
                   </Link>
                   <Link
                     href="/rewards"
@@ -100,7 +123,7 @@ export default function NavBar() {
                       pathname === "/rewards" ? "text-blue-400" : ""
                     }`}
                   >
-                    Rewards
+                    {t("rewards")}
                   </Link>
                 </>
               ) : (
@@ -111,7 +134,7 @@ export default function NavBar() {
                       pathname === "/points" ? "text-blue-400" : ""
                     }`}
                   >
-                    My Points
+                    {t("myPoints")}
                   </Link>
                   <Link
                     href="/redeem"
@@ -119,7 +142,7 @@ export default function NavBar() {
                       pathname === "/redeem" ? "text-blue-400" : ""
                     }`}
                   >
-                    Redeem
+                    {t("redeem")}
                   </Link>
                 </>
               )}
@@ -128,9 +151,10 @@ export default function NavBar() {
         </div>
 
         {/* User info and logout */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <LanguageToggle />
           <div className="text-sm">
-            <span className="text-gray-400 hidden sm:inline">Logged in as </span>
+            <span className="text-gray-400 hidden sm:inline">{t("loggedInAs")} </span>
             <span className="font-medium">
               {session.user.name || session.user.email}
             </span>
@@ -141,7 +165,7 @@ export default function NavBar() {
                   : "bg-green-600 text-green-100"
               }`}
             >
-              {isParent ? "Parent" : "Kid"}
+              {isParent ? t("parent") : t("kid")}
             </span>
           </div>
 
@@ -149,7 +173,7 @@ export default function NavBar() {
             onClick={() => signOut({ callbackUrl: "/" })}
             className="text-sm bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded transition"
           >
-            Log out
+            {t("logout")}
           </button>
         </div>
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { getDailyTotals, getDaysInMonth, toDateKey } from "@/lib/points-utils";
 
 type PointEntry = {
@@ -21,6 +22,7 @@ export default function PointsProgression({
   year,
 }: PointsProgressionProps) {
   const [today, setToday] = useState<Date | null>(null);
+  const t = useTranslations("points");
 
   useEffect(() => {
     setToday(new Date());
@@ -139,12 +141,12 @@ export default function PointsProgression({
   return (
     <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-bold text-gray-800">Daily Progress</h3>
+        <h3 className="text-lg font-bold text-gray-800">{t("dailyProgress")}</h3>
         <div className="text-right">
           <span className="text-2xl font-bold text-blue-600">
             {totalThisMonth}
           </span>
-          <span className="text-sm text-gray-500 ml-1">pts this month</span>
+          <span className="text-sm text-gray-500 ml-1">{t("ptsThisMonth")}</span>
         </div>
       </div>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 type PointEntry = {
   id: string;
@@ -19,6 +20,8 @@ type PointsHistoryProps = {
 export default function PointsHistory({ kidId }: PointsHistoryProps) {
   const [entries, setEntries] = useState<PointEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const t = useTranslations("history");
+  const tCommon = useTranslations("common");
 
   useEffect(() => {
     fetchPoints();
@@ -39,14 +42,14 @@ export default function PointsHistory({ kidId }: PointsHistoryProps) {
   };
 
   if (loading) {
-    return <div className="text-center py-8">Loading...</div>;
+    return <div className="text-center py-8">{tCommon("loading")}</div>;
   }
 
   if (entries.length === 0) {
     return (
       <div className="text-center py-12 bg-white rounded-lg shadow">
         <p className="text-gray-500">
-          No point entries yet. Complete chores to start earning points!
+          {t("noEntries")}
         </p>
       </div>
     );
@@ -58,16 +61,16 @@ export default function PointsHistory({ kidId }: PointsHistoryProps) {
         <thead className="bg-gray-50">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Date
+              {t("date")}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Chore
+              {t("chore")}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Points
+              {t("pointsColumn")}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Note
+              {t("note")}
             </th>
           </tr>
         </thead>
@@ -93,7 +96,7 @@ export default function PointsHistory({ kidId }: PointsHistoryProps) {
               <td className="px-6 py-4 text-sm text-gray-500">
                 {entry.redemption ? (
                   <span className="text-purple-600">
-                    Redeemed: {entry.redemption.reward.title}
+                    {t("redeemed")} {entry.redemption.reward.title}
                   </span>
                 ) : (
                   entry.note || "-"

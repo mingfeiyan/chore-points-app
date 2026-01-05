@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 type Chore = {
   id: string;
@@ -99,6 +100,8 @@ function getIconForChore(title: string, icon: string | null): string {
 export default function ChoreFlashcards() {
   const [chores, setChores] = useState<Chore[]>([]);
   const [loading, setLoading] = useState(true);
+  const t = useTranslations("chores");
+  const tCommon = useTranslations("common");
 
   useEffect(() => {
     fetchChores();
@@ -134,9 +137,9 @@ export default function ChoreFlashcards() {
   if (chores.length === 0) {
     return (
       <div className="text-center py-8 bg-white rounded-lg shadow">
-        <p className="text-gray-500">No chores available yet.</p>
+        <p className="text-gray-500">{t("noChoresYet")}</p>
         <p className="text-sm text-gray-400 mt-1">
-          Ask your parents to add some chores!
+          {t("askParents")}
         </p>
       </div>
     );
@@ -177,7 +180,7 @@ export default function ChoreFlashcards() {
             {/* Points Badge */}
             <div className="mt-auto">
               <span className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold">
-                +{chore.defaultPoints} pts
+                +{chore.defaultPoints} {tCommon("points")}
               </span>
             </div>
           </div>

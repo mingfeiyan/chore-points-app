@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import {
   getDailyTotals,
   getDayIndicator,
@@ -19,26 +20,14 @@ type PointsCalendarProps = {
   entries: PointEntry[];
 };
 
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-
 export default function PointsCalendar({ entries }: PointsCalendarProps) {
   const [today, setToday] = useState<Date | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const t = useTranslations("calendar");
+
+  const weekdays = t.raw("weekdays") as string[];
+  const months = t.raw("months") as string[];
 
   useEffect(() => {
     setToday(new Date());
@@ -96,7 +85,7 @@ export default function PointsCalendar({ entries }: PointsCalendarProps) {
         <button
           onClick={goToPrevMonth}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          aria-label="Previous month"
+          aria-label={t("previousMonth")}
         >
           <svg
             className="w-5 h-5 text-gray-600"
@@ -113,12 +102,12 @@ export default function PointsCalendar({ entries }: PointsCalendarProps) {
           </svg>
         </button>
         <h3 className="text-lg font-bold text-gray-800">
-          {MONTHS[currentMonth]} {currentYear}
+          {months[currentMonth]} {currentYear}
         </h3>
         <button
           onClick={goToNextMonth}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          aria-label="Next month"
+          aria-label={t("nextMonth")}
         >
           <svg
             className="w-5 h-5 text-gray-600"
@@ -140,19 +129,19 @@ export default function PointsCalendar({ entries }: PointsCalendarProps) {
       <div className="flex justify-center gap-4 mb-4 text-sm">
         <div className="flex items-center gap-1">
           <span className="text-xl">🔥</span>
-          <span className="text-gray-600">&gt;10 pts</span>
+          <span className="text-gray-600">{t("moreThan10")}</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="text-xl">⭐</span>
-          <span className="text-gray-600">1+ pts</span>
+          <span className="text-gray-600">{t("oneOrMore")}</span>
         </div>
       </div>
 
       {/* Weekday headers */}
       <div className="grid grid-cols-7 gap-1 mb-2">
-        {WEEKDAYS.map((day) => (
+        {weekdays.map((day, index) => (
           <div
-            key={day}
+            key={index}
             className="text-center text-xs font-medium text-gray-500 py-1"
           >
             {day}

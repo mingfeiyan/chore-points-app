@@ -4,6 +4,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -16,29 +17,32 @@ export default function SignupPage() {
   const [registrationSecret, setRegistrationSecret] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const t = useTranslations("auth");
+  const tNav = useTranslations("nav");
+  const tCommon = useTranslations("common");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError(t("passwordsMismatch"));
       return;
     }
 
     if (password.length < 6) {
-      setError("Password must be at least 6 characters");
+      setError(t("passwordTooShort"));
       return;
     }
 
     if (mode === "kid" && !inviteCode.trim()) {
-      setError("Invite code is required to sign up as a kid");
+      setError(t("inviteCodeRequired"));
       return;
     }
 
     // Parent needs either invite code OR registration secret
     if (mode === "parent" && !inviteCode.trim() && !registrationSecret.trim()) {
-      setError("Either an invite code or registration code is required");
+      setError(t("codeRequired"));
       return;
     }
 
@@ -61,7 +65,7 @@ export default function SignupPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Something went wrong");
+        setError(data.error || tCommon("error"));
         setLoading(false);
         return;
       }
@@ -74,13 +78,13 @@ export default function SignupPage() {
       });
 
       if (result?.error) {
-        setError("Account created but sign in failed. Please try logging in.");
+        setError(t("accountCreatedSignInFailed"));
       } else {
         router.push("/dashboard");
         router.refresh();
       }
-    } catch (error) {
-      setError("Something went wrong");
+    } catch {
+      setError(tCommon("error"));
     } finally {
       setLoading(false);
     }
@@ -93,10 +97,10 @@ export default function SignupPage() {
         <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow">
           <div>
             <h2 className="text-center text-3xl font-bold text-gray-900">
-              Chore Points
+              {tNav("appName")}
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600">
-              How would you like to sign up?
+              {t("howSignUp")}
             </p>
           </div>
 
@@ -119,10 +123,10 @@ export default function SignupPage() {
                 />
               </svg>
               <span className="text-lg font-medium text-gray-900">
-                I'm a Parent
+                {t("imParent")}
               </span>
               <span className="text-sm text-gray-500 mt-1">
-                Create a family and manage chores
+                {t("createFamily")}
               </span>
             </button>
 
@@ -144,18 +148,18 @@ export default function SignupPage() {
                 />
               </svg>
               <span className="text-lg font-medium text-gray-900">
-                I'm a Kid
+                {t("imKid")}
               </span>
               <span className="text-sm text-gray-500 mt-1">
-                Join with an invite code from your parent
+                {t("joinWithCode")}
               </span>
             </button>
           </div>
 
           <div className="text-center text-sm">
-            <span className="text-gray-600">Already have an account? </span>
+            <span className="text-gray-600">{t("alreadyHaveAccount")} </span>
             <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
-              Sign in
+              {t("signIn")}
             </Link>
           </div>
         </div>
@@ -188,15 +192,15 @@ export default function SignupPage() {
                 d="M15 19l-7-7 7-7"
               />
             </svg>
-            Back
+            {tCommon("back")}
           </button>
           <h2 className="mt-4 text-center text-3xl font-bold text-gray-900">
-            {mode === "parent" ? "Parent Sign Up" : "Kid Sign Up"}
+            {mode === "parent" ? t("parentSignUp") : t("kidSignUp")}
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             {mode === "parent"
-              ? "Create your account to start managing chores"
-              : "Join your family with an invite code"}
+              ? t("createAccount")
+              : t("joinFamily")}
           </p>
         </div>
 
@@ -211,7 +215,7 @@ export default function SignupPage() {
             {/* Invite code field - required for kids, optional for parents */}
             <div>
               <label htmlFor="inviteCode" className="block text-sm font-medium text-gray-700">
-                Family Invite Code {mode === "kid" && <span className="text-red-500">*</span>}
+                {t("inviteCode")} {mode === "kid" && <span className="text-red-500">*</span>}
                 {mode === "parent" && <span className="text-gray-400 text-xs ml-1">(optional)</span>}
               </label>
               <input
@@ -220,7 +224,7 @@ export default function SignupPage() {
                 required={mode === "kid"}
                 value={inviteCode}
                 onChange={(e) => setInviteCode(e.target.value)}
-                placeholder={mode === "kid" ? "Enter the code from your parent" : "Enter code to join existing family"}
+                placeholder={t("inviteCodeHelper")}
                 className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none font-mono ${
                   mode === "kid"
                     ? "focus:ring-green-500 focus:border-green-500"
@@ -228,9 +232,7 @@ export default function SignupPage() {
                 }`}
               />
               <p className="mt-1 text-xs text-gray-500">
-                {mode === "kid"
-                  ? "Ask your parent for the invite code from their dashboard"
-                  : "Have an invite code? Enter it to join an existing family"}
+                {t("inviteCodeHelper")}
               </p>
             </div>
 
@@ -238,7 +240,7 @@ export default function SignupPage() {
             {mode === "parent" && !inviteCode.trim() && (
               <div>
                 <label htmlFor="registrationSecret" className="block text-sm font-medium text-gray-700">
-                  Registration Code <span className="text-red-500">*</span>
+                  {t("registrationCode")} <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="registrationSecret"
@@ -246,32 +248,31 @@ export default function SignupPage() {
                   required
                   value={registrationSecret}
                   onChange={(e) => setRegistrationSecret(e.target.value)}
-                  placeholder="Enter the registration code"
+                  placeholder={t("registrationCode")}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 />
                 <p className="mt-1 text-xs text-gray-500">
-                  Required to create a new family. Contact the administrator for this code.
+                  {t("registrationCodeHelper")}
                 </p>
               </div>
             )}
 
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Name
+                {t("name")}
               </label>
               <input
                 id="name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Your name"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email <span className="text-red-500">*</span>
+                {t("email")} <span className="text-red-500">*</span>
               </label>
               <input
                 id="email"
@@ -285,7 +286,7 @@ export default function SignupPage() {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password <span className="text-red-500">*</span>
+                {t("password")} <span className="text-red-500">*</span>
               </label>
               <input
                 id="password"
@@ -299,7 +300,7 @@ export default function SignupPage() {
 
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirm Password <span className="text-red-500">*</span>
+                {t("confirmPassword")} <span className="text-red-500">*</span>
               </label>
               <input
                 id="confirmPassword"
@@ -322,16 +323,16 @@ export default function SignupPage() {
             }`}
           >
             {loading
-              ? "Creating account..."
+              ? t("creatingAccount")
               : mode === "kid"
-              ? "Join Family"
-              : "Sign up"}
+              ? t("joinFamilyButton")
+              : t("signUp")}
           </button>
 
           <div className="text-center text-sm">
-            <span className="text-gray-600">Already have an account? </span>
+            <span className="text-gray-600">{t("alreadyHaveAccount")} </span>
             <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
-              Sign in
+              {t("signIn")}
             </Link>
           </div>
         </form>

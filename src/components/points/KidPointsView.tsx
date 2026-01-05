@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import ChoreFlashcards from "@/components/chores/ChoreFlashcards";
 import PointsCalendar from "@/components/points/PointsCalendar";
 import PointsProgression from "@/components/points/PointsProgression";
@@ -20,6 +21,8 @@ export default function KidPointsView({ kidId }: KidPointsViewProps) {
   const [totalPoints, setTotalPoints] = useState(0);
   const [entries, setEntries] = useState<PointEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const t = useTranslations("points");
+  const tCommon = useTranslations("common");
 
   const today = new Date();
   const currentMonth = today.getMonth();
@@ -45,7 +48,7 @@ export default function KidPointsView({ kidId }: KidPointsViewProps) {
   };
 
   if (loading) {
-    return <div className="text-center py-8">Loading...</div>;
+    return <div className="text-center py-8">{tCommon("loading")}</div>;
   }
 
   return (
@@ -54,16 +57,16 @@ export default function KidPointsView({ kidId }: KidPointsViewProps) {
       <div className="mb-8">
         <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl shadow-lg p-8 text-white">
           <div className="text-center">
-            <p className="text-lg font-medium opacity-90">My Points</p>
+            <p className="text-lg font-medium opacity-90">{t("myPoints")}</p>
             <p className="text-7xl font-bold mt-2">{totalPoints}</p>
             <p className="text-sm mt-4 opacity-75">
-              Keep up the great work!
+              {t("keepUpGreatWork")}
             </p>
             <Link
               href="/points/history"
               className="inline-block mt-4 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-medium transition-colors"
             >
-              View History
+              {t("viewHistory")}
             </Link>
           </div>
         </div>
@@ -72,7 +75,7 @@ export default function KidPointsView({ kidId }: KidPointsViewProps) {
       {/* Chore Flashcards Section */}
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          Chores You Can Do
+          {t("choresYouCanDo")}
         </h2>
         <ChoreFlashcards />
       </div>
@@ -82,7 +85,7 @@ export default function KidPointsView({ kidId }: KidPointsViewProps) {
         {/* Calendar View */}
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            My Calendar
+            {t("myCalendar")}
           </h2>
           <PointsCalendar entries={entries} />
         </div>
@@ -90,7 +93,7 @@ export default function KidPointsView({ kidId }: KidPointsViewProps) {
         {/* Progression Chart */}
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            This Month
+            {t("thisMonth")}
           </h2>
           <PointsProgression
             entries={entries}
