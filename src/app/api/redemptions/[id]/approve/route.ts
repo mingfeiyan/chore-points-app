@@ -49,7 +49,7 @@ export async function PUT(
       },
     });
 
-    const totalPoints = pointEntries.reduce((sum: number, entry) => sum + entry.points, 0);
+    const totalPoints = pointEntries.reduce((sum: number, entry: { points: number }) => sum + entry.points, 0);
 
     if (totalPoints < redemption.reward.costPoints) {
       return NextResponse.json(
