@@ -10,7 +10,7 @@
     "point": "pt"
   },
   "nav": {
-    "appName": "StarSteps",
+    "appName": "GemSteps",
     "login": "Log in",
     "signup": "Sign up",
     "logout": "Log out",
@@ -86,7 +86,7 @@
     "redemptionFailed": "Failed to request redemption"
   },
   "home": {
-    "tagline": "Build great habits, earn stars, unlock rewards!",
+    "tagline": "Build great habits, earn gems, unlock rewards!",
     "getStarted": "Get Started",
     "signIn": "Sign In"
   },

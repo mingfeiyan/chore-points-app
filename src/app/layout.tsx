@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "StarSteps - Build Great Habits",
-  description: "Track progress, earn stars, and build lasting habits",
+  title: "GemSteps - Build Great Habits",
+  description: "Track progress, earn gems, and build lasting habits",
 };
 
 export default function RootLayout({

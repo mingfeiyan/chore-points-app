@@ -10,7 +10,7 @@
     "point": "分"
   },
   "nav": {
-    "appName": "星步",
+    "appName": "宝石步",
     "login": "登录",
     "signup": "注册",
     "logout": "退出",
@@ -86,7 +86,7 @@
     "redemptionFailed": "兑换申请失败"
   },
   "home": {
-    "tagline": "养成好习惯，赚取星星，兑换奖励！",
+    "tagline": "养成好习惯，赚取宝石，兑换奖励！",
     "getStarted": "开始使用",
     "signIn": "登录"
   },
