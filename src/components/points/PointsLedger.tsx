@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import PointEntryForm from "./PointEntryForm";
 
 type Kid = {
@@ -28,6 +29,9 @@ export default function PointsLedger() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingEntry, setEditingEntry] = useState<PointEntry | null>(null);
+  const t = useTranslations("parent");
+  const tCommon = useTranslations("common");
+  const tHistory = useTranslations("history");
 
   useEffect(() => {
     fetchKids();
@@ -68,7 +72,7 @@ export default function PointsLedger() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this entry?")) return;
+    if (!confirm(t("confirmDeleteEntry"))) return;
 
     try {
       const response = await fetch(`/api/points/${id}`, {
@@ -101,14 +105,14 @@ export default function PointsLedger() {
   };
 
   if (loading) {
-    return <div className="text-center py-8">Loading...</div>;
+    return <div className="text-center py-8">{tCommon("loading")}</div>;
   }
 
   if (kids.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow p-8 text-center">
         <p className="text-gray-500">
-          No kids in your family yet. Add a kid using the invite code.
+          {t("noKidsInFamily")}
         </p>
       </div>
     );
@@ -119,7 +123,7 @@ export default function PointsLedger() {
       <div className="mb-6 flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <label className="text-sm font-medium text-gray-700">
-            Select Kid:
+            {t("selectKid")}
           </label>
           <select
             value={selectedKid?.id || ""}
@@ -139,7 +143,7 @@ export default function PointsLedger() {
           {selectedKid && (
             <div className="ml-6 flex items-center">
               <span className="text-2xl font-bold text-blue-600">
-                {totalPoints} points
+                {totalPoints} {tCommon("points")}
               </span>
             </div>
           )}
@@ -150,14 +154,14 @@ export default function PointsLedger() {
           disabled={!selectedKid}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          + Add Points
+          {t("addPoints")}
         </button>
       </div>
 
       {selectedKid && entries.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg shadow">
           <p className="text-gray-500">
-            No point entries yet. Add points to get started!
+            {t("noPointEntries")}
           </p>
         </div>
       ) : (
@@ -166,22 +170,22 @@ export default function PointsLedger() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
+                  {t("date")}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Chore
+                  {tHistory("chore")}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Points
+                  {tCommon("points")}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Note
+                  {t("note")}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Added By
+                  {t("addedBy")}
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  {t("actions")}
                 </th>
               </tr>
             </thead>
@@ -209,7 +213,7 @@ export default function PointsLedger() {
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {entry.redemption ? (
                       <span className="text-purple-600">
-                        Redeemed: {entry.redemption.reward.title}
+                        {tHistory("redeemed")} {entry.redemption.reward.title}
                       </span>
                     ) : (
                       entry.note || "-"
@@ -225,13 +229,13 @@ export default function PointsLedger() {
                           onClick={() => handleEdit(entry)}
                           className="text-blue-600 hover:text-blue-900"
                         >
-                          Edit
+                          {t("edit")}
                         </button>
                         <button
                           onClick={() => handleDelete(entry.id)}
                           className="text-red-600 hover:text-red-900"
                         >
-                          Delete
+                          {t("delete")}
                         </button>
                       </>
                     )}

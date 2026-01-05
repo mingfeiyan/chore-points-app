@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 type Chore = {
   id: string;
@@ -36,6 +37,8 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const t = useTranslations("parent");
+  const tCommon = useTranslations("common");
 
   useEffect(() => {
     if (chore) {
@@ -51,7 +54,7 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
 
     const points = parseInt(defaultPoints);
     if (isNaN(points) || points < 0) {
-      setError("Points must be a non-negative number");
+      setError(t("pointsNonNegative"));
       return;
     }
 
@@ -74,14 +77,14 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Something went wrong");
+        setError(data.error || tCommon("error"));
         setLoading(false);
         return;
       }
 
       onSuccess(data.chore);
-    } catch (error) {
-      setError("Something went wrong");
+    } catch {
+      setError(tCommon("error"));
       setLoading(false);
     }
   };
@@ -91,7 +94,7 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
       <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-gray-900">
-            {chore ? "Edit Chore" : "Add Chore"}
+            {chore ? t("editChore") : t("addChoreTitle")}
           </h2>
           <button
             onClick={onClose}
@@ -125,7 +128,7 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
               htmlFor="title"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Chore Name
+              {t("choreName")}
             </label>
             <input
               id="title"
@@ -140,7 +143,7 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Icon (for kids to recognize)
+              {t("iconLabel")}
             </label>
             <div className="flex items-center gap-2">
               <button
@@ -156,11 +159,11 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
                   onClick={() => setIcon("")}
                   className="text-sm text-gray-500 hover:text-red-500"
                 >
-                  Clear
+                  {t("clear")}
                 </button>
               )}
               <span className="text-sm text-gray-500 ml-2">
-                {icon ? "Click to change" : "Click to pick an icon"}
+                {icon ? t("clickToChange") : t("clickToPick")}
               </span>
             </div>
 
@@ -185,7 +188,7 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
                 </div>
                 <div className="mt-3 pt-3 border-t border-gray-200">
                   <label className="block text-xs text-gray-500 mb-1">
-                    Or type any emoji:
+                    {t("orTypeEmoji")}
                   </label>
                   <input
                     type="text"
@@ -199,7 +202,7 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
               </div>
             )}
             <p className="mt-1 text-xs text-gray-500">
-              Icons help kids identify chores without reading
+              {t("iconHelp")}
             </p>
           </div>
 
@@ -208,7 +211,7 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
               htmlFor="defaultPoints"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Default Points
+              {t("defaultPoints")}
             </label>
             <input
               id="defaultPoints"
@@ -221,7 +224,7 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
             <p className="mt-1 text-sm text-gray-500">
-              Points awarded when this chore is completed
+              {t("pointsAwarded")}
             </p>
           </div>
 
@@ -231,14 +234,14 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
               onClick={onClose}
               className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium"
             >
-              Cancel
+              {tCommon("cancel")}
             </button>
             <button
               type="submit"
               disabled={loading}
               className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Saving..." : chore ? "Update" : "Create"}
+              {loading ? t("saving") : chore ? t("update") : t("create")}
             </button>
           </div>
         </form>

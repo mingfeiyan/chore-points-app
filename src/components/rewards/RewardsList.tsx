@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import RewardForm from "./RewardForm";
 
 type Reward = {
@@ -29,6 +30,8 @@ export default function RewardsList() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingReward, setEditingReward] = useState<Reward | null>(null);
+  const t = useTranslations("parent");
+  const tCommon = useTranslations("common");
 
   useEffect(() => {
     fetchRewards();
@@ -62,7 +65,7 @@ export default function RewardsList() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this reward?")) return;
+    if (!confirm(t("confirmDeleteReward"))) return;
 
     try {
       const response = await fetch(`/api/rewards/${id}`, {
@@ -101,7 +104,7 @@ export default function RewardsList() {
   };
 
   const handleApprove = async (redemptionId: string) => {
-    if (!confirm("Approve this redemption? Points will be deducted.")) return;
+    if (!confirm(t("confirmApprove"))) return;
 
     try {
       const response = await fetch(`/api/redemptions/${redemptionId}/approve`, {
@@ -112,18 +115,18 @@ export default function RewardsList() {
 
       if (response.ok) {
         setRedemptions(redemptions.filter((r) => r.id !== redemptionId));
-        alert("Redemption approved!");
+        alert(t("redemptionApproved"));
       } else {
-        alert(data.error || "Failed to approve redemption");
+        alert(data.error || t("failedApprove"));
       }
     } catch (error) {
       console.error("Failed to approve redemption:", error);
-      alert("Failed to approve redemption");
+      alert(t("failedApprove"));
     }
   };
 
   const handleDeny = async (redemptionId: string) => {
-    if (!confirm("Deny this redemption request?")) return;
+    if (!confirm(t("confirmDeny"))) return;
 
     try {
       const response = await fetch(`/api/redemptions/${redemptionId}/deny`, {
@@ -134,18 +137,18 @@ export default function RewardsList() {
 
       if (response.ok) {
         setRedemptions(redemptions.filter((r) => r.id !== redemptionId));
-        alert("Redemption denied");
+        alert(t("redemptionDenied"));
       } else {
-        alert(data.error || "Failed to deny redemption");
+        alert(data.error || t("failedDeny"));
       }
     } catch (error) {
       console.error("Failed to deny redemption:", error);
-      alert("Failed to deny redemption");
+      alert(t("failedDeny"));
     }
   };
 
   if (loading) {
-    return <div className="text-center py-8">Loading rewards...</div>;
+    return <div className="text-center py-8">{tCommon("loading")}</div>;
   }
 
   return (
@@ -154,7 +157,7 @@ export default function RewardsList() {
       {redemptions.length > 0 && (
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Pending Redemption Requests ({redemptions.length})
+            {t("pendingRedemptions")} ({redemptions.length})
           </h2>
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
             <div className="space-y-4">
@@ -168,10 +171,10 @@ export default function RewardsList() {
                       {redemption.reward.title}
                     </h3>
                     <p className="text-sm text-gray-600">
-                      Requested by: {redemption.kid.name || redemption.kid.email}
+                      {t("requestedBy")} {redemption.kid.name || redemption.kid.email}
                     </p>
                     <p className="text-sm text-gray-500">
-                      Cost: {redemption.reward.costPoints} points •{" "}
+                      {t("costLabel")} {redemption.reward.costPoints} {tCommon("points")} •{" "}
                       {new Date(redemption.requestedAt).toLocaleDateString()}
                     </p>
                   </div>
@@ -180,13 +183,13 @@ export default function RewardsList() {
                       onClick={() => handleApprove(redemption.id)}
                       className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 font-medium"
                     >
-                      Approve
+                      {t("approve")}
                     </button>
                     <button
                       onClick={() => handleDeny(redemption.id)}
                       className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium"
                     >
-                      Deny
+                      {t("deny")}
                     </button>
                   </div>
                 </div>
@@ -198,19 +201,19 @@ export default function RewardsList() {
 
       {/* Rewards Management Section */}
       <div className="mb-6 flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Rewards Catalog</h2>
+        <h2 className="text-2xl font-bold text-gray-900">{t("rewardsCatalog")}</h2>
         <button
           onClick={() => setShowForm(true)}
           className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium"
         >
-          + Add Reward
+          {t("addReward")}
         </button>
       </div>
 
       {rewards.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg shadow">
           <p className="text-gray-500">
-            No rewards yet. Add rewards for kids to redeem!
+            {t("noRewardsYet")}
           </p>
         </div>
       ) : (
@@ -239,20 +242,20 @@ export default function RewardsList() {
                   </span>
                 </div>
                 <div className="text-xs text-gray-500 mb-4">
-                  Created by {reward.createdBy.name || reward.createdBy.email}
+                  {t("createdByLabel")} {reward.createdBy.name || reward.createdBy.email}
                 </div>
                 <div className="flex space-x-2">
                   <button
                     onClick={() => handleEdit(reward)}
                     className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium"
                   >
-                    Edit
+                    {t("edit")}
                   </button>
                   <button
                     onClick={() => handleDelete(reward.id)}
                     className="flex-1 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm font-medium"
                   >
-                    Delete
+                    {t("delete")}
                   </button>
                 </div>
               </div>

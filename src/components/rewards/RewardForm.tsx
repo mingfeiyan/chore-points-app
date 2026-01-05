@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 type Reward = {
   id: string;
@@ -30,6 +31,8 @@ export default function RewardForm({
   const [imageUrl, setImageUrl] = useState(reward?.imageUrl || "");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const t = useTranslations("parent");
+  const tCommon = useTranslations("common");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,12 +40,12 @@ export default function RewardForm({
 
     const points = parseInt(costPoints);
     if (isNaN(points) || points <= 0) {
-      setError("Cost points must be a positive number");
+      setError(t("costPositive"));
       return;
     }
 
     if (!title.trim()) {
-      setError("Title is required");
+      setError(t("titleRequired"));
       return;
     }
 
@@ -65,14 +68,14 @@ export default function RewardForm({
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Something went wrong");
+        setError(data.error || tCommon("error"));
         setLoading(false);
         return;
       }
 
       onSuccess(data.reward);
-    } catch (error) {
-      setError("Something went wrong");
+    } catch {
+      setError(tCommon("error"));
       setLoading(false);
     }
   };
@@ -82,7 +85,7 @@ export default function RewardForm({
       <div className="bg-white rounded-lg p-6 w-full max-w-md">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-gray-900">
-            {reward ? "Edit Reward" : "Add Reward"}
+            {reward ? t("editReward") : t("addRewardTitle")}
           </h2>
           <button
             onClick={onClose}
@@ -116,7 +119,7 @@ export default function RewardForm({
               htmlFor="title"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Reward Title
+              {t("rewardTitle")}
             </label>
             <input
               id="title"
@@ -134,7 +137,7 @@ export default function RewardForm({
               htmlFor="costPoints"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Cost (Points)
+              {t("costPoints")}
             </label>
             <input
               id="costPoints"
@@ -153,7 +156,7 @@ export default function RewardForm({
               htmlFor="imageUrl"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Image URL (optional)
+              {t("imageUrl")}
             </label>
             <input
               id="imageUrl"
@@ -164,7 +167,7 @@ export default function RewardForm({
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
             <p className="mt-1 text-sm text-gray-500">
-              Optional: Add an image URL to make the reward more appealing
+              {t("imageUrlHelp")}
             </p>
           </div>
 
@@ -174,14 +177,14 @@ export default function RewardForm({
               onClick={onClose}
               className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium"
             >
-              Cancel
+              {tCommon("cancel")}
             </button>
             <button
               type="submit"
               disabled={loading}
               className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Saving..." : reward ? "Update" : "Add"}
+              {loading ? t("saving") : reward ? t("update") : t("add")}
             </button>
           </div>
         </form>

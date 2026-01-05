@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import ChoreForm from "./ChoreForm";
 
 type Chore = {
@@ -21,6 +22,8 @@ export default function ChoresList() {
   const [showForm, setShowForm] = useState(false);
   const [editingChore, setEditingChore] = useState<Chore | null>(null);
   const [filter, setFilter] = useState<"all" | "active" | "archived">("active");
+  const t = useTranslations("parent");
+  const tCommon = useTranslations("common");
 
   useEffect(() => {
     fetchChores();
@@ -41,7 +44,7 @@ export default function ChoresList() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this chore?")) return;
+    if (!confirm(t("confirmDeleteChore"))) return;
 
     try {
       const response = await fetch(`/api/chores/${id}`, {
@@ -99,7 +102,7 @@ export default function ChoresList() {
   });
 
   if (loading) {
-    return <div className="text-center py-8">Loading chores...</div>;
+    return <div className="text-center py-8">{tCommon("loading")}</div>;
   }
 
   return (
@@ -114,7 +117,7 @@ export default function ChoresList() {
                 : "bg-white text-gray-700 hover:bg-gray-50"
             }`}
           >
-            Active
+            {t("active")}
           </button>
           <button
             onClick={() => setFilter("archived")}
@@ -124,7 +127,7 @@ export default function ChoresList() {
                 : "bg-white text-gray-700 hover:bg-gray-50"
             }`}
           >
-            Archived
+            {t("archived")}
           </button>
           <button
             onClick={() => setFilter("all")}
@@ -142,7 +145,7 @@ export default function ChoresList() {
           onClick={() => setShowForm(true)}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
         >
-          + Add Chore
+          {t("addChore")}
         </button>
       </div>
 
@@ -150,10 +153,10 @@ export default function ChoresList() {
         <div className="text-center py-12 bg-white rounded-lg shadow">
           <p className="text-gray-500">
             {filter === "active"
-              ? "No active chores. Add one to get started!"
+              ? t("noActiveChores")
               : filter === "archived"
-              ? "No archived chores."
-              : "No chores yet. Add one to get started!"}
+              ? t("noArchivedChores")
+              : t("noChoresYet")}
           </p>
         </div>
       ) : (
@@ -162,19 +165,19 @@ export default function ChoresList() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Chore
+                  {t("chore")}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Points
+                  {tCommon("points")}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
+                  {t("status")}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Created By
+                  {t("createdBy")}
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  {t("actions")}
                 </th>
               </tr>
             </thead>
@@ -191,7 +194,7 @@ export default function ChoresList() {
                       </div>
                     </div>
                     <div className="text-xs text-gray-500">
-                      Last updated by{" "}
+                      {t("lastUpdatedBy")}{" "}
                       {chore.updatedBy.name || chore.updatedBy.email}
                     </div>
                   </td>
@@ -208,7 +211,7 @@ export default function ChoresList() {
                           : "bg-gray-100 text-gray-800"
                       }`}
                     >
-                      {chore.isActive ? "Active" : "Archived"}
+                      {chore.isActive ? t("active") : t("archived")}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -219,19 +222,19 @@ export default function ChoresList() {
                       onClick={() => handleEdit(chore)}
                       className="text-blue-600 hover:text-blue-900"
                     >
-                      Edit
+                      {t("edit")}
                     </button>
                     <button
                       onClick={() => handleToggleActive(chore)}
                       className="text-yellow-600 hover:text-yellow-900"
                     >
-                      {chore.isActive ? "Archive" : "Activate"}
+                      {chore.isActive ? t("archive") : t("activate")}
                     </button>
                     <button
                       onClick={() => handleDelete(chore.id)}
                       className="text-red-600 hover:text-red-900"
                     >
-                      Delete
+                      {t("delete")}
                     </button>
                   </td>
                 </tr>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export default function FamilyInviteCode({ inviteCode: initialCode }: { inviteCode: string }) {
   const router = useRouter();
@@ -9,6 +10,7 @@ export default function FamilyInviteCode({ inviteCode: initialCode }: { inviteCo
   const [copied, setCopied] = useState(false);
   const [showCode, setShowCode] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const t = useTranslations("family");
 
   const handleCopy = async () => {
     try {
@@ -51,7 +53,7 @@ export default function FamilyInviteCode({ inviteCode: initialCode }: { inviteCo
 
   return (
     <div className="flex flex-col items-end gap-2">
-      <div className="text-sm text-gray-500">Family Invite Code</div>
+      <div className="text-sm text-gray-500">{t("familyInviteCode")}</div>
       <div className="flex items-center gap-2">
         {showCode ? (
           <code className="bg-gray-100 px-3 py-1.5 rounded font-mono text-sm tracking-wider">
@@ -62,7 +64,7 @@ export default function FamilyInviteCode({ inviteCode: initialCode }: { inviteCo
             onClick={() => setShowCode(true)}
             className="text-blue-600 hover:text-blue-800 text-sm"
           >
-            Show code
+            {t("showCode")}
           </button>
         )}
         <button
@@ -73,13 +75,13 @@ export default function FamilyInviteCode({ inviteCode: initialCode }: { inviteCo
               : "bg-blue-100 text-blue-700 hover:bg-blue-200"
           }`}
         >
-          {copied ? "Copied!" : "Copy"}
+          {copied ? t("copied") : t("copy")}
         </button>
         <button
           onClick={handleRefresh}
           disabled={refreshing}
           className="px-3 py-1.5 rounded text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors disabled:opacity-50"
-          title="Generate new code"
+          title={t("generateNewCode")}
         >
           {refreshing ? (
             <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -95,7 +97,7 @@ export default function FamilyInviteCode({ inviteCode: initialCode }: { inviteCo
       </div>
       {showCode && (
         <p className="text-xs text-gray-400">
-          Share this code to invite family members
+          {t("shareCodeHint")}
         </p>
       )}
     </div>

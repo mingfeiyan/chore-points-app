@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 
 type User = {
   id: string;
@@ -19,6 +20,8 @@ export default function FamilySetup({ user }: { user: User }) {
   const [inviteCode, setInviteCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const t = useTranslations("family");
+  const tCommon = useTranslations("common");
 
   const handleCreateFamily = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +38,7 @@ export default function FamilySetup({ user }: { user: User }) {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Failed to create family");
+        setError(data.error || t("failedToCreateFamily"));
         setLoading(false);
         return;
       }
@@ -46,7 +49,7 @@ export default function FamilySetup({ user }: { user: User }) {
       router.push("/dashboard");
       router.refresh();
     } catch (error) {
-      setError("Something went wrong");
+      setError(tCommon("somethingWentWrong"));
       setLoading(false);
     }
   };
@@ -66,7 +69,7 @@ export default function FamilySetup({ user }: { user: User }) {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Failed to join family");
+        setError(data.error || t("failedToJoinFamily"));
         setLoading(false);
         return;
       }
@@ -80,7 +83,7 @@ export default function FamilySetup({ user }: { user: User }) {
       router.push("/dashboard");
       router.refresh();
     } catch (error) {
-      setError("Something went wrong");
+      setError(tCommon("somethingWentWrong"));
       setLoading(false);
     }
   };
@@ -91,10 +94,10 @@ export default function FamilySetup({ user }: { user: User }) {
         <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow">
           <div>
             <h2 className="text-center text-3xl font-bold text-gray-900">
-              Welcome to Chore Points!
+              {t("welcome")}
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600">
-              Let's set up your family
+              {t("letsSetup")}
             </p>
           </div>
 
@@ -117,10 +120,10 @@ export default function FamilySetup({ user }: { user: User }) {
                 />
               </svg>
               <span className="text-lg font-medium text-gray-900">
-                Create a Family
+                {t("createFamily")}
               </span>
               <span className="text-sm text-gray-500 mt-1">
-                Start fresh as a parent
+                {t("startFreshAsParent")}
               </span>
             </button>
 
@@ -142,10 +145,10 @@ export default function FamilySetup({ user }: { user: User }) {
                 />
               </svg>
               <span className="text-lg font-medium text-gray-900">
-                Join a Family
+                {t("joinFamily")}
               </span>
               <span className="text-sm text-gray-500 mt-1">
-                Use an invite code
+                {t("useInviteCode")}
               </span>
             </button>
           </div>
@@ -176,13 +179,13 @@ export default function FamilySetup({ user }: { user: User }) {
                   d="M15 19l-7-7 7-7"
                 />
               </svg>
-              Back
+              {tCommon("back")}
             </button>
             <h2 className="mt-4 text-center text-3xl font-bold text-gray-900">
-              Create Your Family
+              {t("createYourFamily")}
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600">
-              Choose a name for your family
+              {t("chooseFamilyName")}
             </p>
           </div>
 
@@ -198,7 +201,7 @@ export default function FamilySetup({ user }: { user: User }) {
                 htmlFor="familyName"
                 className="block text-sm font-medium text-gray-700"
               >
-                Family Name
+                {t("familyName")}
               </label>
               <input
                 id="familyName"
@@ -206,7 +209,7 @@ export default function FamilySetup({ user }: { user: User }) {
                 required
                 value={familyName}
                 onChange={(e) => setFamilyName(e.target.value)}
-                placeholder="e.g., The Smiths"
+                placeholder={t("familyNamePlaceholder")}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -216,7 +219,7 @@ export default function FamilySetup({ user }: { user: User }) {
               disabled={loading}
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Creating..." : "Create Family"}
+              {loading ? t("creating") : t("createFamily")}
             </button>
           </form>
         </div>
@@ -246,13 +249,13 @@ export default function FamilySetup({ user }: { user: User }) {
                 d="M15 19l-7-7 7-7"
               />
             </svg>
-            Back
+            {tCommon("back")}
           </button>
           <h2 className="mt-4 text-center text-3xl font-bold text-gray-900">
-            Join a Family
+            {t("joinFamily")}
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Enter the invite code you received
+            {t("enterInviteCode")}
           </p>
         </div>
 
@@ -268,7 +271,7 @@ export default function FamilySetup({ user }: { user: User }) {
               htmlFor="inviteCode"
               className="block text-sm font-medium text-gray-700"
             >
-              Invite Code
+              {t("inviteCode")}
             </label>
             <input
               id="inviteCode"
@@ -276,7 +279,7 @@ export default function FamilySetup({ user }: { user: User }) {
               required
               value={inviteCode}
               onChange={(e) => setInviteCode(e.target.value)}
-              placeholder="Enter invite code"
+              placeholder={t("enterInviteCodePlaceholder")}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 font-mono"
             />
           </div>
@@ -286,7 +289,7 @@ export default function FamilySetup({ user }: { user: User }) {
             disabled={loading}
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Joining..." : "Join Family"}
+            {loading ? t("joining") : t("joinFamily")}
           </button>
         </form>
       </div>

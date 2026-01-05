@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 type Chore = {
   id: string;
@@ -47,6 +48,8 @@ export default function PointEntryForm({
   );
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const t = useTranslations("parent");
+  const tCommon = useTranslations("common");
 
   useEffect(() => {
     fetchChores();
@@ -88,14 +91,14 @@ export default function PointEntryForm({
 
     if (mode === "chore") {
       if (!selectedChore) {
-        setError("Please select a chore");
+        setError(t("pleaseSelectChore"));
         return;
       }
       pointsValue = selectedChore.defaultPoints;
     } else {
       pointsValue = parseInt(customPoints);
       if (isNaN(pointsValue)) {
-        setError("Points must be a number");
+        setError(t("pointsMustBeNumber"));
         return;
       }
     }
@@ -139,7 +142,7 @@ export default function PointEntryForm({
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg p-6 w-full max-w-md">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-gray-900">Award Points</h2>
+            <h2 className="text-xl font-bold text-gray-900">{t("awardPoints")}</h2>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600"
@@ -160,7 +163,7 @@ export default function PointEntryForm({
             </button>
           </div>
 
-          <p className="text-gray-600 mb-6">How would you like to award points?</p>
+          <p className="text-gray-600 mb-6">{t("howToAwardPoints")}</p>
 
           <div className="space-y-3">
             <button
@@ -183,9 +186,9 @@ export default function PointEntryForm({
                 </svg>
               </div>
               <div>
-                <div className="font-medium text-gray-900">Completed Chore</div>
+                <div className="font-medium text-gray-900">{t("completedChore")}</div>
                 <div className="text-sm text-gray-500">
-                  Select from defined chores with set point values
+                  {t("completedChoreDesc")}
                 </div>
               </div>
             </button>
@@ -210,9 +213,9 @@ export default function PointEntryForm({
                 </svg>
               </div>
               <div>
-                <div className="font-medium text-gray-900">Custom Award</div>
+                <div className="font-medium text-gray-900">{t("customAward")}</div>
                 <div className="text-sm text-gray-500">
-                  One-time bonus or deduction with custom points
+                  {t("customAwardDesc")}
                 </div>
               </div>
             </button>
@@ -250,10 +253,10 @@ export default function PointEntryForm({
             )}
             <h2 className="text-xl font-bold text-gray-900">
               {entry
-                ? "Edit Points"
+                ? t("editPoints")
                 : mode === "chore"
-                ? "Award for Chore"
-                : "Custom Award"}
+                ? t("awardForChore")
+                : t("customAward")}
             </h2>
           </div>
           <button
@@ -290,7 +293,7 @@ export default function PointEntryForm({
                 htmlFor="chore"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Select Chore
+                {t("selectChore")}
               </label>
               <select
                 id="chore"
@@ -299,10 +302,10 @@ export default function PointEntryForm({
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="">Choose a chore...</option>
+                <option value="">{t("chooseChore")}</option>
                 {chores.map((chore) => (
                   <option key={chore.id} value={chore.id}>
-                    {chore.title} ({chore.defaultPoints} pts)
+                    {chore.title} ({chore.defaultPoints} {tCommon("pts")})
                   </option>
                 ))}
               </select>
@@ -310,7 +313,7 @@ export default function PointEntryForm({
               {selectedChore && (
                 <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-blue-700">Points to award:</span>
+                    <span className="text-sm text-blue-700">{t("pointsToAward")}</span>
                     <span className="text-lg font-bold text-blue-700">
                       +{selectedChore.defaultPoints}
                     </span>
@@ -320,7 +323,7 @@ export default function PointEntryForm({
 
               {chores.length === 0 && (
                 <p className="mt-2 text-sm text-gray-500">
-                  No chores defined yet. Create chores in the Chores page first.
+                  {t("noChoresDefinedYet")}
                 </p>
               )}
             </div>
@@ -331,7 +334,7 @@ export default function PointEntryForm({
                 htmlFor="points"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Points
+                {tCommon("points")}
               </label>
               <input
                 id="points"
@@ -339,11 +342,11 @@ export default function PointEntryForm({
                 required
                 value={customPoints}
                 onChange={(e) => setCustomPoints(e.target.value)}
-                placeholder="e.g., 10 or -5"
+                placeholder={t("pointsPlaceholder")}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
               <p className="mt-1 text-sm text-gray-500">
-                Use positive for bonus, negative to deduct
+                {t("pointsHint")}
               </p>
             </div>
           )}
@@ -353,7 +356,7 @@ export default function PointEntryForm({
               htmlFor="note"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Note {mode === "custom" && <span className="text-red-500">*</span>}
+              {t("note")} {mode === "custom" && <span className="text-red-500">*</span>}
             </label>
             <textarea
               id="note"
@@ -363,8 +366,8 @@ export default function PointEntryForm({
               rows={2}
               placeholder={
                 mode === "chore"
-                  ? "Optional: e.g., Great job!"
-                  : "Reason for this award (required)"
+                  ? t("noteOptionalPlaceholder")
+                  : t("noteRequiredPlaceholder")
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
@@ -375,7 +378,7 @@ export default function PointEntryForm({
               htmlFor="date"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Date
+              {t("date")}
             </label>
             <input
               id="date"
@@ -393,7 +396,7 @@ export default function PointEntryForm({
               onClick={onClose}
               className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium"
             >
-              Cancel
+              {tCommon("cancel")}
             </button>
             <button
               type="submit"
@@ -405,12 +408,12 @@ export default function PointEntryForm({
               }`}
             >
               {loading
-                ? "Saving..."
+                ? tCommon("saving")
                 : entry
-                ? "Update"
+                ? tCommon("update")
                 : mode === "chore"
-                ? "Award Points"
-                : "Add Custom Award"}
+                ? t("awardPoints")
+                : t("addCustomAward")}
             </button>
           </div>
         </form>
