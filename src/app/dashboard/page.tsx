@@ -59,7 +59,7 @@ export default async function DashboardPage() {
                   {kids.length === 0
                     ? "No kids have joined yet"
                     : `${kids.length} kid${kids.length > 1 ? "s" : ""}: ${kids
-                        .map((k) => k.name || k.email)
+                        .map((k: { name: string | null; email: string }) => k.name || k.email)
                         .join(", ")}`}
                 </p>
               </div>
