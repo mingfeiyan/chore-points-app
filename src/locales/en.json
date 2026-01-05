@@ -85,6 +85,11 @@
     "redemptionSubmitted": "Redemption request submitted! Waiting for parent approval.",
     "redemptionFailed": "Failed to request redemption"
   },
+  "home": {
+    "tagline": "Build great habits, earn stars, unlock rewards!",
+    "getStarted": "Get Started",
+    "signIn": "Sign In"
+  },
   "auth": {
     "signIn": "Sign in",
     "signInToAccount": "Sign in to your account",

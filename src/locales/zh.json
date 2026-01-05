@@ -85,6 +85,11 @@
     "redemptionSubmitted": "兑换申请已提交！等待家长批准。",
     "redemptionFailed": "兑换申请失败"
   },
+  "home": {
+    "tagline": "养成好习惯，赚取星星，兑换奖励！",
+    "getStarted": "开始使用",
+    "signIn": "登录"
+  },
   "auth": {
     "signIn": "登录",
     "signInToAccount": "登录你的账号",
