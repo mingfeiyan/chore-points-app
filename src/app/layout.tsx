@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Chore Points - Family Chore Management",
-  description: "Track chores, earn points, and redeem rewards",
+  title: "StarSteps - Build Great Habits",
+  description: "Track progress, earn stars, and build lasting habits",
 };
 
 export default function RootLayout({
