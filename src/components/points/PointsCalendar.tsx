@@ -132,7 +132,7 @@ export default function PointsCalendar({ entries }: PointsCalendarProps) {
           <span className="text-gray-600">{t("moreThan10")}</span>
         </div>
         <div className="flex items-center gap-1">
-          <span className="text-xl">⭐</span>
+          <span className="text-xl">💎</span>
           <span className="text-gray-600">{t("oneOrMore")}</span>
         </div>
       </div>
@@ -175,7 +175,7 @@ export default function PointsCalendar({ entries }: PointsCalendarProps) {
                   : indicator === "fire"
                   ? "bg-orange-100"
                   : indicator === "star"
-                  ? "bg-yellow-100"
+                  ? "bg-cyan-100"
                   : "bg-gray-100"
               }`}
             >
@@ -188,7 +188,7 @@ export default function PointsCalendar({ entries }: PointsCalendarProps) {
               </span>
               {!futureDay && indicator !== "none" && (
                 <span className="text-lg leading-none">
-                  {indicator === "fire" ? "🔥" : "⭐"}
+                  {indicator === "fire" ? "🔥" : "💎"}
                 </span>
               )}
             </div>

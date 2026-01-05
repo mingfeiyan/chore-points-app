@@ -93,8 +93,8 @@ function getIconForChore(title: string, icon: string | null): string {
     }
   }
 
-  // Default star icon
-  return "⭐";
+  // Default gem icon
+  return "💎";
 }
 
 export default function ChoreFlashcards() {
