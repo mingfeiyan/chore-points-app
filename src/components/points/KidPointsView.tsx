@@ -3,6 +3,14 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ChoreFlashcards from "@/components/chores/ChoreFlashcards";
+import PointsCalendar from "@/components/points/PointsCalendar";
+import PointsProgression from "@/components/points/PointsProgression";
+
+type PointEntry = {
+  id: string;
+  points: number;
+  date: string;
+};
 
 type KidPointsViewProps = {
   kidId: string;
@@ -10,7 +18,12 @@ type KidPointsViewProps = {
 
 export default function KidPointsView({ kidId }: KidPointsViewProps) {
   const [totalPoints, setTotalPoints] = useState(0);
+  const [entries, setEntries] = useState<PointEntry[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const today = new Date();
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
 
   useEffect(() => {
     fetchPoints();
@@ -22,6 +35,7 @@ export default function KidPointsView({ kidId }: KidPointsViewProps) {
       const data = await response.json();
       if (response.ok) {
         setTotalPoints(data.totalPoints);
+        setEntries(data.entries || []);
       }
     } catch (error) {
       console.error("Failed to fetch points:", error);
@@ -56,11 +70,34 @@ export default function KidPointsView({ kidId }: KidPointsViewProps) {
       </div>
 
       {/* Chore Flashcards Section */}
-      <div>
+      <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">
           Chores You Can Do
         </h2>
         <ChoreFlashcards />
+      </div>
+
+      {/* Calendar and Progression Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Calendar View */}
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            My Calendar
+          </h2>
+          <PointsCalendar entries={entries} />
+        </div>
+
+        {/* Progression Chart */}
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            This Month
+          </h2>
+          <PointsProgression
+            entries={entries}
+            month={currentMonth}
+            year={currentYear}
+          />
+        </div>
       </div>
     </div>
   );
