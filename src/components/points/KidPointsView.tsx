@@ -53,12 +53,39 @@ export default function KidPointsView({ kidId }: KidPointsViewProps) {
 
   return (
     <div>
-      {/* Points Score Card */}
+      {/* Custom animation for slow spin */}
+      <style jsx>{`
+        @keyframes spin-slow {
+          0% { transform: rotateY(0deg); }
+          100% { transform: rotateY(360deg); }
+        }
+        :global(.animate-spin-slow) {
+          animation: spin-slow 2s linear infinite;
+          transform-style: preserve-3d;
+        }
+      `}</style>
+
+      {/* Points Score Card with Mario Coin */}
       <div className="mb-8">
         <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl shadow-lg p-8 text-white">
           <div className="text-center">
             <p className="text-lg font-medium opacity-90">{t("myPoints")}</p>
-            <p className="text-7xl font-bold mt-2">{totalPoints}</p>
+            {/* Mario-style Coin Counter */}
+            <div className="flex items-center justify-center gap-4 mt-4">
+              <div className="relative w-16 h-16 animate-spin-slow">
+                {/* Outer gold ring */}
+                <div className="absolute inset-0 rounded-full bg-gradient-to-b from-yellow-300 via-yellow-400 to-yellow-600 shadow-lg" />
+                {/* Inner darker circle */}
+                <div className="absolute inset-2 rounded-full bg-gradient-to-b from-yellow-400 via-amber-500 to-yellow-700" />
+                {/* Highlight shine */}
+                <div className="absolute top-2 left-3 w-4 h-6 bg-yellow-200 rounded-full opacity-60 blur-[1px]" />
+                {/* Center star emblem */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-yellow-900 font-bold text-2xl opacity-70">★</span>
+                </div>
+              </div>
+              <span className="text-7xl font-bold font-mono">× {totalPoints}</span>
+            </div>
             <p className="text-sm mt-4 opacity-75">
               {t("keepUpGreatWork")}
             </p>
