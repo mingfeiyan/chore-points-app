@@ -152,6 +152,66 @@ Vercel will automatically build and deploy from the `main` branch.
 
 ---
 
+## Conversation History
+
+### January 8, 2026
+
+**User**: "how about web app versus native app"
+- Discussed tradeoffs for technical blog documentation
+- Recommended web app for this use case
+
+**User**: "Do you have your coding progress since the beginning of this project?"
+- Explained context limitations, summarized visible codebase state
+
+**User**: "Could you imagine at the very beginning of the development, what steps Opus will take?"
+- Provided imagined 10-step development sequence from PRD to deployment
+
+**User**: "Could you change the star icons in this app to Gem icon?"
+- Changed ⭐ to 💎 in PointsCalendar.tsx and ChoreFlashcards.tsx
+- Updated background color from yellow to cyan
+- Committed and pushed to GitHub
+
+**User**: "could you push to Git and production?"
+- Pushed to GitHub, Vercel auto-deploy triggered
+
+**User**: "in the kid's page, i want him to view the points next to Coins icon"
+- Added Mario-style coin counter to KidPointsHeader
+- Server-side fetch for totalPoints
+- Committed and pushed
+
+**User**: "Could you make the coin emoji looks like the Super Mario coins?"
+- Created custom MarioCoin component with CSS
+- Gold gradient, shine effect, star emblem, 3D spin animation
+
+**User**: "how can i see it locally first?"
+- Started dev server, resolved stale lock file issue
+
+**User**: "this looks great. Could you merge the point banner and the point next to the title"
+- Moved Mario coin into blue points banner in KidPointsView
+- Removed duplicate from header
+- Single consolidated display
+
+**User**: "Love it" → "Could you push to Git and deploy?"
+- Committed and pushed changes
+
+**User**: "I feel there needs to be more icons in the Chore tasks"
+- Expanded from ~40 to ~170+ icons
+- Added game-themed categories (RPG style, quests, power-ups)
+
+**User**: "could you add more varieties of clothes, e.g. Pajama versus school clothes"
+- Added "Wardrobe quest" section with 30+ clothing icons
+- Sleepwear, school clothes, sportswear, footwear, accessories
+
+**User**: "Could you write down everything in this console somewhere"
+- Created CLAUDE_CONVERSATION_LOG.md
+- Documented all work, files, commits, and discussions
+
+**User**: "Could you make sure for each interactions between us in the future, you keep it in this log?"
+- Added this conversation history section
+- Will maintain ongoing log of interactions
+
+---
+
 ## Previous Session Context
 
 This session continued from earlier work that included:
