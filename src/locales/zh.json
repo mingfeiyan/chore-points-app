@@ -28,7 +28,8 @@
     "parent": "家长",
     "kid": "孩子",
     "language": "语言",
-    "loading": "加载中..."
+    "loading": "加载中...",
+    "milestones": "成长记录"
   },
   "points": {
     "myPoints": "我的积分",
@@ -255,5 +256,35 @@
     "creatingAccount": "创建账号中...",
     "joinFamilyButton": "加入家庭",
     "accountCreatedSignInFailed": "账号已创建但登录失败。请尝试登录。"
+  },
+  "milestones": {
+    "pageTitle": "成长里程碑",
+    "pageDesc": "记录和庆祝孩子的特殊时刻和成就",
+    "title": "成长记录",
+    "addMilestone": "添加里程碑",
+    "editMilestone": "编辑里程碑",
+    "noMilestones": "还没有记录任何里程碑",
+    "startTracking": "开始记录孩子的特殊时刻和成就吧！",
+    "addFirstMilestone": "添加第一个里程碑",
+    "allKids": "所有孩子",
+    "selectChild": "选择孩子",
+    "chooseChild": "选择一个孩子...",
+    "milestoneTitle": "里程碑标题",
+    "titlePlaceholder": "例如：第一次骑自行车、掉第一颗牙",
+    "iconLabel": "图标",
+    "clear": "清除",
+    "date": "日期",
+    "description": "描述（可选）",
+    "descriptionPlaceholder": "记录关于这个里程碑的笔记或回忆...",
+    "imageUrl": "照片链接（可选）",
+    "imageUrlPlaceholder": "https://example.com/photo.jpg",
+    "imageUrlHelp": "添加这个特殊时刻的照片链接",
+    "saving": "保存中...",
+    "create": "保存里程碑",
+    "update": "更新",
+    "edit": "编辑",
+    "delete": "删除",
+    "confirmDelete": "确认删除",
+    "selectKid": "请选择一个孩子"
   }
 }

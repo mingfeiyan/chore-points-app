@@ -21,12 +21,25 @@ type ChoreFormProps = {
   onSuccess: (chore: Chore) => void;
 };
 
-// Common emoji icons for chores
-const commonIcons = [
-  "🧹", "🍽️", "🛏️", "👕", "🗑️", "🐕", "🌱", "📚",
-  "🧺", "🚿", "🍳", "🧽", "🪣", "✨", "🧼", "🪥",
-  "🚗", "📦", "🤝", "⭐", "🎯", "💪", "🏆", "🎨",
-];
+// Organized emoji icons for chores (game-style categories)
+const iconCategories = {
+  "Cleaning": ["🧹", "🌀", "🪣", "✨", "🧺", "🧽", "🫧", "💫", "🧴"],
+  "Dishes": ["🍽️", "🫧", "💨", "🗄️"],
+  "Laundry": ["👕", "👔", "🧺", "🪝", "♨️"],
+  "Clothes": ["🩱", "🌙", "🎒", "👔", "👕", "👖", "👗", "🧥", "🧶", "🧦", "👟", "👢", "🩴", "🧢", "🧣", "🧤", "🩲", "🎽", "🩰"],
+  "Bedroom": ["🛏️", "🛋️", "🧣"],
+  "Bathroom": ["🚿", "🚽", "🪥", "🛁", "🪞", "🚰", "🧻"],
+  "Kitchen": ["👨‍🍳", "🍳", "🥐", "🍲", "🥞", "🥪", "🍝", "🍪", "🪑", "🍴"],
+  "Trash": ["🗑️", "♻️", "🌿"],
+  "Pets": ["🐕", "🐱", "🦴", "🦮", "🐠", "🐦", "🐹", "🐰", "🐢", "🐟", "🪮"],
+  "Garden": ["🌱", "💧", "🪴", "🌿", "🚜", "🍂", "🍁", "🌸", "🌳", "💦", "☀️", "❄️", "⛄"],
+  "Study": ["📚", "📖", "🔢", "✏️", "🎯", "🎹", "🎵", "🎸", "🎨", "🖍️", "🔬", "📋", "💻", "⌨️"],
+  "Organize": ["📦", "🗂️", "📐", "🗄️", "🚪", "🗃️", "🧸", "🎮", "🎲", "📗", "🎒", "🖥️"],
+  "Errands": ["🤝", "🛒", "🛍️", "🚗", "🚙", "📬", "📦", "🏃", "📱", "💬"],
+  "Power-ups": ["🎁", "⭐", "🌟", "➕", "⚡", "🏆", "💪", "🔥", "🎯", "🚀", "💎"],
+  "Self-care": ["🦷", "💇", "🧼", "🙌", "💅"],
+  "Time": ["🌅", "🌆", "🌙", "📅", "🗓️", "🔄"],
+};
 
 export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps) {
   const [title, setTitle] = useState(chore?.title || "");
@@ -168,24 +181,31 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
             </div>
 
             {showIconPicker && (
-              <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                <div className="grid grid-cols-8 gap-2">
-                  {commonIcons.map((emoji) => (
-                    <button
-                      key={emoji}
-                      type="button"
-                      onClick={() => {
-                        setIcon(emoji);
-                        setShowIconPicker(false);
-                      }}
-                      className={`text-2xl p-2 rounded hover:bg-blue-100 transition-colors ${
-                        icon === emoji ? "bg-blue-200" : ""
-                      }`}
-                    >
-                      {emoji}
-                    </button>
-                  ))}
-                </div>
+              <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200 max-h-80 overflow-y-auto">
+                {Object.entries(iconCategories).map(([category, icons]) => (
+                  <div key={category} className="mb-3">
+                    <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                      {category}
+                    </h4>
+                    <div className="flex flex-wrap gap-1">
+                      {icons.map((emoji, idx) => (
+                        <button
+                          key={`${category}-${emoji}-${idx}`}
+                          type="button"
+                          onClick={() => {
+                            setIcon(emoji);
+                            setShowIconPicker(false);
+                          }}
+                          className={`text-2xl p-1.5 rounded hover:bg-blue-100 transition-colors ${
+                            icon === emoji ? "bg-blue-200" : ""
+                          }`}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
                 <div className="mt-3 pt-3 border-t border-gray-200">
                   <label className="block text-xs text-gray-500 mb-1">
                     {t("orTypeEmoji")}

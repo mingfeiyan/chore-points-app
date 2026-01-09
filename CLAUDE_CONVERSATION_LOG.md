@@ -210,6 +210,35 @@ Vercel will automatically build and deploy from the `main` branch.
 - Added this conversation history section
 - Will maintain ongoing log of interactions
 
+**User**: "Do you think there will be secure information leak in someway?"
+- Reviewed log for sensitive data - confirmed safe to commit
+- No API keys, credentials, or personal data present
+- Discussed option to add to .gitignore if desired
+
+**User**: "Ok, let's commit"
+- Committed and pushed conversation log updates
+
+**User**: "i dont see those newly added icons in the chore tasks creation form"
+- Found ChoreForm.tsx had separate, smaller icon list (24 icons)
+- Updated ChoreForm to use categorized iconCategories with ~140 icons
+- Added scrollable picker with category headers
+
+**User**: "I cant connect localhost:3000"
+- Server wasn't running, Turbopack cache was corrupted
+- Cleared .next folder and restarted dev server
+
+**User**: "I want to add another key feature where parents can keep track Jasper's key growth milestone"
+- Clarified: Life milestones (first bike ride, lost tooth, etc.), parent-only visibility
+- Created implementation plan
+- Added Milestone model to Prisma schema
+- Created migration and generated Prisma client
+- Built API endpoints: GET/POST /api/milestones, PUT/DELETE /api/milestones/[id]
+- Created MilestoneForm component with milestone-specific icons
+- Created MilestonesList component with timeline view
+- Created /milestones page for parents
+- Added "Milestones" link to NavBar for parents
+- Added EN/ZH translations
+
 ---
 
 ## Previous Session Context

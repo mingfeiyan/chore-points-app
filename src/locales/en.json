@@ -28,7 +28,8 @@
     "parent": "Parent",
     "kid": "Kid",
     "language": "Language",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "milestones": "Milestones"
   },
   "points": {
     "myPoints": "My Points",
@@ -255,5 +256,35 @@
     "creatingAccount": "Creating account...",
     "joinFamilyButton": "Join Family",
     "accountCreatedSignInFailed": "Account created but sign in failed. Please try logging in."
+  },
+  "milestones": {
+    "pageTitle": "Growth Milestones",
+    "pageDesc": "Track and celebrate your child's special moments and achievements",
+    "title": "Milestones",
+    "addMilestone": "Add Milestone",
+    "editMilestone": "Edit Milestone",
+    "noMilestones": "No milestones recorded yet",
+    "startTracking": "Start tracking your child's special moments and achievements!",
+    "addFirstMilestone": "Add First Milestone",
+    "allKids": "All Kids",
+    "selectChild": "Select Child",
+    "chooseChild": "Choose a child...",
+    "milestoneTitle": "Milestone Title",
+    "titlePlaceholder": "e.g., First bike ride, Lost first tooth",
+    "iconLabel": "Icon",
+    "clear": "Clear",
+    "date": "Date",
+    "description": "Description (optional)",
+    "descriptionPlaceholder": "Add any notes or memories about this milestone...",
+    "imageUrl": "Photo URL (optional)",
+    "imageUrlPlaceholder": "https://example.com/photo.jpg",
+    "imageUrlHelp": "Add a link to a photo of this special moment",
+    "saving": "Saving...",
+    "create": "Save Milestone",
+    "update": "Update",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirmDelete": "Confirm Delete",
+    "selectKid": "Please select a child"
   }
 }
