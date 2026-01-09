@@ -5,6 +5,8 @@ import SessionProvider from "@/components/providers/SessionProvider";
 import NavBar from "@/components/NavBar";
 import MobileNav from "@/components/MobileNav";
 import LocaleProvider from "@/components/LocaleProvider";
+import KidModeProvider from "@/components/providers/KidModeProvider";
+import KidModeBanner from "@/components/KidModeBanner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,9 +35,12 @@ export default function RootLayout({
       >
         <SessionProvider>
           <LocaleProvider>
-            <NavBar />
-            <main className="pb-16 sm:pb-0">{children}</main>
-            <MobileNav />
+            <KidModeProvider>
+              <NavBar />
+              <KidModeBanner />
+              <main className="pb-16 sm:pb-0">{children}</main>
+              <MobileNav />
+            </KidModeProvider>
           </LocaleProvider>
         </SessionProvider>
       </body>

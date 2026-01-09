@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import FamilySetup from "@/components/family/FamilySetup";
 import ParentDashboardHeader from "@/components/parent/ParentDashboardHeader";
 import ParentDashboardCards from "@/components/parent/ParentDashboardCards";
+import KidModeSelector from "@/components/parent/KidModeSelector";
 
 export default async function DashboardPage() {
   const session = await getSession();
@@ -53,6 +54,9 @@ export default async function DashboardPage() {
             kidsNames={kidsNames}
             inviteCode={family?.inviteCode || ""}
           />
+          <div className="mt-6">
+            <KidModeSelector />
+          </div>
           <ParentDashboardCards />
         </div>
       </div>

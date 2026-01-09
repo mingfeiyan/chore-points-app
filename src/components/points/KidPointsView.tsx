@@ -15,9 +15,10 @@ type PointEntry = {
 
 type KidPointsViewProps = {
   kidId: string;
+  readOnly?: boolean;
 };
 
-export default function KidPointsView({ kidId }: KidPointsViewProps) {
+export default function KidPointsView({ kidId, readOnly = false }: KidPointsViewProps) {
   const [totalPoints, setTotalPoints] = useState(0);
   const [entries, setEntries] = useState<PointEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -90,7 +91,7 @@ export default function KidPointsView({ kidId }: KidPointsViewProps) {
               {t("keepUpGreatWork")}
             </p>
             <Link
-              href="/points/history"
+              href={readOnly ? "/view-as/points/history" : "/points/history"}
               className="inline-block mt-4 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-medium transition-colors"
             >
               {t("viewHistory")}

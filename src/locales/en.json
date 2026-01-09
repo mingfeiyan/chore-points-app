@@ -302,5 +302,13 @@
     "filterByKid": "Filter by kid",
     "allKids": "All Kids",
     "pointAward": "Point Award"
+  },
+  "kidMode": {
+    "viewAsKid": "View as Kid",
+    "viewAsKidDesc": "Preview the app as your child would see it",
+    "viewingAs": "Viewing as {name}",
+    "viewOnly": "View Only",
+    "exitKidMode": "Exit Kid Mode",
+    "backToDashboard": "Back to Dashboard"
   }
 }

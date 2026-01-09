@@ -4,11 +4,13 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useKidMode } from "@/components/providers/KidModeProvider";
 
 export default function MobileNav() {
   const { data: session } = useSession();
   const pathname = usePathname();
   const t = useTranslations("nav");
+  const { isKidMode } = useKidMode();
 
   // Don't show on login/signup pages or if not logged in
   if (
@@ -31,13 +33,24 @@ export default function MobileNav() {
     { href: "/gallery", label: t("gallery"), icon: "📷" },
   ];
 
+  const kidModeLinks = [
+    { href: "/view-as/points", label: t("myPoints"), icon: "💎" },
+    { href: "/view-as/redeem", label: t("redeem"), icon: "🎁" },
+  ];
+
   const kidLinks = [
     { href: "/dashboard", label: t("dashboard"), icon: "🏠" },
     { href: "/points", label: t("myPoints"), icon: "💎" },
     { href: "/redeem", label: t("redeem"), icon: "🎁" },
   ];
 
-  const links = isParent ? parentLinks : kidLinks;
+  // Determine which links to show
+  let links = kidLinks;
+  if (isParent && isKidMode) {
+    links = kidModeLinks;
+  } else if (isParent) {
+    links = parentLinks;
+  }
 
   return (
     <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-gray-800 text-white border-t border-gray-700 z-50">

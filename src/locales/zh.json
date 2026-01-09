@@ -302,5 +302,13 @@
     "filterByKid": "按孩子筛选",
     "allKids": "所有孩子",
     "pointAward": "积分奖励"
+  },
+  "kidMode": {
+    "viewAsKid": "以孩子视角查看",
+    "viewAsKidDesc": "预览孩子看到的应用界面",
+    "viewingAs": "正在查看: {name}",
+    "viewOnly": "仅查看模式",
+    "exitKidMode": "退出孩子模式",
+    "backToDashboard": "返回控制台"
   }
 }

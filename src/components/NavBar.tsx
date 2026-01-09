@@ -5,12 +5,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useLocale } from "@/components/LocaleProvider";
+import { useKidMode } from "@/components/providers/KidModeProvider";
 
 export default function NavBar() {
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const t = useTranslations("nav");
   const { locale, setLocale } = useLocale();
+  const { isKidMode } = useKidMode();
 
   const toggleLanguage = () => {
     setLocale(locale === "en" ? "zh" : "en");
@@ -99,7 +101,28 @@ export default function NavBar() {
                 {t("dashboard")}
               </Link>
 
-              {isParent ? (
+              {isParent && isKidMode ? (
+                // Kid Mode navigation for parents
+                <>
+                  <Link
+                    href="/view-as/points"
+                    className={`hover:text-gray-300 transition ${
+                      pathname === "/view-as/points" ? "text-blue-400" : ""
+                    }`}
+                  >
+                    {t("myPoints")}
+                  </Link>
+                  <Link
+                    href="/view-as/redeem"
+                    className={`hover:text-gray-300 transition ${
+                      pathname === "/view-as/redeem" ? "text-blue-400" : ""
+                    }`}
+                  >
+                    {t("redeem")}
+                  </Link>
+                </>
+              ) : isParent ? (
+                // Normal parent navigation
                 <>
                   <Link
                     href="/chores"
@@ -143,6 +166,7 @@ export default function NavBar() {
                   </Link>
                 </>
               ) : (
+                // Kid navigation
                 <>
                   <Link
                     href="/points"

@@ -21,9 +21,10 @@ type Redemption = {
 
 type KidRewardsViewProps = {
   kidId: string;
+  readOnly?: boolean;
 };
 
-export default function KidRewardsView({ kidId }: KidRewardsViewProps) {
+export default function KidRewardsView({ kidId, readOnly = false }: KidRewardsViewProps) {
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [redemptions, setRedemptions] = useState<Redemption[]>([]);
   const [totalPoints, setTotalPoints] = useState(0);
@@ -76,6 +77,8 @@ export default function KidRewardsView({ kidId }: KidRewardsViewProps) {
   };
 
   const handleRedeem = async (rewardId: string, rewardTitle: string) => {
+    if (readOnly) return;
+
     if (
       !confirm(
         `${t("confirmRedeem", { title: rewardTitle })} ${t("confirmRedeemDesc")}`
@@ -193,14 +196,16 @@ export default function KidRewardsView({ kidId }: KidRewardsViewProps) {
                     </div>
                     <button
                       onClick={() => handleRedeem(reward.id, reward.title)}
-                      disabled={!canAfford}
+                      disabled={!canAfford || readOnly}
                       className={`w-full px-4 py-2 rounded-md font-medium ${
-                        canAfford
-                          ? "bg-purple-600 text-white hover:bg-purple-700"
-                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        readOnly
+                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          : canAfford
+                            ? "bg-purple-600 text-white hover:bg-purple-700"
+                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
                       }`}
                     >
-                      {canAfford ? t("redeemButton") : t("notEnoughPoints")}
+                      {readOnly ? t("viewOnly") : canAfford ? t("redeemButton") : t("notEnoughPoints")}
                     </button>
                   </div>
                 </div>
