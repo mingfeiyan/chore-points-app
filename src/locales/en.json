@@ -257,7 +257,10 @@
     "codeRequired": "Either an invite code or registration code is required",
     "creatingAccount": "Creating account...",
     "joinFamilyButton": "Join Family",
-    "accountCreatedSignInFailed": "Account created but sign in failed. Please try logging in."
+    "accountCreatedSignInFailed": "Account created but sign in failed. Please try logging in.",
+    "continueWithGoogle": "Continue with Google",
+    "orContinueWith": "or continue with",
+    "googleSignInFailed": "Google sign-in failed. Please try again."
   },
   "milestones": {
     "pageTitle": "Growth Milestones",

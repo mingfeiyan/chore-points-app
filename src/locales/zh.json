@@ -257,7 +257,10 @@
     "codeRequired": "需要邀请码或注册码",
     "creatingAccount": "创建账号中...",
     "joinFamilyButton": "加入家庭",
-    "accountCreatedSignInFailed": "账号已创建但登录失败。请尝试登录。"
+    "accountCreatedSignInFailed": "账号已创建但登录失败。请尝试登录。",
+    "continueWithGoogle": "使用 Google 账号继续",
+    "orContinueWith": "或者使用",
+    "googleSignInFailed": "Google 登录失败，请重试。"
   },
   "milestones": {
     "pageTitle": "成长里程碑",

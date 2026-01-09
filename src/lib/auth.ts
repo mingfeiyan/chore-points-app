@@ -36,6 +36,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      authorization: {
+        params: {
+          scope: "openid email profile https://www.googleapis.com/auth/calendar",
+          access_type: "offline",
+          prompt: "consent",
+        },
+      },
     }),
     Credentials({
       name: "credentials",
@@ -107,7 +114,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         });
 
         if (!existingUser) {
-          await prisma.user.create({
+          // Create new user for Google sign-in
+          const newUser = await prisma.user.create({
             data: {
               email: user.email!,
               name: user.name,
@@ -116,6 +124,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               role: "PARENT", // Default to PARENT for OAuth sign-ins
             },
           });
+          // Update the user object with database info
+          user.id = newUser.id;
+          user.role = newUser.role;
+          user.familyId = newUser.familyId;
+        } else {
+          // Update user object with existing database info
+          user.id = existingUser.id;
+          user.role = existingUser.role;
+          user.familyId = existingUser.familyId;
         }
       }
       return true;
