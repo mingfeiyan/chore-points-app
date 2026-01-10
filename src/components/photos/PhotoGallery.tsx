@@ -83,6 +83,26 @@ export default function PhotoGallery({ kidId, showKidFilter = true, showUpload =
     fetchPhotos();
   };
 
+  const handleDownload = async (photo: PhotoEntry) => {
+    try {
+      const response = await fetch(photo.photoUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      // Create filename from kid name and date
+      const kidName = photo.kid.name || "photo";
+      const date = new Date(photo.date).toISOString().split("T")[0];
+      link.download = `${kidName}-${date}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Failed to download photo:", error);
+    }
+  };
+
   if (photos.length === 0) {
     return (
       <>
@@ -221,12 +241,24 @@ export default function PhotoGallery({ kidId, showKidFilter = true, showUpload =
                 alt={viewingPhoto.chore?.title || t("pointAward")}
                 className="w-full max-h-[70vh] object-contain bg-gray-900"
               />
-              <button
-                onClick={() => setViewingPhoto(null)}
-                className="absolute top-2 right-2 bg-black/50 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-black/70"
-              >
-                &times;
-              </button>
+              <div className="absolute top-2 right-2 flex gap-2">
+                <button
+                  onClick={() => handleDownload(viewingPhoto)}
+                  className="bg-black/50 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-black/70"
+                  title="Download"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setViewingPhoto(null)}
+                  className="bg-black/50 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-black/70"
+                  title="Close"
+                >
+                  &times;
+                </button>
+              </div>
             </div>
             <div className="p-4">
               <div className="flex items-center justify-between">
