@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSession } from "@/lib/permissions";
+import { getSession, requireFamily } from "@/lib/permissions";
 
-// GET /api/photos - Get point entries with photos
-// Parents: all family photos, Kids: only their own photos
-// Optional kidId query param for parents to filter by specific kid
+// GET /api/photos - Get photos from Photo model + legacy PointEntry photos
 export async function GET(request: NextRequest) {
   try {
     const session = await getSession();
@@ -22,26 +20,54 @@ export async function GET(request: NextRequest) {
 
     const isParent = session.user.role === "PARENT";
 
-    // Build the where clause
-    const whereClause: {
+    // Build the where clause for Photo model
+    const photoWhereClause: {
       familyId: string;
-      photoUrl: { not: null };
       kidId?: string;
     } = {
       familyId: session.user.familyId,
+    };
+
+    // Build the where clause for legacy PointEntry photos
+    const pointEntryWhereClause: {
+      familyId: string;
+      photoUrl: { not: null };
+      kidId?: string;
+      points: { gt: number };
+    } = {
+      familyId: session.user.familyId,
       photoUrl: { not: null },
+      points: { gt: 0 }, // Only include photos with actual points (not activity photos)
     };
 
     // Kids can only see their own photos
     if (!isParent) {
-      whereClause.kidId = session.user.id;
+      photoWhereClause.kidId = session.user.id;
+      pointEntryWhereClause.kidId = session.user.id;
     } else if (kidIdParam) {
       // Parents can filter by kidId
-      whereClause.kidId = kidIdParam;
+      photoWhereClause.kidId = kidIdParam;
+      pointEntryWhereClause.kidId = kidIdParam;
     }
 
-    const photos = await prisma.pointEntry.findMany({
-      where: whereClause,
+    // Fetch from Photo model
+    const photos = await prisma.photo.findMany({
+      where: photoWhereClause,
+      select: {
+        id: true,
+        photoUrl: true,
+        caption: true,
+        date: true,
+        kid: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+      orderBy: { date: "desc" },
+    });
+
+    // Fetch legacy photos from PointEntry (with points > 0)
+    const legacyPhotos = await prisma.pointEntry.findMany({
+      where: pointEntryWhereClause,
       select: {
         id: true,
         photoUrl: true,
@@ -58,12 +84,89 @@ export async function GET(request: NextRequest) {
       orderBy: { date: "desc" },
     });
 
-    return NextResponse.json({ photos });
+    // Combine and format
+    const allPhotos = [
+      ...photos.map((p) => ({
+        id: p.id,
+        photoUrl: p.photoUrl,
+        caption: p.caption,
+        date: p.date,
+        kid: p.kid,
+        points: null,
+        chore: null,
+      })),
+      ...legacyPhotos.map((p) => ({
+        id: p.id,
+        photoUrl: p.photoUrl,
+        caption: p.note,
+        date: p.date,
+        kid: p.kid,
+        points: p.points,
+        chore: p.chore,
+      })),
+    ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    return NextResponse.json({ photos: allPhotos });
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : "Something went wrong";
+    const errorMessage =
+      error instanceof Error ? error.message : "Something went wrong";
     return NextResponse.json(
       { error: errorMessage },
       { status: errorMessage.includes("Forbidden") ? 403 : 500 }
     );
+  }
+}
+
+// POST /api/photos - Create a new photo (without point entry)
+export async function POST(request: NextRequest) {
+  try {
+    const session = await requireFamily();
+
+    if (session.user.role !== "PARENT") {
+      return NextResponse.json(
+        { error: "Only parents can upload photos" },
+        { status: 403 }
+      );
+    }
+
+    const { kidId, photoUrl, caption, date } = await request.json();
+
+    if (!kidId || !photoUrl) {
+      return NextResponse.json(
+        { error: "kidId and photoUrl are required" },
+        { status: 400 }
+      );
+    }
+
+    // Verify kid belongs to same family
+    const kid = await prisma.user.findUnique({
+      where: { id: kidId },
+    });
+
+    if (!kid || kid.familyId !== session.user.familyId || kid.role !== "KID") {
+      return NextResponse.json({ error: "Invalid kid" }, { status: 400 });
+    }
+
+    const photo = await prisma.photo.create({
+      data: {
+        familyId: session.user.familyId!,
+        kidId,
+        photoUrl,
+        caption: caption || null,
+        date: date ? new Date(date) : new Date(),
+        createdById: session.user.id,
+      },
+      include: {
+        kid: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+    });
+
+    return NextResponse.json({ photo }, { status: 201 });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Something went wrong";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

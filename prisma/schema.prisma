@@ -45,6 +45,8 @@ model User {
   milestones          Milestone[]   @relation("KidMilestones")
   createdMilestones   Milestone[]   @relation("MilestoneCreatedBy")
   createdTodos        FamilyTodo[]  @relation("TodoCreatedBy")
+  photos              Photo[]       @relation("KidPhotos")
+  createdPhotos       Photo[]       @relation("PhotoCreatedBy")
 
   // NextAuth fields
   accounts      Account[]
@@ -69,6 +71,7 @@ model Family {
   milestones  Milestone[]
   calendarSettings CalendarSettings?
   todos       FamilyTodo[]
+  photos      Photo[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -278,4 +281,27 @@ model FamilyTodo {
 
   @@index([familyId])
   @@index([familyId, isCompleted])
+}
+
+model Photo {
+  id          String   @id @default(cuid())
+  familyId    String
+  family      Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  kidId       String
+  kid         User     @relation("KidPhotos", fields: [kidId], references: [id], onDelete: Cascade)
+
+  photoUrl    String
+  caption     String?
+  date        DateTime @default(now())
+
+  createdById String
+  createdBy   User     @relation("PhotoCreatedBy", fields: [createdById], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([familyId])
+  @@index([kidId])
+  @@index([familyId, kidId])
 }

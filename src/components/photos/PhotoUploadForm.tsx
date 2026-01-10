@@ -100,14 +100,13 @@ export default function PhotoUploadForm({
 
       console.log("File uploaded successfully:", uploadData.url);
 
-      // Create point entry with 0 points (activity photo)
-      const response = await fetch("/api/points", {
+      // Create photo entry (without point entry)
+      const response = await fetch("/api/photos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           kidId: selectedKidId,
-          points: 0,
-          note: note || t("activityPhoto"),
+          caption: note || null,
           photoUrl: uploadData.url,
           date,
         }),
