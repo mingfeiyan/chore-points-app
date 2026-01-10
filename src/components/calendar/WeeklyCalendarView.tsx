@@ -90,6 +90,7 @@ export default function WeeklyCalendarView() {
     endTime: "",
     allDay: false,
   });
+  const [isCreating, setIsCreating] = useState(false);
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
     const today = new Date();
     const dayOfWeek = today.getDay();
@@ -207,6 +208,80 @@ export default function WeeklyCalendarView() {
       return time.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
     }
     return "";
+  };
+
+  const startCreateMode = () => {
+    const today = new Date();
+    const todayStr = today.toISOString().split("T")[0];
+    const currentTime = today.toTimeString().slice(0, 5);
+    // Default to 1 hour duration
+    const endTime = new Date(today);
+    endTime.setHours(endTime.getHours() + 1);
+    const endTimeStr = endTime.toTimeString().slice(0, 5);
+
+    setEditForm({
+      summary: "",
+      selectedMember: "",
+      description: "",
+      location: "",
+      startDate: todayStr,
+      startTime: currentTime,
+      endDate: todayStr,
+      endTime: endTimeStr,
+      allDay: false,
+    });
+    setIsCreating(true);
+  };
+
+  const handleCreateEvent = async () => {
+    setIsSaving(true);
+
+    try {
+      // Format the title with family member if selected
+      const finalSummary = formatTitleWithMember(editForm.summary, editForm.selectedMember);
+
+      const eventData: {
+        summary: string;
+        description?: string;
+        location?: string;
+        start: { date?: string; dateTime?: string };
+        end: { date?: string; dateTime?: string };
+      } = {
+        summary: finalSummary,
+        description: editForm.description || undefined,
+        location: editForm.location || undefined,
+        start: {},
+        end: {},
+      };
+
+      if (editForm.allDay) {
+        eventData.start = { date: editForm.startDate };
+        // Add 1 day to end for Google Calendar all-day events
+        const endDate = new Date(editForm.endDate + "T00:00:00");
+        endDate.setDate(endDate.getDate() + 1);
+        eventData.end = { date: endDate.toISOString().split("T")[0] };
+      } else {
+        eventData.start = { dateTime: new Date(`${editForm.startDate}T${editForm.startTime}`).toISOString() };
+        eventData.end = { dateTime: new Date(`${editForm.endDate}T${editForm.endTime}`).toISOString() };
+      }
+
+      const res = await fetch("/api/calendar/events", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(eventData),
+      });
+
+      if (res.ok) {
+        setIsCreating(false);
+        loadEvents();
+      } else {
+        console.error("Failed to create event");
+      }
+    } catch (err) {
+      console.error("Failed to create event:", err);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const startEditMode = (event: CalendarEvent) => {
@@ -483,6 +558,15 @@ export default function WeeklyCalendarView() {
             className="text-sm text-blue-600 hover:text-blue-800"
           >
             {t("today")}
+          </button>
+          <button
+            onClick={startCreateMode}
+            className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            {t("addEvent")}
           </button>
         </div>
 
@@ -916,6 +1000,205 @@ export default function WeeklyCalendarView() {
                 </div>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Create Event Modal */}
+      {isCreating && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          onClick={() => setIsCreating(false)}
+        >
+          <div
+            className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[80vh] overflow-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-start justify-between p-4 border-b">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {t("addEvent")}
+              </h3>
+              <button
+                onClick={() => setIsCreating(false)}
+                className="text-gray-400 hover:text-gray-600 transition"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Create Form */}
+            <div className="p-4 space-y-4">
+              {/* Family Member Selector */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t("assignTo")}
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditForm({ ...editForm, selectedMember: "" })}
+                    className={`px-3 py-1.5 text-sm rounded-full border transition ${
+                      editForm.selectedMember === ""
+                        ? "bg-blue-100 border-blue-500 text-blue-700"
+                        : "bg-white border-gray-300 text-gray-600 hover:border-gray-400"
+                    }`}
+                  >
+                    {t("noAssignment")}
+                  </button>
+                  {FAMILY_MEMBERS.map((member) => (
+                    <button
+                      key={member.name}
+                      type="button"
+                      onClick={() => setEditForm({ ...editForm, selectedMember: member.name })}
+                      className={`px-3 py-1.5 text-sm rounded-full border transition ${
+                        editForm.selectedMember === member.name
+                          ? member.name === "Jasper"
+                            ? "bg-purple-100 border-purple-500 text-purple-700"
+                            : member.name === "Mingfei"
+                            ? "bg-green-100 border-green-500 text-green-700"
+                            : "bg-pink-100 border-pink-500 text-pink-700"
+                          : "bg-white border-gray-300 text-gray-600 hover:border-gray-400"
+                      }`}
+                    >
+                      {member.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Title */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t("eventTitle")}
+                </label>
+                <input
+                  type="text"
+                  value={editForm.summary}
+                  onChange={(e) => setEditForm({ ...editForm, summary: e.target.value })}
+                  placeholder={t("eventTitlePlaceholder")}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              {/* All Day Toggle */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="createAllDay"
+                  checked={editForm.allDay}
+                  onChange={(e) => setEditForm({ ...editForm, allDay: e.target.checked })}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label htmlFor="createAllDay" className="text-sm text-gray-700">
+                  {t("allDayEvent")}
+                </label>
+              </div>
+
+              {/* Start Date/Time */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t("startDate")}
+                  </label>
+                  <input
+                    type="date"
+                    value={editForm.startDate}
+                    onChange={(e) => setEditForm({ ...editForm, startDate: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                {!editForm.allDay && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t("startTime")}
+                    </label>
+                    <input
+                      type="time"
+                      value={editForm.startTime}
+                      onChange={(e) => setEditForm({ ...editForm, startTime: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* End Date/Time */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t("endDate")}
+                  </label>
+                  <input
+                    type="date"
+                    value={editForm.endDate}
+                    onChange={(e) => setEditForm({ ...editForm, endDate: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                {!editForm.allDay && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t("endTime")}
+                    </label>
+                    <input
+                      type="time"
+                      value={editForm.endTime}
+                      onChange={(e) => setEditForm({ ...editForm, endTime: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Location */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t("location")}
+                </label>
+                <input
+                  type="text"
+                  value={editForm.location}
+                  onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
+                  placeholder={t("locationPlaceholder")}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t("description")}
+                </label>
+                <textarea
+                  value={editForm.description}
+                  onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                  placeholder={t("descriptionPlaceholder")}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              {/* Create Form Buttons */}
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  onClick={() => setIsCreating(false)}
+                  disabled={isSaving}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition disabled:opacity-50"
+                >
+                  {t("cancel")}
+                </button>
+                <button
+                  onClick={handleCreateEvent}
+                  disabled={isSaving || !editForm.summary || !editForm.startDate || !editForm.endDate}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition disabled:opacity-50"
+                >
+                  {isSaving ? t("saving") : t("createEvent")}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
