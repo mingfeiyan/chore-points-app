@@ -16,6 +16,7 @@ type Weather = {
   temperature: number;
   description: string;
   icon: string;
+  location: string;
 };
 
 // Get time-based greeting key
@@ -95,35 +96,50 @@ export default function ParentDashboardHeader() {
         navigator.geolocation.getCurrentPosition(
           async (position) => {
             const { latitude, longitude } = position.coords;
-            // Use Open-Meteo free API (no API key needed)
-            const response = await fetch(
-              `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code&temperature_unit=fahrenheit`
-            );
-            const data = await response.json();
-            if (data.current) {
-              const weatherInfo = getWeatherInfo(data.current.weather_code);
+            // Fetch weather and location name in parallel
+            const [weatherResponse, geoResponse] = await Promise.all([
+              fetch(
+                `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code&temperature_unit=fahrenheit`
+              ),
+              fetch(
+                `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+              ),
+            ]);
+
+            const weatherData = await weatherResponse.json();
+            const geoData = await geoResponse.json();
+
+            if (weatherData.current) {
+              const weatherInfo = getWeatherInfo(weatherData.current.weather_code);
+              // Get city name from reverse geocoding (prefer city, then town, then county)
+              const locationName = geoData.address?.city ||
+                                   geoData.address?.town ||
+                                   geoData.address?.county ||
+                                   geoData.address?.state ||
+                                   "";
               setWeather({
-                temperature: Math.round(data.current.temperature_2m),
+                temperature: Math.round(weatherData.current.temperature_2m),
                 description: weatherInfo.description,
                 icon: weatherInfo.icon,
+                location: locationName,
               });
             }
           },
           () => {
             // If location denied, use default location (Seattle)
-            fetchWeatherForLocation(47.6062, -122.3321);
+            fetchWeatherForLocation(47.6062, -122.3321, "Seattle");
           }
         );
       } else {
         // Fallback to default location
-        fetchWeatherForLocation(47.6062, -122.3321);
+        fetchWeatherForLocation(47.6062, -122.3321, "Seattle");
       }
     } catch (error) {
       console.error("Failed to fetch weather:", error);
     }
   };
 
-  const fetchWeatherForLocation = async (lat: number, lon: number) => {
+  const fetchWeatherForLocation = async (lat: number, lon: number, locationName: string) => {
     try {
       const response = await fetch(
         `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&temperature_unit=fahrenheit`
@@ -135,6 +151,7 @@ export default function ParentDashboardHeader() {
           temperature: Math.round(data.current.temperature_2m),
           description: weatherInfo.description,
           icon: weatherInfo.icon,
+          location: locationName,
         });
       }
     } catch (error) {
@@ -173,6 +190,12 @@ export default function ParentDashboardHeader() {
           {dateString && <span>{dateString}</span>}
           {weather && (
             <span className="flex items-center gap-1 text-gray-600">
+              {weather.location && (
+                <>
+                  <span className="text-sm">{weather.location}</span>
+                  <span className="text-gray-400">·</span>
+                </>
+              )}
               <span className="text-lg">{weather.icon}</span>
               <span>{weather.temperature}°F</span>
               <span className="text-gray-400">·</span>
