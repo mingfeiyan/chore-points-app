@@ -18,8 +18,8 @@ export default function NavBar() {
     setLocale(locale === "en" ? "zh" : "en");
   };
 
-  // Don't show navbar on login/signup pages
-  if (pathname === "/login" || pathname === "/signup") {
+  // Don't show navbar on login/signup pages or homepage (has its own nav)
+  if (pathname === "/login" || pathname === "/signup" || pathname === "/") {
     return null;
   }
 
