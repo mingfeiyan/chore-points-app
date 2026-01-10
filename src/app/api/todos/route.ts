@@ -57,7 +57,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { title, icon, dueDate } = body;
+    const { title, icon, dueDate, assignedTo } = body;
 
     if (!title || typeof title !== "string" || title.trim() === "") {
       return NextResponse.json(
@@ -72,6 +72,7 @@ export async function POST(request: Request) {
         title: title.trim(),
         icon: icon || null,
         dueDate: dueDate ? new Date(dueDate) : null,
+        assignedTo: assignedTo || null,
         createdById: session.user.id,
       },
       include: {

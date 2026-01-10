@@ -9,6 +9,7 @@ type Todo = {
   icon: string | null;
   isCompleted: boolean;
   dueDate: string | null;
+  assignedTo: string | null;
   createdBy: {
     id: string;
     name: string | null;
@@ -16,6 +17,13 @@ type Todo = {
   };
   createdAt: string;
 };
+
+// Assignee options
+const ASSIGNEES = [
+  { value: "both", label: "Both", color: "bg-blue-100 text-blue-700 border-blue-300" },
+  { value: "Yue", label: "Yue", color: "bg-pink-100 text-pink-700 border-pink-300" },
+  { value: "Mingfei", label: "Mingfei", color: "bg-green-100 text-green-700 border-green-300" },
+];
 
 const TODO_ICONS = [
   // Travel & Transportation
@@ -37,7 +45,9 @@ export default function FamilyTodoList() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodoTitle, setNewTodoTitle] = useState("");
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
+  const [selectedAssignee, setSelectedAssignee] = useState<string | null>(null);
   const [showIconPicker, setShowIconPicker] = useState(false);
+  const [showAssigneePicker, setShowAssigneePicker] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
 
@@ -71,6 +81,7 @@ export default function FamilyTodoList() {
         body: JSON.stringify({
           title: newTodoTitle.trim(),
           icon: selectedIcon,
+          assignedTo: selectedAssignee,
         }),
       });
 
@@ -79,7 +90,9 @@ export default function FamilyTodoList() {
         setTodos([data.todo, ...todos]);
         setNewTodoTitle("");
         setSelectedIcon(null);
+        setSelectedAssignee(null);
         setShowIconPicker(false);
+        setShowAssigneePicker(false);
       } else {
         console.error("Failed to add todo:", data.error);
       }
@@ -206,6 +219,64 @@ export default function FamilyTodoList() {
             )}
           </div>
 
+          {/* Assignee Picker Button */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => {
+                setShowAssigneePicker(!showAssigneePicker);
+                setShowIconPicker(false);
+              }}
+              className={`h-10 px-3 flex items-center justify-center border rounded-lg hover:bg-gray-50 transition text-sm ${
+                selectedAssignee
+                  ? ASSIGNEES.find((a) => a.value === selectedAssignee)?.color || "border-gray-300"
+                  : "border-gray-300 text-gray-500"
+              }`}
+            >
+              {selectedAssignee
+                ? ASSIGNEES.find((a) => a.value === selectedAssignee)?.label
+                : t("assignTo")}
+            </button>
+
+            {/* Assignee Picker Dropdown */}
+            {showAssigneePicker && (
+              <div className="absolute top-12 left-0 z-10 bg-white border border-gray-200 rounded-lg shadow-lg p-2 w-36">
+                <p className="text-xs text-gray-500 mb-2 px-1">{t("assignTo")}</p>
+                <div className="space-y-1">
+                  {ASSIGNEES.map((assignee) => (
+                    <button
+                      key={assignee.value}
+                      type="button"
+                      onClick={() => {
+                        setSelectedAssignee(assignee.value);
+                        setShowAssigneePicker(false);
+                      }}
+                      className={`w-full px-3 py-1.5 text-left text-sm rounded border transition ${
+                        selectedAssignee === assignee.value
+                          ? assignee.color + " ring-2 ring-offset-1"
+                          : "border-gray-200 hover:bg-gray-50"
+                      }`}
+                    >
+                      {assignee.label}
+                    </button>
+                  ))}
+                </div>
+                {selectedAssignee && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedAssignee(null);
+                      setShowAssigneePicker(false);
+                    }}
+                    className="mt-2 text-xs text-gray-500 hover:text-gray-700 w-full text-center"
+                  >
+                    {t("clearAssignee")}
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
           <input
             type="text"
             value={newTodoTitle}
@@ -262,6 +333,15 @@ export default function FamilyTodoList() {
                 <span className="text-lg flex-shrink-0">{todo.icon}</span>
               )}
               <span className="flex-1 text-gray-900">{todo.title}</span>
+              {todo.assignedTo && (
+                <span
+                  className={`text-xs px-2 py-0.5 rounded-full border ${
+                    ASSIGNEES.find((a) => a.value === todo.assignedTo)?.color || "bg-gray-100 text-gray-600"
+                  }`}
+                >
+                  {ASSIGNEES.find((a) => a.value === todo.assignedTo)?.label || todo.assignedTo}
+                </span>
+              )}
               <span className="text-xs text-gray-400 hidden sm:block">
                 {todo.createdBy.name || todo.createdBy.email.split("@")[0]}
               </span>
@@ -317,6 +397,15 @@ export default function FamilyTodoList() {
                   <span className="flex-1 text-gray-400 line-through">
                     {todo.title}
                   </span>
+                  {todo.assignedTo && (
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full border opacity-50 ${
+                        ASSIGNEES.find((a) => a.value === todo.assignedTo)?.color || "bg-gray-100 text-gray-600"
+                      }`}
+                    >
+                      {ASSIGNEES.find((a) => a.value === todo.assignedTo)?.label || todo.assignedTo}
+                    </span>
+                  )}
                   <button
                     onClick={() => deleteTodo(todo.id)}
                     className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition p-1"

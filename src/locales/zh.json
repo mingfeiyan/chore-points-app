@@ -427,6 +427,8 @@
     "addFirst": "添加第一个待办事项开始吧！",
     "completed": "已完成",
     "pickIcon": "选择图标",
-    "clearIcon": "清除图标"
+    "clearIcon": "清除图标",
+    "assignTo": "分配",
+    "clearAssignee": "清除分配"
   }
 }

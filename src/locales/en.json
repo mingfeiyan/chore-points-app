@@ -427,6 +427,8 @@
     "addFirst": "Add your first to-do to get started!",
     "completed": "Completed",
     "pickIcon": "Pick an icon",
-    "clearIcon": "Clear icon"
+    "clearIcon": "Clear icon",
+    "assignTo": "Assign",
+    "clearAssignee": "Clear assignee"
   }
 }

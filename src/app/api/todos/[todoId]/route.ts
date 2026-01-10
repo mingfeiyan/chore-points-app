@@ -36,13 +36,14 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { title, icon, isCompleted, dueDate } = body;
+    const { title, icon, isCompleted, dueDate, assignedTo } = body;
 
     const updateData: {
       title?: string;
       icon?: string | null;
       isCompleted?: boolean;
       dueDate?: Date | null;
+      assignedTo?: string | null;
     } = {};
 
     if (title !== undefined) {
@@ -65,6 +66,10 @@ export async function PUT(
 
     if (dueDate !== undefined) {
       updateData.dueDate = dueDate ? new Date(dueDate) : null;
+    }
+
+    if (assignedTo !== undefined) {
+      updateData.assignedTo = assignedTo || null;
     }
 
     const todo = await prisma.familyTodo.update({

@@ -267,6 +267,7 @@ model FamilyTodo {
   icon        String?
   isCompleted Boolean   @default(false)
   dueDate     DateTime?
+  assignedTo  String?   // "both", "Yue", "Mingfei", or null
 
   createdById String
   createdBy   User      @relation("TodoCreatedBy", fields: [createdById], references: [id])
