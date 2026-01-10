@@ -114,7 +114,10 @@
     "october": "October",
     "november": "November",
     "december": "December",
-    "viewFullCalendar": "View Full Calendar"
+    "viewFullCalendar": "View Full Calendar",
+    "openInGoogle": "Open in Google Calendar",
+    "close": "Close",
+    "other": "Other"
   },
   "chores": {
     "noChoresYet": "No chores available yet.",

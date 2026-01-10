@@ -114,7 +114,10 @@
     "october": "十月",
     "november": "十一月",
     "december": "十二月",
-    "viewFullCalendar": "查看完整日历"
+    "viewFullCalendar": "查看完整日历",
+    "openInGoogle": "在 Google 日历中打开",
+    "close": "关闭",
+    "other": "其他"
   },
   "settings": {
     "pageTitle": "设置",

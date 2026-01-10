@@ -7,6 +7,8 @@ import Link from "next/link";
 interface CalendarEvent {
   id: string;
   summary: string;
+  description?: string;
+  location?: string;
   start: { dateTime?: string; date?: string };
   end: { dateTime?: string; date?: string };
   htmlLink?: string;
@@ -42,6 +44,7 @@ export default function WeeklyCalendarView() {
   const [settings, setSettings] = useState<CalendarSettings | null>(null);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
     const today = new Date();
     const dayOfWeek = today.getDay();
@@ -157,6 +160,42 @@ export default function WeeklyCalendarView() {
     if (event.start.dateTime) {
       const time = new Date(event.start.dateTime);
       return time.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    }
+    return "";
+  };
+
+  const formatEventDateTime = (event: CalendarEvent) => {
+    if (event.start.date) {
+      // All-day event
+      const startDate = new Date(event.start.date + "T00:00:00");
+      const endDate = event.end.date ? new Date(event.end.date + "T00:00:00") : startDate;
+      // Subtract 1 day from end since Google Calendar all-day events end on the next day
+      endDate.setDate(endDate.getDate() - 1);
+
+      if (startDate.getTime() === endDate.getTime()) {
+        return startDate.toLocaleDateString(undefined, {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+          year: "numeric"
+        });
+      }
+      return `${startDate.toLocaleDateString(undefined, { month: "short", day: "numeric" })} - ${endDate.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`;
+    }
+
+    if (event.start.dateTime) {
+      const startTime = new Date(event.start.dateTime);
+      const endTime = event.end.dateTime ? new Date(event.end.dateTime) : startTime;
+
+      const dateStr = startTime.toLocaleDateString(undefined, {
+        weekday: "long",
+        month: "long",
+        day: "numeric"
+      });
+      const startTimeStr = startTime.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+      const endTimeStr = endTime.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+
+      return `${dateStr}, ${startTimeStr} - ${endTimeStr}`;
     }
     return "";
   };
@@ -342,13 +381,14 @@ export default function WeeklyCalendarView() {
                 {dayEvents.slice(0, 2).map((event) => {
                   const eventColor = getEventColor(event.summary);
                   return (
-                    <div
+                    <button
                       key={event.id}
-                      className={`text-xs ${eventColor.color} px-1 py-0.5 rounded truncate`}
+                      onClick={() => setSelectedEvent(event)}
+                      className={`w-full text-left text-xs ${eventColor.color} px-1 py-0.5 rounded truncate hover:opacity-80 transition cursor-pointer`}
                       title={`${formatTime(event)} - ${event.summary}`}
                     >
                       {event.summary}
-                    </div>
+                    </button>
                   );
                 })}
                 {dayEvents.length > 2 && (
@@ -394,13 +434,14 @@ export default function WeeklyCalendarView() {
                 {dayEvents.slice(0, 2).map((event) => {
                   const eventColor = getEventColor(event.summary);
                   return (
-                    <div
+                    <button
                       key={event.id}
-                      className={`text-xs ${eventColor.color} px-1 py-0.5 rounded truncate`}
+                      onClick={() => setSelectedEvent(event)}
+                      className={`w-full text-left text-xs ${eventColor.color} px-1 py-0.5 rounded truncate hover:opacity-80 transition cursor-pointer`}
                       title={`${formatTime(event)} - ${event.summary}`}
                     >
                       {event.summary}
-                    </div>
+                    </button>
                   );
                 })}
                 {dayEvents.length > 2 && (
@@ -413,6 +454,92 @@ export default function WeeklyCalendarView() {
           );
         })}
       </div>
+
+      {/* Event Details Modal */}
+      {selectedEvent && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          onClick={() => setSelectedEvent(null)}
+        >
+          <div
+            className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[80vh] overflow-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-start justify-between p-4 border-b">
+              <div className="flex items-center gap-3">
+                <span className={`w-3 h-3 rounded-full ${getEventColor(selectedEvent.summary).dotColor}`}></span>
+                <h3 className="text-lg font-semibold text-gray-900">{selectedEvent.summary}</h3>
+              </div>
+              <button
+                onClick={() => setSelectedEvent(null)}
+                className="text-gray-400 hover:text-gray-600 transition"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-4 space-y-4">
+              {/* Date/Time */}
+              <div className="flex items-start gap-3">
+                <svg className="w-5 h-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <p className="text-sm text-gray-900">{formatEventDateTime(selectedEvent)}</p>
+                  {selectedEvent.start.date && (
+                    <p className="text-xs text-gray-500 mt-0.5">{t("allDay")}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Location */}
+              {selectedEvent.location && (
+                <div className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <p className="text-sm text-gray-900">{selectedEvent.location}</p>
+                </div>
+              )}
+
+              {/* Description */}
+              {selectedEvent.description && (
+                <div className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
+                  </svg>
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{selectedEvent.description}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-end gap-2 p-4 border-t bg-gray-50">
+              {selectedEvent.htmlLink && (
+                <a
+                  href={selectedEvent.htmlLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-800 transition"
+                >
+                  {t("openInGoogle") || "Open in Google Calendar"}
+                </a>
+              )}
+              <button
+                onClick={() => setSelectedEvent(null)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition"
+              >
+                {t("close") || "Close"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
