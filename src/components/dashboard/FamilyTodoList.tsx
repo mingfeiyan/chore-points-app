@@ -342,9 +342,6 @@ export default function FamilyTodoList() {
                   {ASSIGNEES.find((a) => a.value === todo.assignedTo)?.label || todo.assignedTo}
                 </span>
               )}
-              <span className="text-xs text-gray-400 hidden sm:block">
-                {todo.createdBy.name || todo.createdBy.email.split("@")[0]}
-              </span>
               <button
                 onClick={() => deleteTodo(todo.id)}
                 className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition p-1"
