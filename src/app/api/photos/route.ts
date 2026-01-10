@@ -33,11 +33,9 @@ export async function GET(request: NextRequest) {
       familyId: string;
       photoUrl: { not: null };
       kidId?: string;
-      points: { gt: number };
     } = {
       familyId: session.user.familyId,
       photoUrl: { not: null },
-      points: { gt: 0 }, // Only include photos with actual points (not activity photos)
     };
 
     // Kids can only see their own photos
@@ -65,7 +63,7 @@ export async function GET(request: NextRequest) {
       orderBy: { date: "desc" },
     });
 
-    // Fetch legacy photos from PointEntry (with points > 0)
+    // Fetch photos from PointEntry (includes photos attached to point awards)
     const legacyPhotos = await prisma.pointEntry.findMany({
       where: pointEntryWhereClause,
       select: {
