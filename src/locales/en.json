@@ -117,7 +117,11 @@
     "viewFullCalendar": "View Full Calendar",
     "openInGoogle": "Open in Google Calendar",
     "close": "Close",
-    "other": "Other"
+    "other": "Other",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "deleting": "Deleting..."
   },
   "chores": {
     "noChoresYet": "No chores available yet.",

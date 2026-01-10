@@ -117,7 +117,11 @@
     "viewFullCalendar": "查看完整日历",
     "openInGoogle": "在 Google 日历中打开",
     "close": "关闭",
-    "other": "其他"
+    "other": "其他",
+    "cancel": "取消",
+    "save": "保存",
+    "saving": "保存中...",
+    "deleting": "删除中..."
   },
   "settings": {
     "pageTitle": "设置",

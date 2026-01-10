@@ -45,6 +45,19 @@ export default function WeeklyCalendarView() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [editForm, setEditForm] = useState({
+    summary: "",
+    description: "",
+    location: "",
+    startDate: "",
+    startTime: "",
+    endDate: "",
+    endTime: "",
+    allDay: false,
+  });
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
     const today = new Date();
     const dayOfWeek = today.getDay();
@@ -162,6 +175,119 @@ export default function WeeklyCalendarView() {
       return time.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
     }
     return "";
+  };
+
+  const startEditMode = (event: CalendarEvent) => {
+    const isAllDay = !!event.start.date;
+    let startDate = "";
+    let startTime = "";
+    let endDate = "";
+    let endTime = "";
+
+    if (isAllDay) {
+      startDate = event.start.date || "";
+      endDate = event.end.date || "";
+      // Subtract 1 day from end since Google all-day events end on next day
+      if (endDate) {
+        const end = new Date(endDate + "T00:00:00");
+        end.setDate(end.getDate() - 1);
+        endDate = end.toISOString().split("T")[0];
+      }
+    } else if (event.start.dateTime) {
+      const start = new Date(event.start.dateTime);
+      startDate = start.toISOString().split("T")[0];
+      startTime = start.toTimeString().slice(0, 5);
+      if (event.end.dateTime) {
+        const end = new Date(event.end.dateTime);
+        endDate = end.toISOString().split("T")[0];
+        endTime = end.toTimeString().slice(0, 5);
+      }
+    }
+
+    setEditForm({
+      summary: event.summary || "",
+      description: event.description || "",
+      location: event.location || "",
+      startDate,
+      startTime,
+      endDate,
+      endTime,
+      allDay: isAllDay,
+    });
+    setIsEditing(true);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!selectedEvent) return;
+    setIsSaving(true);
+
+    try {
+      const eventData: {
+        summary: string;
+        description?: string;
+        location?: string;
+        start: { date?: string; dateTime?: string };
+        end: { date?: string; dateTime?: string };
+      } = {
+        summary: editForm.summary,
+        description: editForm.description || undefined,
+        location: editForm.location || undefined,
+        start: {},
+        end: {},
+      };
+
+      if (editForm.allDay) {
+        eventData.start = { date: editForm.startDate };
+        // Add 1 day to end for Google Calendar all-day events
+        const endDate = new Date(editForm.endDate + "T00:00:00");
+        endDate.setDate(endDate.getDate() + 1);
+        eventData.end = { date: endDate.toISOString().split("T")[0] };
+      } else {
+        eventData.start = { dateTime: new Date(`${editForm.startDate}T${editForm.startTime}`).toISOString() };
+        eventData.end = { dateTime: new Date(`${editForm.endDate}T${editForm.endTime}`).toISOString() };
+      }
+
+      const res = await fetch(`/api/calendar/events/${selectedEvent.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(eventData),
+      });
+
+      if (res.ok) {
+        setIsEditing(false);
+        setSelectedEvent(null);
+        loadEvents();
+      } else {
+        console.error("Failed to update event");
+      }
+    } catch (err) {
+      console.error("Failed to update event:", err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteEvent = async () => {
+    if (!selectedEvent) return;
+    setIsSaving(true);
+
+    try {
+      const res = await fetch(`/api/calendar/events/${selectedEvent.id}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        setIsDeleting(false);
+        setSelectedEvent(null);
+        loadEvents();
+      } else {
+        console.error("Failed to delete event");
+      }
+    } catch (err) {
+      console.error("Failed to delete event:", err);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const formatEventDateTime = (event: CalendarEvent) => {
@@ -459,7 +585,7 @@ export default function WeeklyCalendarView() {
       {selectedEvent && (
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-          onClick={() => setSelectedEvent(null)}
+          onClick={() => { setSelectedEvent(null); setIsEditing(false); setIsDeleting(false); }}
         >
           <div
             className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[80vh] overflow-auto"
@@ -469,10 +595,12 @@ export default function WeeklyCalendarView() {
             <div className="flex items-start justify-between p-4 border-b">
               <div className="flex items-center gap-3">
                 <span className={`w-3 h-3 rounded-full ${getEventColor(selectedEvent.summary).dotColor}`}></span>
-                <h3 className="text-lg font-semibold text-gray-900">{selectedEvent.summary}</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {isEditing ? (t("editEvent") || "Edit Event") : selectedEvent.summary}
+                </h3>
               </div>
               <button
-                onClick={() => setSelectedEvent(null)}
+                onClick={() => { setSelectedEvent(null); setIsEditing(false); setIsDeleting(false); }}
                 className="text-gray-400 hover:text-gray-600 transition"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -481,62 +609,236 @@ export default function WeeklyCalendarView() {
               </button>
             </div>
 
-            {/* Modal Body */}
-            <div className="p-4 space-y-4">
-              {/* Date/Time */}
-              <div className="flex items-start gap-3">
-                <svg className="w-5 h-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div>
-                  <p className="text-sm text-gray-900">{formatEventDateTime(selectedEvent)}</p>
-                  {selectedEvent.start.date && (
-                    <p className="text-xs text-gray-500 mt-0.5">{t("allDay")}</p>
-                  )}
+            {/* Delete Confirmation */}
+            {isDeleting ? (
+              <div className="p-4">
+                <p className="text-sm text-gray-700 mb-4">{t("confirmDelete") || "Are you sure you want to delete this event?"}</p>
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => setIsDeleting(false)}
+                    disabled={isSaving}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition disabled:opacity-50"
+                  >
+                    {t("cancel") || "Cancel"}
+                  </button>
+                  <button
+                    onClick={handleDeleteEvent}
+                    disabled={isSaving}
+                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition disabled:opacity-50"
+                  >
+                    {isSaving ? (t("deleting") || "Deleting...") : (t("delete") || "Delete")}
+                  </button>
                 </div>
               </div>
-
-              {/* Location */}
-              {selectedEvent.location && (
-                <div className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <p className="text-sm text-gray-900">{selectedEvent.location}</p>
+            ) : isEditing ? (
+              /* Edit Form */
+              <div className="p-4 space-y-4">
+                {/* Title */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t("eventTitle") || "Event Title"}
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.summary}
+                    onChange={(e) => setEditForm({ ...editForm, summary: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
                 </div>
-              )}
 
-              {/* Description */}
-              {selectedEvent.description && (
-                <div className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
-                  </svg>
-                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{selectedEvent.description}</p>
+                {/* All Day Toggle */}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="allDay"
+                    checked={editForm.allDay}
+                    onChange={(e) => setEditForm({ ...editForm, allDay: e.target.checked })}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <label htmlFor="allDay" className="text-sm text-gray-700">
+                    {t("allDayEvent") || "All day event"}
+                  </label>
                 </div>
-              )}
-            </div>
 
-            {/* Modal Footer */}
-            <div className="flex items-center justify-end gap-2 p-4 border-t bg-gray-50">
-              {selectedEvent.htmlLink && (
-                <a
-                  href={selectedEvent.htmlLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-800 transition"
-                >
-                  {t("openInGoogle") || "Open in Google Calendar"}
-                </a>
-              )}
-              <button
-                onClick={() => setSelectedEvent(null)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition"
-              >
-                {t("close") || "Close"}
-              </button>
-            </div>
+                {/* Start Date/Time */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t("startDate") || "Start Date"}
+                    </label>
+                    <input
+                      type="date"
+                      value={editForm.startDate}
+                      onChange={(e) => setEditForm({ ...editForm, startDate: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  {!editForm.allDay && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t("startTime") || "Start Time"}
+                      </label>
+                      <input
+                        type="time"
+                        value={editForm.startTime}
+                        onChange={(e) => setEditForm({ ...editForm, startTime: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* End Date/Time */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t("endDate") || "End Date"}
+                    </label>
+                    <input
+                      type="date"
+                      value={editForm.endDate}
+                      onChange={(e) => setEditForm({ ...editForm, endDate: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  {!editForm.allDay && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t("endTime") || "End Time"}
+                      </label>
+                      <input
+                        type="time"
+                        value={editForm.endTime}
+                        onChange={(e) => setEditForm({ ...editForm, endTime: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Location */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t("location") || "Location"}
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.location}
+                    onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
+                    placeholder={t("locationPlaceholder") || "Add a location"}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t("description") || "Description"}
+                  </label>
+                  <textarea
+                    value={editForm.description}
+                    onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                    placeholder={t("descriptionPlaceholder") || "Add event description"}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                {/* Edit Form Buttons */}
+                <div className="flex justify-end gap-2 pt-2">
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    disabled={isSaving}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition disabled:opacity-50"
+                  >
+                    {t("cancel") || "Cancel"}
+                  </button>
+                  <button
+                    onClick={handleSaveEdit}
+                    disabled={isSaving || !editForm.summary || !editForm.startDate || !editForm.endDate}
+                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition disabled:opacity-50"
+                  >
+                    {isSaving ? (t("saving") || "Saving...") : (t("save") || "Save")}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* View Mode */
+              <>
+                {/* Modal Body */}
+                <div className="p-4 space-y-4">
+                  {/* Date/Time */}
+                  <div className="flex items-start gap-3">
+                    <svg className="w-5 h-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                      <p className="text-sm text-gray-900">{formatEventDateTime(selectedEvent)}</p>
+                      {selectedEvent.start.date && (
+                        <p className="text-xs text-gray-500 mt-0.5">{t("allDay")}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Location */}
+                  {selectedEvent.location && (
+                    <div className="flex items-start gap-3">
+                      <svg className="w-5 h-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <p className="text-sm text-gray-900">{selectedEvent.location}</p>
+                    </div>
+                  )}
+
+                  {/* Description */}
+                  {selectedEvent.description && (
+                    <div className="flex items-start gap-3">
+                      <svg className="w-5 h-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
+                      </svg>
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap">{selectedEvent.description}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Modal Footer */}
+                <div className="flex items-center justify-between p-4 border-t bg-gray-50">
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => startEditMode(selectedEvent)}
+                      className="px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                    >
+                      {t("edit") || "Edit"}
+                    </button>
+                    <button
+                      onClick={() => setIsDeleting(true)}
+                      className="px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition"
+                    >
+                      {t("delete") || "Delete"}
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {selectedEvent.htmlLink && (
+                      <a
+                        href={selectedEvent.htmlLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-800 transition"
+                      >
+                        {t("openInGoogle") || "Open in Google Calendar"}
+                      </a>
+                    )}
+                    <button
+                      onClick={() => setSelectedEvent(null)}
+                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition"
+                    >
+                      {t("close") || "Close"}
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
