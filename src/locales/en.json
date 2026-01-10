@@ -121,7 +121,9 @@
     "cancel": "Cancel",
     "save": "Save",
     "saving": "Saving...",
-    "deleting": "Deleting..."
+    "deleting": "Deleting...",
+    "assignTo": "Assign to",
+    "noAssignment": "None"
   },
   "chores": {
     "noChoresYet": "No chores available yet.",

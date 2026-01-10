@@ -121,7 +121,9 @@
     "cancel": "取消",
     "save": "保存",
     "saving": "保存中...",
-    "deleting": "删除中..."
+    "deleting": "删除中...",
+    "assignTo": "分配给",
+    "noAssignment": "不分配"
   },
   "settings": {
     "pageTitle": "设置",

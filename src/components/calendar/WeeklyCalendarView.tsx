@@ -39,6 +39,37 @@ function getEventColor(summary: string): { color: string; dotColor: string; memb
   return { ...DEFAULT_COLOR, member: null };
 }
 
+// Detect family member from event title and return member name and clean title
+function parseMemberFromTitle(title: string): { member: string; cleanTitle: string } {
+  const lowerTitle = title.toLowerCase();
+  for (const member of FAMILY_MEMBERS) {
+    const lowerMember = member.name.toLowerCase();
+    // Check for patterns like "Jasper - Event" or "Jasper: Event" or "Jasper's Event"
+    const patterns = [
+      new RegExp(`^${lowerMember}\\s*[-:]\\s*`, "i"),
+      new RegExp(`^${lowerMember}'s\\s+`, "i"),
+    ];
+    for (const pattern of patterns) {
+      if (pattern.test(title)) {
+        return { member: member.name, cleanTitle: title.replace(pattern, "") };
+      }
+    }
+    // Also check if name appears anywhere in title
+    if (lowerTitle.includes(lowerMember)) {
+      return { member: member.name, cleanTitle: title };
+    }
+  }
+  return { member: "", cleanTitle: title };
+}
+
+// Format the final event title with member prefix
+function formatTitleWithMember(title: string, member: string): string {
+  if (!member) return title;
+  // Don't add prefix if name is already in title
+  if (title.toLowerCase().includes(member.toLowerCase())) return title;
+  return `${member} - ${title}`;
+}
+
 export default function WeeklyCalendarView() {
   const t = useTranslations("calendar");
   const [settings, setSettings] = useState<CalendarSettings | null>(null);
@@ -50,6 +81,7 @@ export default function WeeklyCalendarView() {
   const [isSaving, setIsSaving] = useState(false);
   const [editForm, setEditForm] = useState({
     summary: "",
+    selectedMember: "",
     description: "",
     location: "",
     startDate: "",
@@ -204,8 +236,12 @@ export default function WeeklyCalendarView() {
       }
     }
 
+    // Parse member from existing title
+    const { member, cleanTitle } = parseMemberFromTitle(event.summary || "");
+
     setEditForm({
-      summary: event.summary || "",
+      summary: cleanTitle,
+      selectedMember: member,
       description: event.description || "",
       location: event.location || "",
       startDate,
@@ -222,6 +258,9 @@ export default function WeeklyCalendarView() {
     setIsSaving(true);
 
     try {
+      // Format the title with family member if selected
+      const finalSummary = formatTitleWithMember(editForm.summary, editForm.selectedMember);
+
       const eventData: {
         summary: string;
         description?: string;
@@ -229,7 +268,7 @@ export default function WeeklyCalendarView() {
         start: { date?: string; dateTime?: string };
         end: { date?: string; dateTime?: string };
       } = {
-        summary: editForm.summary,
+        summary: finalSummary,
         description: editForm.description || undefined,
         location: editForm.location || undefined,
         start: {},
@@ -633,6 +672,44 @@ export default function WeeklyCalendarView() {
             ) : isEditing ? (
               /* Edit Form */
               <div className="p-4 space-y-4">
+                {/* Family Member Selector */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t("assignTo") || "Assign to"}
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setEditForm({ ...editForm, selectedMember: "" })}
+                      className={`px-3 py-1.5 text-sm rounded-full border transition ${
+                        editForm.selectedMember === ""
+                          ? "bg-blue-100 border-blue-500 text-blue-700"
+                          : "bg-white border-gray-300 text-gray-600 hover:border-gray-400"
+                      }`}
+                    >
+                      {t("noAssignment") || "None"}
+                    </button>
+                    {FAMILY_MEMBERS.map((member) => (
+                      <button
+                        key={member.name}
+                        type="button"
+                        onClick={() => setEditForm({ ...editForm, selectedMember: member.name })}
+                        className={`px-3 py-1.5 text-sm rounded-full border transition ${
+                          editForm.selectedMember === member.name
+                            ? member.name === "Jasper"
+                              ? "bg-purple-100 border-purple-500 text-purple-700"
+                              : member.name === "Mingfei"
+                              ? "bg-green-100 border-green-500 text-green-700"
+                              : "bg-pink-100 border-pink-500 text-pink-700"
+                            : "bg-white border-gray-300 text-gray-600 hover:border-gray-400"
+                        }`}
+                      >
+                        {member.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Title */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">

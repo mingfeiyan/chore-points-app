@@ -19,6 +19,40 @@ interface Props {
   onSave: () => void;
 }
 
+// Family members for event assignment
+const FAMILY_MEMBERS = ["Jasper", "Mingfei", "Yue"];
+
+// Detect family member from event title and return member name and clean title
+function parseMemberFromTitle(title: string): { member: string; cleanTitle: string } {
+  const lowerTitle = title.toLowerCase();
+  for (const member of FAMILY_MEMBERS) {
+    const lowerMember = member.toLowerCase();
+    // Check for patterns like "Jasper - Event" or "Jasper: Event" or "Jasper's Event"
+    const patterns = [
+      new RegExp(`^${lowerMember}\\s*[-:]\\s*`, "i"),
+      new RegExp(`^${lowerMember}'s\\s+`, "i"),
+    ];
+    for (const pattern of patterns) {
+      if (pattern.test(title)) {
+        return { member, cleanTitle: title.replace(pattern, "") };
+      }
+    }
+    // Also check if name appears anywhere in title
+    if (lowerTitle.includes(lowerMember)) {
+      return { member, cleanTitle: title };
+    }
+  }
+  return { member: "", cleanTitle: title };
+}
+
+// Format the final event title with member prefix
+function formatTitleWithMember(title: string, member: string): string {
+  if (!member) return title;
+  // Don't add prefix if name is already in title
+  if (title.toLowerCase().includes(member.toLowerCase())) return title;
+  return `${member} - ${title}`;
+}
+
 export default function CalendarEventForm({
   event,
   selectedDate,
@@ -29,6 +63,7 @@ export default function CalendarEventForm({
   const tCommon = useTranslations("common");
 
   const [summary, setSummary] = useState("");
+  const [selectedMember, setSelectedMember] = useState("");
   const [description, setDescription] = useState("");
   const [startDate, setStartDate] = useState("");
   const [startTime, setStartTime] = useState("");
@@ -42,7 +77,10 @@ export default function CalendarEventForm({
   // Initialize form with event data or defaults
   useEffect(() => {
     if (event) {
-      setSummary(event.summary);
+      // Parse member from existing title
+      const { member, cleanTitle } = parseMemberFromTitle(event.summary);
+      setSummary(cleanTitle);
+      setSelectedMember(member);
       setDescription(event.description || "");
       setLocation(event.location || "");
 
@@ -69,6 +107,7 @@ export default function CalendarEventForm({
       setEndDate(dateStr);
       setStartTime("09:00");
       setEndTime("10:00");
+      setSelectedMember("");
     }
   }, [event, selectedDate]);
 
@@ -78,8 +117,11 @@ export default function CalendarEventForm({
     setLoading(true);
 
     try {
+      // Format the title with family member if selected
+      const finalSummary = formatTitleWithMember(summary, selectedMember);
+
       const eventData = {
-        summary,
+        summary: finalSummary,
         description: description || undefined,
         location: location || undefined,
         allDay,
@@ -148,6 +190,44 @@ export default function CalendarEventForm({
               {error}
             </div>
           )}
+
+          {/* Family Member Selector */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t("assignTo")}
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setSelectedMember("")}
+                className={`px-3 py-1.5 text-sm rounded-full border transition ${
+                  selectedMember === ""
+                    ? "bg-blue-100 border-blue-500 text-blue-700"
+                    : "bg-white border-gray-300 text-gray-600 hover:border-gray-400"
+                }`}
+              >
+                {t("noAssignment")}
+              </button>
+              {FAMILY_MEMBERS.map((member) => (
+                <button
+                  key={member}
+                  type="button"
+                  onClick={() => setSelectedMember(member)}
+                  className={`px-3 py-1.5 text-sm rounded-full border transition ${
+                    selectedMember === member
+                      ? member === "Jasper"
+                        ? "bg-purple-100 border-purple-500 text-purple-700"
+                        : member === "Mingfei"
+                        ? "bg-green-100 border-green-500 text-green-700"
+                        : "bg-pink-100 border-pink-500 text-pink-700"
+                      : "bg-white border-gray-300 text-gray-600 hover:border-gray-400"
+                  }`}
+                >
+                  {member}
+                </button>
+              ))}
+            </div>
+          </div>
 
           {/* Event Title */}
           <div>
