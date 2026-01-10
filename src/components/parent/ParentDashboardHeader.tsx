@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useSession } from "next-auth/react";
 import { useKidMode } from "@/components/providers/KidModeProvider";
 
 type Kid = {
@@ -11,16 +12,40 @@ type Kid = {
   email: string;
 };
 
+// Get time-based greeting key
+function getGreetingKey(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return "goodMorning";
+  if (hour < 18) return "goodAfternoon";
+  return "goodEvening";
+}
+
+// Format today's date
+function formatDate(locale: string): string {
+  return new Date().toLocaleDateString(locale === "zh" ? "zh-CN" : "en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
 export default function ParentDashboardHeader() {
   const t = useTranslations("parent");
   const tKidMode = useTranslations("kidMode");
+  const { data: session } = useSession();
   const [kids, setKids] = useState<Kid[]>([]);
   const [showKidSelector, setShowKidSelector] = useState(false);
+  const [greeting, setGreeting] = useState("");
+  const [dateString, setDateString] = useState("");
   const { setViewingAsKid } = useKidMode();
   const router = useRouter();
 
   useEffect(() => {
     fetchKids();
+    // Set greeting and date on client side to avoid hydration mismatch
+    setGreeting(getGreetingKey());
+    setDateString(formatDate("en"));
   }, []);
 
   const fetchKids = async () => {
@@ -41,11 +66,18 @@ export default function ParentDashboardHeader() {
     router.push("/view-as/points");
   };
 
+  // Get user's first name
+  const userName = session?.user?.name?.split(" ")[0] || "";
+
   return (
     <div className="flex items-center justify-between">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">{t("dashboard")}</h1>
-        <p className="mt-1 text-gray-600">{t("dashboardDesc")}</p>
+        <h1 className="text-3xl font-bold text-gray-900">
+          {greeting && userName ? `${t(greeting)}, ${userName}` : t("dashboard")}
+        </h1>
+        {dateString && (
+          <p className="mt-1 text-gray-500">{dateString}</p>
+        )}
       </div>
 
       {kids.length > 0 && (

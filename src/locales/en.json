@@ -193,6 +193,9 @@
   "parent": {
     "dashboard": "Parent Dashboard",
     "dashboardDesc": "Manage your family's chores, points, and rewards",
+    "goodMorning": "Good morning",
+    "goodAfternoon": "Good afternoon",
+    "goodEvening": "Good evening",
     "yourFamily": "Your Family",
     "noKidsYet": "No kids have joined yet",
     "manageChores": "Manage chores and point values",

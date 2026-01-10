@@ -202,6 +202,9 @@
   "parent": {
     "dashboard": "家长控制台",
     "dashboardDesc": "管理家庭的家务、积分和奖励",
+    "goodMorning": "早上好",
+    "goodAfternoon": "下午好",
+    "goodEvening": "晚上好",
     "yourFamily": "你的家庭",
     "noKidsYet": "还没有孩子加入",
     "manageChores": "管理家务和积分值",
