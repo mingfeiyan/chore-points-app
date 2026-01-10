@@ -17,6 +17,26 @@ interface CalendarSettings {
   selectedCalendarName: string | null;
 }
 
+// Family member color mapping
+const FAMILY_MEMBERS = [
+  { name: "Jasper", color: "bg-purple-100 text-purple-800", dotColor: "bg-purple-500" },
+  { name: "Mingfei", color: "bg-green-100 text-green-800", dotColor: "bg-green-500" },
+  { name: "Yue", color: "bg-pink-100 text-pink-800", dotColor: "bg-pink-500" },
+];
+
+const DEFAULT_COLOR = { color: "bg-blue-100 text-blue-800", dotColor: "bg-blue-500" };
+
+// Detect which family member an event belongs to based on the title
+function getEventColor(summary: string): { color: string; dotColor: string; member: string | null } {
+  const lowerSummary = summary.toLowerCase();
+  for (const member of FAMILY_MEMBERS) {
+    if (lowerSummary.includes(member.name.toLowerCase())) {
+      return { ...member, member: member.name };
+    }
+  }
+  return { ...DEFAULT_COLOR, member: null };
+}
+
 export default function WeeklyCalendarView() {
   const t = useTranslations("calendar");
   const [settings, setSettings] = useState<CalendarSettings | null>(null);
@@ -270,6 +290,20 @@ export default function WeeklyCalendarView() {
         </Link>
       </div>
 
+      {/* Legend */}
+      <div className="flex items-center justify-center gap-4 px-4 py-2 bg-gray-50 border-b text-xs">
+        {FAMILY_MEMBERS.map((member) => (
+          <div key={member.name} className="flex items-center gap-1.5">
+            <span className={`w-2.5 h-2.5 rounded-full ${member.dotColor}`}></span>
+            <span className="text-gray-600">{member.name}</span>
+          </div>
+        ))}
+        <div className="flex items-center gap-1.5">
+          <span className={`w-2.5 h-2.5 rounded-full ${DEFAULT_COLOR.dotColor}`}></span>
+          <span className="text-gray-600">{t("other") || "Other"}</span>
+        </div>
+      </div>
+
       {/* Day Headers */}
       <div className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
         {dayNames.map((name, index) => (
@@ -305,15 +339,18 @@ export default function WeeklyCalendarView() {
 
               {/* Events */}
               <div className="px-1 pb-1 space-y-0.5">
-                {dayEvents.slice(0, 2).map((event) => (
-                  <div
-                    key={event.id}
-                    className="text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded truncate"
-                    title={`${formatTime(event)} - ${event.summary}`}
-                  >
-                    {event.summary}
-                  </div>
-                ))}
+                {dayEvents.slice(0, 2).map((event) => {
+                  const eventColor = getEventColor(event.summary);
+                  return (
+                    <div
+                      key={event.id}
+                      className={`text-xs ${eventColor.color} px-1 py-0.5 rounded truncate`}
+                      title={`${formatTime(event)} - ${event.summary}`}
+                    >
+                      {event.summary}
+                    </div>
+                  );
+                })}
                 {dayEvents.length > 2 && (
                   <div className="text-xs text-gray-500 px-1">
                     +{dayEvents.length - 2} {t("more")}
@@ -354,15 +391,18 @@ export default function WeeklyCalendarView() {
 
               {/* Events */}
               <div className="px-1 pb-1 space-y-0.5">
-                {dayEvents.slice(0, 2).map((event) => (
-                  <div
-                    key={event.id}
-                    className="text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded truncate"
-                    title={`${formatTime(event)} - ${event.summary}`}
-                  >
-                    {event.summary}
-                  </div>
-                ))}
+                {dayEvents.slice(0, 2).map((event) => {
+                  const eventColor = getEventColor(event.summary);
+                  return (
+                    <div
+                      key={event.id}
+                      className={`text-xs ${eventColor.color} px-1 py-0.5 rounded truncate`}
+                      title={`${formatTime(event)} - ${event.summary}`}
+                    >
+                      {event.summary}
+                    </div>
+                  );
+                })}
                 {dayEvents.length > 2 && (
                   <div className="text-xs text-gray-500 px-1">
                     +{dayEvents.length - 2} {t("more")}
