@@ -95,11 +95,11 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { summary, description, startDate, endDate, allDay, location } = body;
+    const { summary, description, location, start, end } = body;
 
-    if (!summary || !startDate) {
+    if (!summary || !start) {
       return NextResponse.json(
-        { error: "Summary and start date are required" },
+        { error: "Summary and start are required" },
         { status: 400 }
       );
     }
@@ -107,22 +107,30 @@ export async function POST(request: NextRequest) {
     // Get access token
     const accessToken = await getValidAccessToken(session.user.id);
 
-    // Build event object
-    const eventData = allDay
-      ? {
-          summary,
-          description,
-          location,
-          start: { date: startDate.split("T")[0] },
-          end: { date: (endDate || startDate).split("T")[0] },
-        }
-      : {
-          summary,
-          description,
-          location,
-          start: { dateTime: startDate, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
-          end: { dateTime: endDate || startDate, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
-        };
+    // Build event object - frontend sends start/end in Google Calendar format
+    const eventData: {
+      summary: string;
+      description?: string;
+      location?: string;
+      start: { date?: string; dateTime?: string; timeZone?: string };
+      end: { date?: string; dateTime?: string; timeZone?: string };
+    } = {
+      summary,
+      description,
+      location,
+      start: {},
+      end: {},
+    };
+
+    // Handle all-day events (date) vs timed events (dateTime)
+    if (start.date) {
+      eventData.start = { date: start.date };
+      eventData.end = { date: end?.date || start.date };
+    } else if (start.dateTime) {
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      eventData.start = { dateTime: start.dateTime, timeZone };
+      eventData.end = { dateTime: end?.dateTime || start.dateTime, timeZone };
+    }
 
     const event = await createEvent(
       accessToken,
