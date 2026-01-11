@@ -703,7 +703,7 @@ export default function WeeklyCalendarView() {
             return (
               <div
                 key={index}
-                className={`min-h-[100px] ${todayClass}`}
+                className={`min-h-[70px] ${todayClass}`}
               >
                 {/* Day Header */}
                 <div className="px-2 py-1 text-center border-b border-gray-100">
@@ -753,7 +753,7 @@ export default function WeeklyCalendarView() {
             return (
               <div
                 key={index}
-                className={`min-h-[100px] ${todayClass}`}
+                className={`min-h-[70px] ${todayClass}`}
               >
                 {/* Day Header */}
                 <div className="px-2 py-1 text-center border-b border-gray-100">
@@ -816,7 +816,7 @@ export default function WeeklyCalendarView() {
             return (
               <div
                 key={index}
-                className={`min-h-[100px] ${todayClass}`}
+                className={`min-h-[70px] ${todayClass}`}
               >
                 {/* Day Number */}
                 <div className="px-2 py-1 text-center">
@@ -869,7 +869,7 @@ export default function WeeklyCalendarView() {
             return (
               <div
                 key={index}
-                className={`min-h-[100px] ${todayClass}`}
+                className={`min-h-[70px] ${todayClass}`}
               >
                 {/* Day Number */}
                 <div className="px-2 py-1 text-center">

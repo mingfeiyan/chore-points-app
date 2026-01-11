@@ -100,20 +100,20 @@ export default function KidPointsView({ kidId, readOnly = false }: KidPointsView
         </div>
       </div>
 
-      {/* Chore Flashcards Section */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          {t("choresYouCanDo")}
-        </h2>
-        <ChoreFlashcards />
-      </div>
-
       {/* Calendar Section */}
-      <div>
+      <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">
           {t("myCalendar")}
         </h2>
         <PointsCalendar entries={entries} />
+      </div>
+
+      {/* Chore Flashcards Section */}
+      <div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          {t("choresYouCanDo")}
+        </h2>
+        <ChoreFlashcards />
       </div>
     </div>
     </PointsCelebrationWrapper>
