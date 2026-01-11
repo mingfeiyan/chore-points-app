@@ -78,10 +78,14 @@ export default function ParentDashboardHeader() {
   const [greeting, setGreeting] = useState("");
   const [dateString, setDateString] = useState("");
   const [weather, setWeather] = useState<Weather | null>(null);
-  const { setViewingAsKid } = useKidMode();
+  const { setViewingAsKid, exitKidMode } = useKidMode();
   const router = useRouter();
 
   useEffect(() => {
+    // Clear kid mode when parent visits the dashboard
+    // This ensures the banner doesn't show incorrectly
+    exitKidMode();
+
     fetchKids();
     // Set greeting and date on client side to avoid hydration mismatch
     setGreeting(getGreetingKey());
