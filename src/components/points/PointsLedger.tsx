@@ -125,33 +125,16 @@ export default function PointsLedger() {
   return (
     <div>
       <div className="mb-6 flex justify-between items-center">
-        <div className="flex items-center space-x-4">
-          <label className="text-sm font-medium text-gray-700">
-            {t("selectKid")}
-          </label>
-          <select
-            value={selectedKid?.id || ""}
-            onChange={(e) => {
-              const kid = kids.find((k) => k.id === e.target.value);
-              setSelectedKid(kid || null);
-            }}
-            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          >
-            {kids.map((kid) => (
-              <option key={kid.id} value={kid.id}>
-                {kid.name || kid.email}
-              </option>
-            ))}
-          </select>
-
-          {selectedKid && (
-            <div className="ml-6 flex items-center">
-              <span className="text-2xl font-bold text-blue-600">
-                {totalPoints} {tCommon("points")}
-              </span>
-            </div>
-          )}
-        </div>
+        {selectedKid && (
+          <div className="flex items-center space-x-4">
+            <span className="text-2xl font-bold text-gray-900">
+              {selectedKid.name || selectedKid.email}
+            </span>
+            <span className="text-2xl font-bold text-blue-600">
+              {totalPoints} {tCommon("points")}
+            </span>
+          </div>
+        )}
 
         <button
           onClick={() => setShowForm(true)}
