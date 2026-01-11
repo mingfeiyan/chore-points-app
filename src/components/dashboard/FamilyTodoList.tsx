@@ -171,127 +171,133 @@ export default function FamilyTodoList() {
 
       {/* Add Todo Form */}
       <form onSubmit={addTodo} className="mb-4">
-        <div className="flex gap-2">
-          {/* Icon Picker Button */}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setShowIconPicker(!showIconPicker)}
-              className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-50 transition text-xl"
-            >
-              {selectedIcon || "📝"}
-            </button>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          {/* Icon and Assignee Pickers Row */}
+          <div className="flex gap-2">
+            {/* Icon Picker Button */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowIconPicker(!showIconPicker)}
+                className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-50 transition text-xl"
+              >
+                {selectedIcon || "📝"}
+              </button>
 
-            {/* Icon Picker Dropdown */}
-            {showIconPicker && (
-              <div className="absolute top-12 left-0 z-10 bg-white border border-gray-200 rounded-lg shadow-lg p-2 w-64">
-                <p className="text-xs text-gray-500 mb-2 px-1">{t("pickIcon")}</p>
-                <div className="grid grid-cols-8 gap-1">
-                  {TODO_ICONS.map((icon) => (
+              {/* Icon Picker Dropdown */}
+              {showIconPicker && (
+                <div className="absolute top-14 left-0 z-10 bg-white border border-gray-200 rounded-lg shadow-lg p-2 w-64 sm:w-72">
+                  <p className="text-xs text-gray-500 mb-2 px-1">{t("pickIcon")}</p>
+                  <div className="grid grid-cols-6 sm:grid-cols-8 gap-1">
+                    {TODO_ICONS.map((icon) => (
+                      <button
+                        key={icon}
+                        type="button"
+                        onClick={() => {
+                          setSelectedIcon(icon);
+                          setShowIconPicker(false);
+                        }}
+                        className={`w-9 h-9 sm:w-7 sm:h-7 min-h-[36px] sm:min-h-0 flex items-center justify-center rounded hover:bg-gray-100 transition text-xl sm:text-lg ${
+                          selectedIcon === icon ? "bg-blue-100 ring-2 ring-blue-500" : ""
+                        }`}
+                      >
+                        {icon}
+                      </button>
+                    ))}
+                  </div>
+                  {selectedIcon && (
                     <button
-                      key={icon}
                       type="button"
                       onClick={() => {
-                        setSelectedIcon(icon);
+                        setSelectedIcon(null);
                         setShowIconPicker(false);
                       }}
-                      className={`w-7 h-7 flex items-center justify-center rounded hover:bg-gray-100 transition text-lg ${
-                        selectedIcon === icon ? "bg-blue-100 ring-2 ring-blue-500" : ""
-                      }`}
+                      className="mt-2 text-xs text-gray-500 hover:text-gray-700 w-full text-center py-2"
                     >
-                      {icon}
+                      {t("clearIcon")}
                     </button>
-                  ))}
+                  )}
                 </div>
-                {selectedIcon && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedIcon(null);
-                      setShowIconPicker(false);
-                    }}
-                    className="mt-2 text-xs text-gray-500 hover:text-gray-700 w-full text-center"
-                  >
-                    {t("clearIcon")}
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
+              )}
+            </div>
 
-          {/* Assignee Picker Button */}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => {
-                setShowAssigneePicker(!showAssigneePicker);
-                setShowIconPicker(false);
-              }}
-              className={`h-10 px-3 flex items-center justify-center border rounded-lg hover:bg-gray-50 transition text-sm ${
-                selectedAssignee
-                  ? ASSIGNEES.find((a) => a.value === selectedAssignee)?.color || "border-gray-300"
-                  : "border-gray-300 text-gray-500"
-              }`}
-            >
-              {selectedAssignee
-                ? ASSIGNEES.find((a) => a.value === selectedAssignee)?.label
-                : t("assignTo")}
-            </button>
+            {/* Assignee Picker Button */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAssigneePicker(!showAssigneePicker);
+                  setShowIconPicker(false);
+                }}
+                className={`h-11 min-h-[44px] px-3 flex items-center justify-center border rounded-lg hover:bg-gray-50 transition text-sm ${
+                  selectedAssignee
+                    ? ASSIGNEES.find((a) => a.value === selectedAssignee)?.color || "border-gray-300"
+                    : "border-gray-300 text-gray-500"
+                }`}
+              >
+                {selectedAssignee
+                  ? ASSIGNEES.find((a) => a.value === selectedAssignee)?.label
+                  : t("assignTo")}
+              </button>
 
-            {/* Assignee Picker Dropdown */}
-            {showAssigneePicker && (
-              <div className="absolute top-12 left-0 z-10 bg-white border border-gray-200 rounded-lg shadow-lg p-2 w-36">
-                <p className="text-xs text-gray-500 mb-2 px-1">{t("assignTo")}</p>
-                <div className="space-y-1">
-                  {ASSIGNEES.map((assignee) => (
+              {/* Assignee Picker Dropdown */}
+              {showAssigneePicker && (
+                <div className="absolute top-14 left-0 z-10 bg-white border border-gray-200 rounded-lg shadow-lg p-2 w-40">
+                  <p className="text-xs text-gray-500 mb-2 px-1">{t("assignTo")}</p>
+                  <div className="space-y-1">
+                    {ASSIGNEES.map((assignee) => (
+                      <button
+                        key={assignee.value}
+                        type="button"
+                        onClick={() => {
+                          setSelectedAssignee(assignee.value);
+                          setShowAssigneePicker(false);
+                        }}
+                        className={`w-full px-3 py-2 min-h-[44px] text-left text-sm rounded border transition ${
+                          selectedAssignee === assignee.value
+                            ? assignee.color + " ring-2 ring-offset-1"
+                            : "border-gray-200 hover:bg-gray-50"
+                        }`}
+                      >
+                        {assignee.label}
+                      </button>
+                    ))}
+                  </div>
+                  {selectedAssignee && (
                     <button
-                      key={assignee.value}
                       type="button"
                       onClick={() => {
-                        setSelectedAssignee(assignee.value);
+                        setSelectedAssignee(null);
                         setShowAssigneePicker(false);
                       }}
-                      className={`w-full px-3 py-1.5 text-left text-sm rounded border transition ${
-                        selectedAssignee === assignee.value
-                          ? assignee.color + " ring-2 ring-offset-1"
-                          : "border-gray-200 hover:bg-gray-50"
-                      }`}
+                      className="mt-2 text-xs text-gray-500 hover:text-gray-700 w-full text-center py-2"
                     >
-                      {assignee.label}
+                      {t("clearAssignee")}
                     </button>
-                  ))}
+                  )}
                 </div>
-                {selectedAssignee && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedAssignee(null);
-                      setShowAssigneePicker(false);
-                    }}
-                    className="mt-2 text-xs text-gray-500 hover:text-gray-700 w-full text-center"
-                  >
-                    {t("clearAssignee")}
-                  </button>
-                )}
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
-          <input
-            type="text"
-            value={newTodoTitle}
-            onChange={(e) => setNewTodoTitle(e.target.value)}
-            placeholder={t("addPlaceholder")}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            disabled={isAdding}
-          />
-          <button
-            type="submit"
-            disabled={!newTodoTitle.trim() || isAdding}
-            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-          >
-            {isAdding ? t("adding") : t("add")}
-          </button>
+          {/* Input and Submit Row */}
+          <div className="flex flex-1 gap-2">
+            <input
+              type="text"
+              value={newTodoTitle}
+              onChange={(e) => setNewTodoTitle(e.target.value)}
+              placeholder={t("addPlaceholder")}
+              className="flex-1 min-h-[44px] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              disabled={isAdding}
+            />
+            <button
+              type="submit"
+              disabled={!newTodoTitle.trim() || isAdding}
+              className="px-4 py-2 min-h-[44px] min-w-[70px] bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            >
+              {isAdding ? t("adding") : t("add")}
+            </button>
+          </div>
         </div>
       </form>
 
@@ -344,10 +350,10 @@ export default function FamilyTodoList() {
               )}
               <button
                 onClick={() => deleteTodo(todo.id)}
-                className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition p-1"
+                className="sm:opacity-0 sm:group-hover:opacity-100 text-gray-400 hover:text-red-500 transition p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
               >
                 <svg
-                  className="w-4 h-4"
+                  className="w-5 h-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -405,10 +411,10 @@ export default function FamilyTodoList() {
                   )}
                   <button
                     onClick={() => deleteTodo(todo.id)}
-                    className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition p-1"
+                    className="sm:opacity-0 sm:group-hover:opacity-100 text-gray-400 hover:text-red-500 transition p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
                   >
                     <svg
-                      className="w-4 h-4"
+                      className="w-5 h-5"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"

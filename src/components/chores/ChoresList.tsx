@@ -107,11 +107,11 @@ export default function ChoresList() {
 
   return (
     <div>
-      <div className="mb-6 flex justify-between items-center">
-        <div className="flex space-x-2">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setFilter("active")}
-            className={`px-4 py-2 rounded-lg font-medium ${
+            className={`px-4 py-2 min-h-[44px] rounded-lg font-medium ${
               filter === "active"
                 ? "bg-blue-600 text-white"
                 : "bg-white text-gray-700 hover:bg-gray-50"
@@ -121,7 +121,7 @@ export default function ChoresList() {
           </button>
           <button
             onClick={() => setFilter("archived")}
-            className={`px-4 py-2 rounded-lg font-medium ${
+            className={`px-4 py-2 min-h-[44px] rounded-lg font-medium ${
               filter === "archived"
                 ? "bg-blue-600 text-white"
                 : "bg-white text-gray-700 hover:bg-gray-50"
@@ -131,7 +131,7 @@ export default function ChoresList() {
           </button>
           <button
             onClick={() => setFilter("all")}
-            className={`px-4 py-2 rounded-lg font-medium ${
+            className={`px-4 py-2 min-h-[44px] rounded-lg font-medium ${
               filter === "all"
                 ? "bg-blue-600 text-white"
                 : "bg-white text-gray-700 hover:bg-gray-50"
@@ -143,7 +143,7 @@ export default function ChoresList() {
 
         <button
           onClick={() => setShowForm(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+          className="w-full sm:w-auto px-4 py-2 min-h-[44px] bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
         >
           {t("addChore")}
         </button>
@@ -160,88 +160,137 @@ export default function ChoresList() {
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t("chore")}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {tCommon("points")}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t("status")}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t("createdBy")}
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t("actions")}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredChores.map((chore) => (
-                <tr key={chore.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center gap-2">
-                      {chore.icon && (
-                        <span className="text-2xl">{chore.icon}</span>
-                      )}
-                      <div className="text-sm font-medium text-gray-900">
-                        {chore.title}
-                      </div>
+        <>
+          {/* Mobile Card View */}
+          <div className="md:hidden space-y-3">
+            {filteredChores.map((chore) => (
+              <div key={chore.id} className="bg-white rounded-lg shadow border border-gray-200 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    {chore.icon && <span className="text-2xl flex-shrink-0">{chore.icon}</span>}
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium text-gray-900 truncate">{chore.title}</div>
+                      <div className="text-xs text-gray-500">{t("lastUpdatedBy")} {chore.updatedBy.name || chore.updatedBy.email}</div>
                     </div>
-                    <div className="text-xs text-gray-500">
-                      {t("lastUpdatedBy")}{" "}
-                      {chore.updatedBy.name || chore.updatedBy.email}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm font-semibold text-blue-600">
-                      {chore.defaultPoints} pts
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        chore.isActive
-                          ? "bg-green-100 text-green-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {chore.isActive ? t("active") : t("archived")}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {chore.createdBy.name || chore.createdBy.email}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                  </div>
+                  <span className={`flex-shrink-0 px-2 py-0.5 text-xs leading-5 font-semibold rounded-full ${
+                    chore.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                  }`}>
+                    {chore.isActive ? t("active") : t("archived")}
+                  </span>
+                </div>
+
+                <div className="mt-3 flex items-center justify-between">
+                  <span className="text-sm font-semibold text-blue-600">{chore.defaultPoints} pts</span>
+                  <div className="flex items-center gap-1">
                     <button
                       onClick={() => handleEdit(chore)}
-                      className="text-blue-600 hover:text-blue-900"
+                      className="px-3 py-2 min-h-[44px] text-blue-600 hover:text-blue-900 text-sm font-medium"
                     >
                       {t("edit")}
                     </button>
                     <button
                       onClick={() => handleToggleActive(chore)}
-                      className="text-yellow-600 hover:text-yellow-900"
+                      className="px-3 py-2 min-h-[44px] text-yellow-600 hover:text-yellow-900 text-sm font-medium"
                     >
                       {chore.isActive ? t("archive") : t("activate")}
                     </button>
                     <button
                       onClick={() => handleDelete(chore.id)}
-                      className="text-red-600 hover:text-red-900"
+                      className="px-3 py-2 min-h-[44px] text-red-600 hover:text-red-900 text-sm font-medium"
                     >
                       {t("delete")}
                     </button>
-                  </td>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t("chore")}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {tCommon("points")}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t("status")}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t("createdBy")}
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t("actions")}
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredChores.map((chore) => (
+                  <tr key={chore.id}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        {chore.icon && (
+                          <span className="text-2xl">{chore.icon}</span>
+                        )}
+                        <div className="text-sm font-medium text-gray-900">
+                          {chore.title}
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {t("lastUpdatedBy")}{" "}
+                        {chore.updatedBy.name || chore.updatedBy.email}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-sm font-semibold text-blue-600">
+                        {chore.defaultPoints} pts
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          chore.isActive
+                            ? "bg-green-100 text-green-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {chore.isActive ? t("active") : t("archived")}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {chore.createdBy.name || chore.createdBy.email}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                      <button
+                        onClick={() => handleEdit(chore)}
+                        className="text-blue-600 hover:text-blue-900"
+                      >
+                        {t("edit")}
+                      </button>
+                      <button
+                        onClick={() => handleToggleActive(chore)}
+                        className="text-yellow-600 hover:text-yellow-900"
+                      >
+                        {chore.isActive ? t("archive") : t("activate")}
+                      </button>
+                      <button
+                        onClick={() => handleDelete(chore.id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        {t("delete")}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
       {showForm && (

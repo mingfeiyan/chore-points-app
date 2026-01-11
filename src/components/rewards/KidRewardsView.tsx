@@ -130,10 +130,10 @@ export default function KidRewardsView({ kidId }: KidRewardsViewProps) {
     <div>
       {/* Current Points Display */}
       <div className="mb-8">
-        <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg shadow-lg p-8 text-white">
+        <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 sm:p-8 text-white">
           <div className="text-center">
-            <p className="text-lg font-medium opacity-90">{t("availablePoints")}</p>
-            <p className="text-6xl font-bold mt-2">{totalPoints}</p>
+            <p className="text-base sm:text-lg font-medium opacity-90">{t("availablePoints")}</p>
+            <p className="text-4xl sm:text-6xl font-bold mt-2">{totalPoints}</p>
             <p className="text-sm mt-4 opacity-75">
               {t("saveUp")}
             </p>
@@ -223,58 +223,88 @@ export default function KidRewardsView({ kidId }: KidRewardsViewProps) {
             </p>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t("reward")}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t("cost")}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t("status")}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t("requested")}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t("resolved")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {redemptions.map((redemption) => (
-                  <tr key={redemption.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {redemption.reward.title}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {redemption.reward.costPoints} {tCommon("points")}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadge(
-                          redemption.status
-                        )}`}
-                      >
-                        {getStatusText(redemption.status)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(redemption.requestedAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {redemption.resolvedAt
-                        ? new Date(redemption.resolvedAt).toLocaleDateString()
-                        : "-"}
-                    </td>
+          <>
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-3">
+              {redemptions.map((redemption) => (
+                <div key={redemption.id} className="bg-white rounded-lg shadow border border-gray-200 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium text-gray-900">{redemption.reward.title}</div>
+                      <div className="text-sm text-purple-600 font-semibold mt-1">
+                        {redemption.reward.costPoints} {tCommon("points")}
+                      </div>
+                    </div>
+                    <span className={`flex-shrink-0 px-2 py-0.5 text-xs leading-5 font-semibold rounded-full ${getStatusBadge(redemption.status)}`}>
+                      {getStatusText(redemption.status)}
+                    </span>
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-gray-100 flex justify-between text-xs text-gray-500">
+                    <div>
+                      <span className="font-medium">{t("requested")}:</span> {new Date(redemption.requestedAt).toLocaleDateString()}
+                    </div>
+                    <div>
+                      <span className="font-medium">{t("resolved")}:</span> {redemption.resolvedAt ? new Date(redemption.resolvedAt).toLocaleDateString() : "-"}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t("reward")}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t("cost")}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t("status")}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t("requested")}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t("resolved")}
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {redemptions.map((redemption) => (
+                    <tr key={redemption.id}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {redemption.reward.title}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {redemption.reward.costPoints} {tCommon("points")}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadge(
+                            redemption.status
+                          )}`}
+                        >
+                          {getStatusText(redemption.status)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(redemption.requestedAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {redemption.resolvedAt
+                          ? new Date(redemption.resolvedAt).toLocaleDateString()
+                          : "-"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </div>

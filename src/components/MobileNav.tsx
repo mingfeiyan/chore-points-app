@@ -103,22 +103,22 @@ export default function MobileNav() {
         </div>
       )}
 
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-gray-800 text-white border-t border-gray-700 z-50">
-        <div className="flex justify-around items-center h-16">
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-gray-800 text-white border-t border-gray-700 z-50 pb-[env(safe-area-inset-bottom)]">
+        <div className="flex justify-around items-center h-[68px]">
           {primaryLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
+                className={`flex flex-col items-center justify-center flex-1 h-full min-h-[68px] transition-colors ${
                   isActive
                     ? "text-blue-400 bg-gray-700/50"
                     : "text-gray-400 hover:text-gray-200"
                 }`}
               >
-                <span className="text-xl mb-0.5">{link.icon}</span>
-                <span className="text-[10px] font-medium truncate max-w-[60px]">
+                <span className="text-2xl mb-1">{link.icon}</span>
+                <span className="text-xs font-medium truncate max-w-[70px]">
                   {link.label}
                 </span>
               </Link>
@@ -129,14 +129,14 @@ export default function MobileNav() {
           {secondaryLinks.length > 0 && (
             <button
               onClick={() => setShowMore(!showMore)}
-              className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
+              className={`flex flex-col items-center justify-center flex-1 h-full min-h-[68px] transition-colors ${
                 showMore || isSecondaryActive
                   ? "text-blue-400 bg-gray-700/50"
                   : "text-gray-400 hover:text-gray-200"
               }`}
             >
-              <span className="text-xl mb-0.5">•••</span>
-              <span className="text-[10px] font-medium">{t("more")}</span>
+              <span className="text-2xl mb-1">•••</span>
+              <span className="text-xs font-medium">{t("more")}</span>
             </button>
           )}
         </div>

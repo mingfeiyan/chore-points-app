@@ -38,7 +38,7 @@ export default function RootLayout({
             <KidModeProvider>
               <NavBar />
               <KidModeBanner />
-              <main className="pb-16 sm:pb-0">{children}</main>
+              <main className="pb-20 sm:pb-0">{children}</main>
               <MobileNav />
             </KidModeProvider>
           </LocaleProvider>

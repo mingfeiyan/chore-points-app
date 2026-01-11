@@ -27,7 +27,7 @@ export default function NavBar() {
   const LanguageToggle = () => (
     <button
       onClick={toggleLanguage}
-      className="text-sm px-2 py-1 rounded border border-gray-600 hover:border-gray-400 transition"
+      className="text-sm px-3 py-2 min-h-[44px] min-w-[44px] rounded border border-gray-600 hover:border-gray-400 transition flex items-center justify-center"
       title={t("language")}
     >
       {locale === "en" ? "中文" : "EN"}
@@ -59,17 +59,17 @@ export default function NavBar() {
           <Link href="/" className="text-xl font-bold">
             {t("appName")}
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <LanguageToggle />
             <Link
               href="/login"
-              className="text-sm hover:text-gray-300 transition"
+              className="text-sm hover:text-gray-300 transition px-3 py-2 min-h-[44px] flex items-center"
             >
               {t("login")}
             </Link>
             <Link
               href="/signup"
-              className="text-sm bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded transition"
+              className="text-sm bg-blue-600 hover:bg-blue-700 px-4 py-2.5 min-h-[44px] rounded-lg transition flex items-center"
             >
               {t("signup")}
             </Link>
@@ -243,7 +243,7 @@ export default function NavBar() {
 
           <button
             onClick={() => signOut({ callbackUrl: "/" })}
-            className="text-sm bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded transition"
+            className="text-sm bg-red-600 hover:bg-red-700 px-4 py-2.5 min-h-[44px] rounded-lg transition flex items-center"
           >
             {t("logout")}
           </button>

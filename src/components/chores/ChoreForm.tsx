@@ -103,8 +103,8 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-gray-900">
             {chore ? t("editChore") : t("addChoreTitle")}
@@ -181,13 +181,13 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
             </div>
 
             {showIconPicker && (
-              <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200 max-h-80 overflow-y-auto">
+              <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200 max-h-[50vh] overflow-y-auto">
                 {Object.entries(iconCategories).map(([category, icons]) => (
-                  <div key={category} className="mb-3">
-                    <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                  <div key={category} className="mb-4">
+                    <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
                       {category}
                     </h4>
-                    <div className="flex flex-wrap gap-1">
+                    <div className="grid grid-cols-6 sm:grid-cols-8 gap-1">
                       {icons.map((emoji, idx) => (
                         <button
                           key={`${category}-${emoji}-${idx}`}
@@ -196,8 +196,8 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
                             setIcon(emoji);
                             setShowIconPicker(false);
                           }}
-                          className={`text-2xl p-1.5 rounded hover:bg-blue-100 transition-colors ${
-                            icon === emoji ? "bg-blue-200" : ""
+                          className={`text-xl sm:text-2xl p-2 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 sm:p-1.5 rounded hover:bg-blue-100 transition-colors flex items-center justify-center ${
+                            icon === emoji ? "bg-blue-200 ring-2 ring-blue-500" : ""
                           }`}
                         >
                           {emoji}
@@ -215,7 +215,7 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
                     value={icon}
                     onChange={(e) => setIcon(e.target.value)}
                     placeholder="Type or paste an emoji"
-                    className="w-full px-2 py-1 text-lg border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 min-h-[44px] text-lg border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     maxLength={4}
                   />
                 </div>
@@ -252,14 +252,14 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium"
+              className="flex-1 px-4 py-2 min-h-[44px] border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium"
             >
               {tCommon("cancel")}
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 min-h-[44px] bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? t("saving") : chore ? t("update") : t("create")}
             </button>
