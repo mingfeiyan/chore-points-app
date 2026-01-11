@@ -74,6 +74,15 @@ export async function PUT(
       });
 
       // Create negative point entry
+      // Use noon local time to avoid timezone date shift issues
+      const now = new Date();
+      const dateAtNoon = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        12, 0, 0
+      );
+
       await tx.pointEntry.create({
         data: {
           familyId: session.user.familyId!,
@@ -81,6 +90,7 @@ export async function PUT(
           points: -redemption.reward.costPoints,
           note: `Redeemed: ${redemption.reward.title}`,
           redemptionId: redemption.id,
+          date: dateAtNoon,
           createdById: session.user.id,
           updatedById: session.user.id,
         },

@@ -55,7 +55,7 @@ export function getDailyTotals(entries: PointEntry[]): Map<string, number> {
 export function getDayIndicator(
   points: number
 ): "fire" | "star" | "none" {
-  if (points > 10) return "fire";
+  if (points >= 10) return "fire";
   if (points >= 1) return "star";
   return "none";
 }
