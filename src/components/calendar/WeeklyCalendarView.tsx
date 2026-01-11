@@ -113,6 +113,19 @@ export default function WeeklyCalendarView() {
   const firstWeekDays = twoWeeksDays.slice(0, 7);
   const secondWeekDays = twoWeeksDays.slice(7, 14);
 
+  // Mobile view: 6 days starting from today
+  const mobileDays = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const days = [];
+    for (let i = 0; i < 6; i++) {
+      const day = new Date(today);
+      day.setDate(today.getDate() + i);
+      days.push(day);
+    }
+    return days;
+  }, []);
+
   const loadSettings = useCallback(async () => {
     try {
       const res = await fetch("/api/calendar/settings");
@@ -500,9 +513,16 @@ export default function WeeklyCalendarView() {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
       {/* Header */}
-      <div className="flex flex-col gap-3 px-4 py-3 bg-gray-50 border-b md:flex-row md:items-center md:justify-between">
-        {/* Navigation and date range */}
-        <div className="flex items-center justify-between gap-2 md:justify-start">
+      <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b">
+        {/* Mobile: Simple title */}
+        <div className="md:hidden">
+          <span className="font-medium text-gray-900 text-sm">
+            {t("next6Days") || "Next 6 Days"}
+          </span>
+        </div>
+
+        {/* Desktop: Navigation and date range */}
+        <div className="hidden md:flex items-center gap-2">
           <div className="flex items-center gap-1">
             <button
               onClick={goToPreviousTwoWeeks}
@@ -541,44 +561,42 @@ export default function WeeklyCalendarView() {
               </svg>
             </button>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-900 text-sm md:text-base">
-              {firstWeekDays[0].toLocaleDateString(undefined, {
-                month: "short",
-                day: "numeric",
-              })}{" "}
-              -{" "}
-              {secondWeekDays[6].toLocaleDateString(undefined, {
-                month: "short",
-                day: "numeric",
-              })}
-            </span>
-            <button
-              onClick={goToToday}
-              className="text-sm text-blue-600 hover:text-blue-800 p-2 min-h-[44px] flex items-center"
-            >
-              {t("today")}
-            </button>
-          </div>
+          <span className="font-medium text-gray-900">
+            {firstWeekDays[0].toLocaleDateString(undefined, {
+              month: "short",
+              day: "numeric",
+            })}{" "}
+            -{" "}
+            {secondWeekDays[6].toLocaleDateString(undefined, {
+              month: "short",
+              day: "numeric",
+            })}
+          </span>
+          <button
+            onClick={goToToday}
+            className="text-sm text-blue-600 hover:text-blue-800 p-2 min-h-[44px] flex items-center"
+          >
+            {t("today")}
+          </button>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-between gap-2 md:justify-end">
+        <div className="flex items-center gap-2">
           <button
             onClick={startCreateMode}
-            className="flex-1 md:flex-none flex items-center justify-center gap-1 px-4 py-2.5 min-h-[44px] text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition"
+            className="flex items-center justify-center gap-1 px-3 md:px-4 py-2.5 min-h-[44px] min-w-[44px] text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            {t("addEvent")}
+            <span className="hidden md:inline">{t("addEvent")}</span>
           </button>
           <Link
             href="/calendar"
             className="text-sm text-gray-500 hover:text-gray-700 p-2 min-h-[44px] flex items-center whitespace-nowrap"
           >
-            <span className="hidden sm:inline">{t("viewFullCalendar") || "View Full Calendar"}</span>
-            <span className="sm:hidden">{t("more") || "More"}</span>
+            <span className="hidden md:inline">{t("viewFullCalendar") || "View Full Calendar"}</span>
+            <span className="md:hidden">{t("more") || "More"}</span>
             {" "}&rarr;
           </Link>
         </div>
@@ -598,116 +616,223 @@ export default function WeeklyCalendarView() {
         </div>
       </div>
 
-      {/* Day Headers */}
-      <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-7 border-b border-gray-200 bg-gray-50 scrollbar-hide">
-        {dayNames.map((name, index) => (
-          <div key={index} className="flex-shrink-0 w-[calc(100%/3)] md:w-auto snap-start px-2 py-2 text-center text-xs text-gray-500 uppercase font-medium">
-            {name}
-          </div>
-        ))}
-      </div>
+      {/* Mobile View: 6 days from today in a 3x2 grid */}
+      <div className="md:hidden">
+        <div className="grid grid-cols-3 divide-x divide-gray-100">
+          {mobileDays.slice(0, 3).map((day, index) => {
+            const dayEvents = getEventsForDay(day);
+            const todayClass = isToday(day) ? "bg-blue-50" : "";
+            const dayName = dayNames[day.getDay()];
 
-      {/* First Week Grid */}
-      <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-7 md:divide-x divide-gray-100 scrollbar-hide">
-        {firstWeekDays.map((day, index) => {
-          const dayEvents = getEventsForDay(day);
-          const todayClass = isToday(day) ? "bg-blue-50" : "";
+            return (
+              <div
+                key={index}
+                className={`min-h-[100px] ${todayClass}`}
+              >
+                {/* Day Header */}
+                <div className="px-2 py-1 text-center border-b border-gray-100">
+                  <div className="text-xs text-gray-500 uppercase">{dayName}</div>
+                  <div
+                    className={`text-sm font-medium ${
+                      isToday(day)
+                        ? "w-7 h-7 mx-auto flex items-center justify-center bg-blue-600 text-white rounded-full"
+                        : "text-gray-900"
+                    }`}
+                  >
+                    {day.getDate()}
+                  </div>
+                </div>
 
-          return (
-            <div
-              key={index}
-              className={`flex-shrink-0 w-[calc(100%/3)] md:w-auto snap-start min-h-[120px] md:min-h-[100px] border-r border-gray-100 md:border-r-0 ${todayClass}`}
-            >
-              {/* Day Number */}
-              <div className="px-2 py-1 text-center">
-                <div
-                  className={`text-sm font-medium ${
-                    isToday(day)
-                      ? "w-7 h-7 mx-auto flex items-center justify-center bg-blue-600 text-white rounded-full"
-                      : "text-gray-900"
-                  }`}
-                >
-                  {day.getDate()}
+                {/* Events */}
+                <div className="px-1 py-1 space-y-0.5">
+                  {dayEvents.slice(0, 2).map((event) => {
+                    const eventColor = getEventColor(event.summary);
+                    return (
+                      <button
+                        key={event.id}
+                        onClick={() => setSelectedEvent(event)}
+                        className={`w-full text-left text-xs ${eventColor.color} px-1.5 py-1 min-h-[28px] rounded truncate hover:opacity-80 transition cursor-pointer`}
+                        title={`${formatTime(event)} - ${event.summary}`}
+                      >
+                        {event.summary}
+                      </button>
+                    );
+                  })}
+                  {dayEvents.length > 2 && (
+                    <div className="text-xs text-gray-500 px-1">
+                      +{dayEvents.length - 2}
+                    </div>
+                  )}
                 </div>
               </div>
+            );
+          })}
+        </div>
+        <div className="grid grid-cols-3 divide-x divide-gray-100 border-t border-gray-200">
+          {mobileDays.slice(3, 6).map((day, index) => {
+            const dayEvents = getEventsForDay(day);
+            const todayClass = isToday(day) ? "bg-blue-50" : "";
+            const dayName = dayNames[day.getDay()];
 
-              {/* Events */}
-              <div className="px-1 pb-1 space-y-0.5">
-                {dayEvents.slice(0, 2).map((event) => {
-                  const eventColor = getEventColor(event.summary);
-                  return (
-                    <button
-                      key={event.id}
-                      onClick={() => setSelectedEvent(event)}
-                      className={`w-full text-left text-xs ${eventColor.color} px-1.5 py-1 min-h-[28px] rounded truncate hover:opacity-80 transition cursor-pointer`}
-                      title={`${formatTime(event)} - ${event.summary}`}
-                    >
-                      {event.summary}
-                    </button>
-                  );
-                })}
-                {dayEvents.length > 2 && (
-                  <div className="text-xs text-gray-500 px-1">
-                    +{dayEvents.length - 2} {t("more")}
+            return (
+              <div
+                key={index}
+                className={`min-h-[100px] ${todayClass}`}
+              >
+                {/* Day Header */}
+                <div className="px-2 py-1 text-center border-b border-gray-100">
+                  <div className="text-xs text-gray-500 uppercase">{dayName}</div>
+                  <div
+                    className={`text-sm font-medium ${
+                      isToday(day)
+                        ? "w-7 h-7 mx-auto flex items-center justify-center bg-blue-600 text-white rounded-full"
+                        : "text-gray-900"
+                    }`}
+                  >
+                    {day.getDate()}
                   </div>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+                </div>
 
-      {/* Divider between weeks */}
-      <div className="border-t border-gray-200"></div>
-
-      {/* Second Week Grid */}
-      <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-7 md:divide-x divide-gray-100 scrollbar-hide">
-        {secondWeekDays.map((day, index) => {
-          const dayEvents = getEventsForDay(day);
-          const todayClass = isToday(day) ? "bg-blue-50" : "";
-
-          return (
-            <div
-              key={index}
-              className={`flex-shrink-0 w-[calc(100%/3)] md:w-auto snap-start min-h-[120px] md:min-h-[100px] border-r border-gray-100 md:border-r-0 ${todayClass}`}
-            >
-              {/* Day Number */}
-              <div className="px-2 py-1 text-center">
-                <div
-                  className={`text-sm font-medium ${
-                    isToday(day)
-                      ? "w-7 h-7 mx-auto flex items-center justify-center bg-blue-600 text-white rounded-full"
-                      : "text-gray-900"
-                  }`}
-                >
-                  {day.getDate()}
+                {/* Events */}
+                <div className="px-1 py-1 space-y-0.5">
+                  {dayEvents.slice(0, 2).map((event) => {
+                    const eventColor = getEventColor(event.summary);
+                    return (
+                      <button
+                        key={event.id}
+                        onClick={() => setSelectedEvent(event)}
+                        className={`w-full text-left text-xs ${eventColor.color} px-1.5 py-1 min-h-[28px] rounded truncate hover:opacity-80 transition cursor-pointer`}
+                        title={`${formatTime(event)} - ${event.summary}`}
+                      >
+                        {event.summary}
+                      </button>
+                    );
+                  })}
+                  {dayEvents.length > 2 && (
+                    <div className="text-xs text-gray-500 px-1">
+                      +{dayEvents.length - 2}
+                    </div>
+                  )}
                 </div>
               </div>
+            );
+          })}
+        </div>
+      </div>
 
-              {/* Events */}
-              <div className="px-1 pb-1 space-y-0.5">
-                {dayEvents.slice(0, 2).map((event) => {
-                  const eventColor = getEventColor(event.summary);
-                  return (
-                    <button
-                      key={event.id}
-                      onClick={() => setSelectedEvent(event)}
-                      className={`w-full text-left text-xs ${eventColor.color} px-1.5 py-1 min-h-[28px] rounded truncate hover:opacity-80 transition cursor-pointer`}
-                      title={`${formatTime(event)} - ${event.summary}`}
-                    >
-                      {event.summary}
-                    </button>
-                  );
-                })}
-                {dayEvents.length > 2 && (
-                  <div className="text-xs text-gray-500 px-1">
-                    +{dayEvents.length - 2} {t("more")}
-                  </div>
-                )}
-              </div>
+      {/* Desktop View: Full 2-week calendar */}
+      <div className="hidden md:block">
+        {/* Day Headers */}
+        <div className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
+          {dayNames.map((name, index) => (
+            <div key={index} className="px-2 py-2 text-center text-xs text-gray-500 uppercase font-medium">
+              {name}
             </div>
-          );
-        })}
+          ))}
+        </div>
+
+        {/* First Week Grid */}
+        <div className="grid grid-cols-7 divide-x divide-gray-100">
+          {firstWeekDays.map((day, index) => {
+            const dayEvents = getEventsForDay(day);
+            const todayClass = isToday(day) ? "bg-blue-50" : "";
+
+            return (
+              <div
+                key={index}
+                className={`min-h-[100px] ${todayClass}`}
+              >
+                {/* Day Number */}
+                <div className="px-2 py-1 text-center">
+                  <div
+                    className={`text-sm font-medium ${
+                      isToday(day)
+                        ? "w-7 h-7 mx-auto flex items-center justify-center bg-blue-600 text-white rounded-full"
+                        : "text-gray-900"
+                    }`}
+                  >
+                    {day.getDate()}
+                  </div>
+                </div>
+
+                {/* Events */}
+                <div className="px-1 pb-1 space-y-0.5">
+                  {dayEvents.slice(0, 2).map((event) => {
+                    const eventColor = getEventColor(event.summary);
+                    return (
+                      <button
+                        key={event.id}
+                        onClick={() => setSelectedEvent(event)}
+                        className={`w-full text-left text-xs ${eventColor.color} px-1.5 py-1 min-h-[28px] rounded truncate hover:opacity-80 transition cursor-pointer`}
+                        title={`${formatTime(event)} - ${event.summary}`}
+                      >
+                        {event.summary}
+                      </button>
+                    );
+                  })}
+                  {dayEvents.length > 2 && (
+                    <div className="text-xs text-gray-500 px-1">
+                      +{dayEvents.length - 2} {t("more")}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Divider between weeks */}
+        <div className="border-t border-gray-200"></div>
+
+        {/* Second Week Grid */}
+        <div className="grid grid-cols-7 divide-x divide-gray-100">
+          {secondWeekDays.map((day, index) => {
+            const dayEvents = getEventsForDay(day);
+            const todayClass = isToday(day) ? "bg-blue-50" : "";
+
+            return (
+              <div
+                key={index}
+                className={`min-h-[100px] ${todayClass}`}
+              >
+                {/* Day Number */}
+                <div className="px-2 py-1 text-center">
+                  <div
+                    className={`text-sm font-medium ${
+                      isToday(day)
+                        ? "w-7 h-7 mx-auto flex items-center justify-center bg-blue-600 text-white rounded-full"
+                        : "text-gray-900"
+                    }`}
+                  >
+                    {day.getDate()}
+                  </div>
+                </div>
+
+                {/* Events */}
+                <div className="px-1 pb-1 space-y-0.5">
+                  {dayEvents.slice(0, 2).map((event) => {
+                    const eventColor = getEventColor(event.summary);
+                    return (
+                      <button
+                        key={event.id}
+                        onClick={() => setSelectedEvent(event)}
+                        className={`w-full text-left text-xs ${eventColor.color} px-1.5 py-1 min-h-[28px] rounded truncate hover:opacity-80 transition cursor-pointer`}
+                        title={`${formatTime(event)} - ${event.summary}`}
+                      >
+                        {event.summary}
+                      </button>
+                    );
+                  })}
+                  {dayEvents.length > 2 && (
+                    <div className="text-xs text-gray-500 px-1">
+                      +{dayEvents.length - 2} {t("more")}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Event Details Modal */}
