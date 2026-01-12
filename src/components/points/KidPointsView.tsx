@@ -53,6 +53,7 @@ export default function KidPointsView({ kidId, readOnly = false }: KidPointsView
 
   return (
     <PointsCelebrationWrapper kidId={kidId} currentPoints={totalPoints}>
+      {({ onReplay, canReplay }) => (
     <div>
       {/* Custom animation for slow spin */}
       <style jsx>{`
@@ -102,6 +103,14 @@ export default function KidPointsView({ kidId, readOnly = false }: KidPointsView
               >
                 {t("redeemRewards")}
               </Link>
+              {canReplay && (
+                <button
+                  onClick={onReplay}
+                  className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 rounded-full text-sm font-medium transition-colors"
+                >
+                  🎉
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -123,6 +132,7 @@ export default function KidPointsView({ kidId, readOnly = false }: KidPointsView
         <ChoreFlashcards />
       </div>
     </div>
+      )}
     </PointsCelebrationWrapper>
   );
 }
