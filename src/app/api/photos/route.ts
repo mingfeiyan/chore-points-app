@@ -56,11 +56,12 @@ export async function GET(request: NextRequest) {
         photoUrl: true,
         caption: true,
         date: true,
+        createdAt: true,
         kid: {
           select: { id: true, name: true, email: true },
         },
       },
-      orderBy: { date: "desc" },
+      orderBy: { createdAt: "desc" },
     });
 
     // Fetch photos from PointEntry (includes photos attached to point awards)
@@ -72,6 +73,7 @@ export async function GET(request: NextRequest) {
         points: true,
         note: true,
         date: true,
+        createdAt: true,
         chore: {
           select: { title: true },
         },
@@ -79,7 +81,7 @@ export async function GET(request: NextRequest) {
           select: { id: true, name: true, email: true },
         },
       },
-      orderBy: { date: "desc" },
+      orderBy: { createdAt: "desc" },
     });
 
     // Combine and format
@@ -89,6 +91,7 @@ export async function GET(request: NextRequest) {
         photoUrl: p.photoUrl,
         caption: p.caption,
         date: p.date,
+        createdAt: p.createdAt,
         kid: p.kid,
         points: null,
         chore: null,
@@ -98,11 +101,12 @@ export async function GET(request: NextRequest) {
         photoUrl: p.photoUrl,
         caption: p.note,
         date: p.date,
+        createdAt: p.createdAt,
         kid: p.kid,
         points: p.points,
         chore: p.chore,
       })),
-    ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     return NextResponse.json({ photos: allPhotos });
   } catch (error: unknown) {
