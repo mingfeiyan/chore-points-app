@@ -447,6 +447,12 @@
     "pickIcon": "选择图标",
     "clearIcon": "清除图标",
     "assignTo": "分配",
-    "clearAssignee": "清除分配"
+    "clearAssignee": "清除分配",
+    "save": "保存",
+    "saving": "保存中...",
+    "cancel": "取消",
+    "delete": "删除",
+    "deleting": "删除中...",
+    "confirmDelete": "删除此项？"
   }
 }

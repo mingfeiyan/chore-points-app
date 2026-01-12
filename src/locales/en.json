@@ -447,6 +447,12 @@
     "pickIcon": "Pick an icon",
     "clearIcon": "Clear icon",
     "assignTo": "Assign",
-    "clearAssignee": "Clear assignee"
+    "clearAssignee": "Clear assignee",
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "confirmDelete": "Delete this item?"
   }
 }
