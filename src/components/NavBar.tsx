@@ -113,6 +113,14 @@ export default function NavBar() {
                     {t("myPoints")}
                   </Link>
                   <Link
+                    href="/view-as/learn"
+                    className={`hover:text-gray-300 transition ${
+                      pathname === "/view-as/learn" ? "text-blue-400" : ""
+                    }`}
+                  >
+                    {t("learn")}
+                  </Link>
+                  <Link
                     href="/view-as/redeem"
                     className={`hover:text-gray-300 transition ${
                       pathname === "/view-as/redeem" ? "text-blue-400" : ""
@@ -181,6 +189,14 @@ export default function NavBar() {
                     {t("calendar")}
                   </Link>
                   <Link
+                    href="/sight-words"
+                    className={`hover:text-gray-300 transition ${
+                      pathname === "/sight-words" ? "text-blue-400" : ""
+                    }`}
+                  >
+                    {t("sightWords")}
+                  </Link>
+                  <Link
                     href="/settings"
                     className={`hover:text-gray-300 transition ${
                       pathname === "/settings" ? "text-blue-400" : ""
@@ -199,6 +215,14 @@ export default function NavBar() {
                     }`}
                   >
                     {t("myPoints")}
+                  </Link>
+                  <Link
+                    href="/learn"
+                    className={`hover:text-gray-300 transition ${
+                      pathname === "/learn" ? "text-blue-400" : ""
+                    }`}
+                  >
+                    {t("learn")}
                   </Link>
                   <Link
                     href="/redeem"

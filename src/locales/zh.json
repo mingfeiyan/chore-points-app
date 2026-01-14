@@ -11,7 +11,10 @@
     "pts": "分",
     "point": "分",
     "saving": "保存中...",
-    "update": "更新"
+    "update": "更新",
+    "add": "添加",
+    "edit": "编辑",
+    "delete": "删除"
   },
   "nav": {
     "appName": "宝石步",
@@ -33,7 +36,9 @@
     "gallery": "相册",
     "calendar": "日历",
     "settings": "设置",
-    "more": "更多"
+    "more": "更多",
+    "learn": "学习",
+    "sightWords": "单词学习"
   },
   "points": {
     "myPoints": "我的积分",
@@ -480,5 +485,38 @@
     },
     "earnedBadge": "你获得了一个徽章！",
     "reachedLevel": "你达到了{level}等级！"
+  },
+  "learn": {
+    "pageTitle": "学习单词",
+    "pageDesc": "练习拼写高频词",
+    "todaysWord": "今天的单词",
+    "takeQuiz": "开始测验",
+    "alreadyCompleted": "今天完成了！明天再来。",
+    "spellTheWord": "拼写这个单词",
+    "typeAnswer": "输入你的答案...",
+    "submit": "检查",
+    "correct": "正确！",
+    "incorrect": "再试一次！",
+    "progress": "进度",
+    "wordsLearned": "已学习 {count}/{total} 个单词",
+    "allComplete": "太棒了！你已经学完所有单词了！",
+    "noWordsYet": "还没有要学习的单词",
+    "back": "返回"
+  },
+  "sightWords": {
+    "pageTitle": "高频词",
+    "pageDesc": "管理孩子要学习的高频词",
+    "addWord": "+ 添加单词",
+    "editWord": "编辑单词",
+    "word": "单词",
+    "wordPlaceholder": "例如：the, and, cat",
+    "wordRequired": "请输入单词",
+    "image": "图片（可选）",
+    "imageHelp": "添加图片帮助识别",
+    "noWordsYet": "还没有高频词。添加单词让孩子学习吧！",
+    "dragToReorder": "拖动调整单词顺序",
+    "confirmDelete": "确定要删除这个单词吗？",
+    "active": "进行中",
+    "inactive": "已暂停"
   }
 }

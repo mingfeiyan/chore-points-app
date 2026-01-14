@@ -39,11 +39,13 @@ export default function MobileNav() {
     { href: "/calendar", label: t("calendar"), icon: "📅" },
     { href: "/gallery", label: t("gallery"), icon: "📷" },
     { href: "/milestones", label: t("milestones"), icon: "🏆" },
+    { href: "/sight-words", label: t("sightWords"), icon: "📚" },
     { href: "/settings", label: t("settings"), icon: "⚙️" },
   ];
 
   const kidModeLinks = [
     { href: "/view-as/points", label: t("myPoints"), icon: "💎" },
+    { href: "/view-as/learn", label: t("learn"), icon: "📚" },
     { href: "/view-as/redeem", label: t("redeem"), icon: "🎁" },
     { href: "/view-as/gallery", label: t("gallery"), icon: "📷" },
   ];
@@ -51,6 +53,7 @@ export default function MobileNav() {
   const kidLinks = [
     { href: "/dashboard", label: t("dashboard"), icon: "🏠" },
     { href: "/points", label: t("myPoints"), icon: "💎" },
+    { href: "/learn", label: t("learn"), icon: "📚" },
     { href: "/redeem", label: t("redeem"), icon: "🎁" },
     { href: "/gallery", label: t("gallery"), icon: "📷" },
   ];

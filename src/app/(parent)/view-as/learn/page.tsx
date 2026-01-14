@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/permissions";
-import CalendarView from "@/components/calendar/CalendarView";
+import ViewAsLearnClient from "./ViewAsLearnClient";
 
-export default async function CalendarPage() {
+export default async function ViewAsLearnPage() {
   const session = await getSession();
 
   if (!session?.user) {
@@ -17,9 +17,5 @@ export default async function CalendarPage() {
     redirect("/dashboard");
   }
 
-  return (
-    <div className="max-w-6xl mx-auto px-4 py-6">
-      <CalendarView />
-    </div>
-  );
+  return <ViewAsLearnClient />;
 }

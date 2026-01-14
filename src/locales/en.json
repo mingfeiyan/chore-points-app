@@ -11,7 +11,10 @@
     "pts": "pts",
     "point": "pt",
     "saving": "Saving...",
-    "update": "Update"
+    "update": "Update",
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete"
   },
   "nav": {
     "appName": "GemSteps",
@@ -33,7 +36,9 @@
     "gallery": "Gallery",
     "calendar": "Calendar",
     "settings": "Settings",
-    "more": "More"
+    "more": "More",
+    "learn": "Learn",
+    "sightWords": "Sight Words"
   },
   "points": {
     "myPoints": "My Points",
@@ -480,5 +485,38 @@
     },
     "earnedBadge": "You earned a badge!",
     "reachedLevel": "You reached {level} level!"
+  },
+  "learn": {
+    "pageTitle": "Learn Words",
+    "pageDesc": "Practice spelling sight words",
+    "todaysWord": "Today's Word",
+    "takeQuiz": "Take Quiz",
+    "alreadyCompleted": "Done for today! Come back tomorrow.",
+    "spellTheWord": "Spell the Word",
+    "typeAnswer": "Type your answer...",
+    "submit": "Check",
+    "correct": "Correct!",
+    "incorrect": "Try again!",
+    "progress": "Progress",
+    "wordsLearned": "{count} of {total} words learned",
+    "allComplete": "Amazing! You've learned all the words!",
+    "noWordsYet": "No words to learn yet",
+    "back": "Back"
+  },
+  "sightWords": {
+    "pageTitle": "Sight Words",
+    "pageDesc": "Manage sight words for your child to learn",
+    "addWord": "+ Add Word",
+    "editWord": "Edit Word",
+    "word": "Word",
+    "wordPlaceholder": "e.g., the, and, cat",
+    "wordRequired": "Word is required",
+    "image": "Image (optional)",
+    "imageHelp": "Add an image to help with recognition",
+    "noWordsYet": "No sight words yet. Add words for your child to learn!",
+    "dragToReorder": "Drag to reorder the words",
+    "confirmDelete": "Are you sure you want to delete this word?",
+    "active": "Active",
+    "inactive": "Paused"
   }
 }

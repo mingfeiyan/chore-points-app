@@ -45,3 +45,4 @@ next-env.d.ts
 # SSH keys
 Chore_app
 Chore_app.pub
+.env*.local

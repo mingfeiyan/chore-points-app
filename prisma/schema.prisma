@@ -49,6 +49,9 @@ model User {
   createdPhotos       Photo[]       @relation("PhotoCreatedBy")
   badges              Badge[]       @relation("KidBadges")
   achievementBadges   AchievementBadge[] @relation("KidAchievementBadges")
+  sightWordProgress   SightWordProgress[] @relation("KidSightWordProgress")
+  createdSightWords   SightWord[]   @relation("SightWordCreatedBy")
+  updatedSightWords   SightWord[]   @relation("SightWordUpdatedBy")
 
   // NextAuth fields
   accounts      Account[]
@@ -76,6 +79,7 @@ model Family {
   photos      Photo[]
   badges      Badge[]
   achievementBadges AchievementBadge[]
+  sightWords  SightWord[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -356,4 +360,49 @@ model AchievementBadge {
   @@index([familyId])
   @@index([kidId])
   @@index([familyId, kidId])
+}
+
+model SightWord {
+  id          String   @id @default(cuid())
+  familyId    String
+  family      Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  word        String
+  imageUrl    String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+
+  createdById String
+  createdBy   User     @relation("SightWordCreatedBy", fields: [createdById], references: [id])
+  updatedById String
+  updatedBy   User     @relation("SightWordUpdatedBy", fields: [updatedById], references: [id])
+
+  progress    SightWordProgress[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([familyId])
+  @@index([familyId, sortOrder])
+}
+
+model SightWordProgress {
+  id            String   @id @default(cuid())
+
+  kidId         String
+  kid           User     @relation("KidSightWordProgress", fields: [kidId], references: [id], onDelete: Cascade)
+
+  sightWordId   String
+  sightWord     SightWord @relation(fields: [sightWordId], references: [id], onDelete: Cascade)
+
+  viewedAt      DateTime?
+  quizPassedAt  DateTime?
+  pointAwarded  Boolean   @default(false)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([kidId, sightWordId])
+  @@index([kidId])
+  @@index([sightWordId])
 }
