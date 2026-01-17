@@ -83,11 +83,11 @@ export default function PointsCalendar({ entries }: PointsCalendarProps) {
 
   if (!today) {
     return (
-      <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 animate-pulse">
-        <div className="h-8 bg-gray-200 rounded mb-4"></div>
-        <div className="grid grid-cols-7 gap-1">
+      <div className="bg-white rounded-2xl shadow-lg p-3 sm:p-4 max-w-sm mx-auto animate-pulse">
+        <div className="h-6 bg-gray-200 rounded mb-3"></div>
+        <div className="grid grid-cols-7 gap-0.5">
           {Array.from({ length: 35 }).map((_, i) => (
-            <div key={i} className="aspect-square bg-gray-100 rounded-lg"></div>
+            <div key={i} className="w-10 h-10 bg-gray-100 rounded-md"></div>
           ))}
         </div>
       </div>
@@ -95,16 +95,16 @@ export default function PointsCalendar({ entries }: PointsCalendarProps) {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+    <div className="bg-white rounded-2xl shadow-lg p-3 sm:p-4 max-w-sm mx-auto">
       {/* Header with month navigation */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-3">
         <button
           onClick={goToPrevMonth}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
           aria-label={t("previousMonth")}
         >
           <svg
-            className="w-5 h-5 text-gray-600"
+            className="w-4 h-4 text-gray-600"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -117,16 +117,16 @@ export default function PointsCalendar({ entries }: PointsCalendarProps) {
             />
           </svg>
         </button>
-        <h3 className="text-lg font-bold text-gray-800">
+        <h3 className="text-base font-bold text-gray-800">
           {months[currentMonth]} {currentYear}
         </h3>
         <button
           onClick={goToNextMonth}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
           aria-label={t("nextMonth")}
         >
           <svg
-            className="w-5 h-5 text-gray-600"
+            className="w-4 h-4 text-gray-600"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -142,23 +142,23 @@ export default function PointsCalendar({ entries }: PointsCalendarProps) {
       </div>
 
       {/* Legend */}
-      <div className="flex justify-center gap-4 mb-4 text-sm">
+      <div className="flex justify-center gap-3 mb-3 text-xs">
         <div className="flex items-center gap-1">
-          <span className="text-xl">🔥</span>
+          <span className="text-base">🔥</span>
           <span className="text-gray-600">{t("moreThan10")}</span>
         </div>
         <div className="flex items-center gap-1">
-          <span className="text-xl">💎</span>
+          <span className="text-base">💎</span>
           <span className="text-gray-600">{t("oneOrMore")}</span>
         </div>
       </div>
 
       {/* Weekday headers */}
-      <div className="grid grid-cols-7 gap-1 mb-2">
+      <div className="grid grid-cols-7 gap-0.5 mb-1">
         {weekdays.map((day, index) => (
           <div
             key={index}
-            className="text-center text-xs font-medium text-gray-500 py-1"
+            className="text-center text-[10px] font-medium text-gray-500 py-0.5"
           >
             {day}
           </div>
@@ -166,10 +166,10 @@ export default function PointsCalendar({ entries }: PointsCalendarProps) {
       </div>
 
       {/* Calendar grid */}
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-0.5">
         {/* Empty cells for days before the first of the month */}
         {Array.from({ length: firstDayOfMonth }).map((_, i) => (
-          <div key={`empty-${i}`} className="aspect-square" />
+          <div key={`empty-${i}`} className="w-10 h-10" />
         ))}
 
         {/* Day cells */}
@@ -186,9 +186,9 @@ export default function PointsCalendar({ entries }: PointsCalendarProps) {
               key={dateKey}
               onClick={() => hasActivity && setSelectedDate(dateKey)}
               disabled={!hasActivity}
-              className={`aspect-square flex flex-col items-center justify-center rounded-lg transition-colors ${
+              className={`w-10 h-10 flex flex-col items-center justify-center rounded-md transition-colors ${
                 todayClass
-                  ? "bg-blue-100 ring-2 ring-blue-400"
+                  ? "bg-blue-100 ring-1 ring-blue-400"
                   : futureDay
                   ? "bg-gray-50"
                   : indicator === "fire"
@@ -196,17 +196,17 @@ export default function PointsCalendar({ entries }: PointsCalendarProps) {
                   : indicator === "star"
                   ? "bg-cyan-100"
                   : "bg-gray-100"
-              } ${hasActivity ? "cursor-pointer hover:ring-2 hover:ring-blue-300" : ""}`}
+              } ${hasActivity ? "cursor-pointer hover:ring-1 hover:ring-blue-300" : ""}`}
             >
               <span
-                className={`text-sm font-medium ${
+                className={`text-xs font-medium ${
                   futureDay ? "text-gray-400" : "text-gray-700"
                 }`}
               >
                 {date.getDate()}
               </span>
               {hasActivity && (
-                <span className="text-lg leading-none">
+                <span className="text-sm leading-none">
                   {indicator === "fire" ? "🔥" : "💎"}
                 </span>
               )}
