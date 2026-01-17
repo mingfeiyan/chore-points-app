@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { BADGE_LEVELS } from "@/lib/badges";
 import BadgeIcon from "./BadgeIcon";
+import BadgeDetailModal from "./BadgeDetailModal";
 
 type Badge = {
   id: string;
@@ -39,9 +40,15 @@ type AllAchievementBadge = {
   id: string;
   name: string;
   nameZh: string;
+  description?: string;
+  descriptionZh?: string;
   icon: string;
   customImageUrl?: string | null;
 };
+
+type SelectedBadge =
+  | { type: "achievement"; badge: AllAchievementBadge; earned: boolean; earnedBadge?: AchievementBadge }
+  | { type: "chore"; badge: Badge };
 
 // Level-based colors for the multiplier badge
 const levelBadgeColors: Record<number, string> = {
@@ -62,6 +69,7 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
   const [achievementBadges, setAchievementBadges] = useState<AchievementBadge[]>([]);
   const [allAchievementBadges, setAllAchievementBadges] = useState<AllAchievementBadge[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedBadge, setSelectedBadge] = useState<SelectedBadge | null>(null);
   const t = useTranslations("badges");
   const locale = useLocale();
 
@@ -106,67 +114,79 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
   }
 
   return (
-    <div className="grid grid-cols-4 gap-4">
-      {/* Achievement Badges - show all, gray out unearned */}
-      {allAchievementBadges.map((badge) => {
-        const earned = earnedAchievementIds.has(badge.id);
-        const earnedBadge = achievementBadges.find((b) => b.badgeId === badge.id);
+    <>
+      <div className="grid grid-cols-4 gap-4">
+        {/* Achievement Badges - show all, gray out unearned */}
+        {allAchievementBadges.map((badge) => {
+          const earned = earnedAchievementIds.has(badge.id);
+          const earnedBadge = achievementBadges.find((b) => b.badgeId === badge.id);
 
-        return (
-          <div
-            key={badge.id}
-            className="flex flex-col items-center"
-          >
-            {/* Sticker */}
-            <div className={`${earned ? "" : "grayscale opacity-30"} transition-all`}>
-              <BadgeIcon
-                imageUrl={earned ? earnedBadge?.customImageUrl : null}
-                emoji={badge.icon}
-                size="2xl"
-                alt={badge.name}
-                className={earned ? "" : "grayscale opacity-30"}
-              />
-            </div>
-            {/* Name */}
-            <div className={`text-xs text-center mt-2 font-medium leading-tight ${earned ? "text-gray-700" : "text-gray-400"}`}>
-              {locale === "zh" ? badge.nameZh : badge.name}
-            </div>
-          </div>
-        );
-      })}
+          return (
+            <button
+              key={badge.id}
+              className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform"
+              onClick={() => setSelectedBadge({ type: "achievement", badge, earned, earnedBadge })}
+            >
+              {/* Sticker */}
+              <div className={`${earned ? "" : "grayscale opacity-30"} transition-all`}>
+                <BadgeIcon
+                  imageUrl={earned ? earnedBadge?.customImageUrl : null}
+                  emoji={badge.icon}
+                  size="2xl"
+                  alt={badge.name}
+                  className={earned ? "" : "grayscale opacity-30"}
+                />
+              </div>
+              {/* Name */}
+              <div className={`text-xs text-center mt-2 font-medium leading-tight ${earned ? "text-gray-700" : "text-gray-400"}`}>
+                {locale === "zh" ? badge.nameZh : badge.name}
+              </div>
+            </button>
+          );
+        })}
 
-      {/* Chore Badges - show earned ones */}
-      {badges.map((badge) => {
-        const showCount = badge.count > 1;
-        const badgeColor = levelBadgeColors[badge.level] || levelBadgeColors[1];
+        {/* Chore Badges - show earned ones */}
+        {badges.map((badge) => {
+          const showCount = badge.count > 1;
+          const badgeColor = levelBadgeColors[badge.level] || levelBadgeColors[1];
 
-        return (
-          <div
-            key={badge.id}
-            className="flex flex-col items-center"
-          >
-            {/* Sticker with count indicator */}
-            <div className="relative">
-              <BadgeIcon
-                imageUrl={badge.customImageUrl}
-                emoji={badge.customIcon || badge.chore.icon || "✨"}
-                size="2xl"
-                alt={badge.chore.title}
-              />
-              {/* Count indicator like "2x" */}
-              {showCount && (
-                <div className={`absolute -bottom-1 -right-1 ${badgeColor} text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-sm`}>
-                  {badge.count}x
-                </div>
-              )}
-            </div>
-            {/* Name */}
-            <div className="text-xs text-center mt-2 font-medium text-gray-700 leading-tight">
-              {badge.chore.title}
-            </div>
-          </div>
-        );
-      })}
-    </div>
+          return (
+            <button
+              key={badge.id}
+              className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform"
+              onClick={() => setSelectedBadge({ type: "chore", badge })}
+            >
+              {/* Sticker with count indicator */}
+              <div className="relative">
+                <BadgeIcon
+                  imageUrl={badge.customImageUrl}
+                  emoji={badge.customIcon || badge.chore.icon || "✨"}
+                  size="2xl"
+                  alt={badge.chore.title}
+                />
+                {/* Count indicator like "2x" */}
+                {showCount && (
+                  <div className={`absolute -bottom-1 -right-1 ${badgeColor} text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-sm`}>
+                    {badge.count}x
+                  </div>
+                )}
+              </div>
+              {/* Name */}
+              <div className="text-xs text-center mt-2 font-medium text-gray-700 leading-tight">
+                {badge.chore.title}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Badge Detail Modal */}
+      {selectedBadge && (
+        <BadgeDetailModal
+          {...selectedBadge}
+          onClose={() => setSelectedBadge(null)}
+        />
+      )}
+    </>
   );
 }

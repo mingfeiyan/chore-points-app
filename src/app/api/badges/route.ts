@@ -112,6 +112,8 @@ export async function GET(req: Request) {
         id: badge.id,
         name: template?.name || badge.name,
         nameZh: template?.nameZh || badge.nameZh,
+        description: template?.description || badge.description,
+        descriptionZh: template?.descriptionZh || badge.descriptionZh,
         icon: template?.icon || badge.icon,
         customImageUrl: template?.imageUrl || null,
       };
