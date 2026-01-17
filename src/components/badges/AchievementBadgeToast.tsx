@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
+import BadgeIcon from "./BadgeIcon";
 
 type AchievementBadgeInfo = {
   badgeId: string;
@@ -10,6 +11,7 @@ type AchievementBadgeInfo = {
   description: string;
   descriptionZh: string;
   icon: string;
+  customImageUrl?: string | null;
 };
 
 type AchievementBadgeToastProps = {
@@ -61,8 +63,13 @@ export default function AchievementBadgeToast({
           <div className="flex items-center gap-4">
             {/* Badge icon with animation */}
             <div className="relative">
-              <div className="text-5xl animate-bounce">
-                {currentBadge.icon}
+              <div className="animate-bounce">
+                <BadgeIcon
+                  imageUrl={currentBadge.customImageUrl}
+                  emoji={currentBadge.icon}
+                  size="xl"
+                  alt={currentBadge.name}
+                />
               </div>
               {/* Sparkle effects */}
               <div className="absolute -top-1 -right-1 text-xl animate-ping">

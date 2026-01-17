@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import FamilyInviteCode from "@/components/family/FamilyInviteCode";
+import BadgeManagementTabs from "@/components/settings/BadgeManagementTabs";
 
 type Kid = {
   id: string;
@@ -71,6 +72,9 @@ export default function SettingsPageContent({ familyName, inviteCode, kids }: Pr
           </div>
         </div>
       </div>
+
+      {/* Badge Management */}
+      <BadgeManagementTabs />
     </>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import BadgeIcon from "./BadgeIcon";
 
 type BadgeLevelUpInfo = {
   choreTitle: string;
@@ -11,6 +12,8 @@ type BadgeLevelUpInfo = {
   levelIcon: string | null;
   count: number;
   isFirstTime: boolean;
+  customImageUrl?: string | null;
+  customIcon?: string | null;
 };
 
 type BadgeLevelUpToastProps = {
@@ -49,8 +52,13 @@ export default function BadgeLevelUpToast({
           <div className="flex items-center gap-4">
             {/* Badge icon with animation */}
             <div className="relative">
-              <div className="text-5xl animate-bounce">
-                {levelUpInfo.levelIcon || "🏅"}
+              <div className="animate-bounce">
+                <BadgeIcon
+                  imageUrl={levelUpInfo.customImageUrl}
+                  emoji={levelUpInfo.customIcon || levelUpInfo.levelIcon || "🏅"}
+                  size="xl"
+                  alt="Badge"
+                />
               </div>
               {/* Sparkle effects */}
               <div className="absolute -top-1 -right-1 text-xl animate-ping">
@@ -66,7 +74,12 @@ export default function BadgeLevelUpToast({
 
               {/* Chore info */}
               <div className="flex items-center gap-2 text-gray-700">
-                <span className="text-xl">{levelUpInfo.choreIcon || "✨"}</span>
+                <BadgeIcon
+                  imageUrl={levelUpInfo.customImageUrl}
+                  emoji={levelUpInfo.customIcon || levelUpInfo.choreIcon || "✨"}
+                  size="sm"
+                  alt={levelUpInfo.choreTitle}
+                />
                 <span className="font-medium">{levelUpInfo.choreTitle}</span>
               </div>
 

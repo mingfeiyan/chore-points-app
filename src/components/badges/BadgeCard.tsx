@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { BADGE_LEVELS } from "@/lib/badges";
+import BadgeIcon from "./BadgeIcon";
 
 type BadgeCardProps = {
   badge: {
@@ -18,6 +19,8 @@ type BadgeCardProps = {
       icon: string | null;
     };
     lastLevelUpAt: string | null;
+    customImageUrl?: string | null;
+    customIcon?: string | null;
   };
   showKidName?: boolean;
   kidName?: string;
@@ -65,7 +68,12 @@ export default function BadgeCard({ badge, showKidName, kidName }: BadgeCardProp
 
       {/* Chore icon and title */}
       <div className="flex items-center gap-3 mb-3">
-        <div className="text-3xl">{badge.chore.icon || "✨"}</div>
+        <BadgeIcon
+          imageUrl={badge.customImageUrl}
+          emoji={badge.customIcon || badge.chore.icon || "✨"}
+          size="lg"
+          alt={badge.chore.title}
+        />
         <div className="flex-1 min-w-0">
           <h3 className="font-bold text-gray-900 truncate">{badge.chore.title}</h3>
           {showKidName && kidName && (

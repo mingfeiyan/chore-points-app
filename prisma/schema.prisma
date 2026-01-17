@@ -52,6 +52,8 @@ model User {
   sightWordProgress   SightWordProgress[] @relation("KidSightWordProgress")
   createdSightWords   SightWord[]   @relation("SightWordCreatedBy")
   updatedSightWords   SightWord[]   @relation("SightWordUpdatedBy")
+  createdBadgeTemplates BadgeTemplate[] @relation("BadgeTemplateCreatedBy")
+  updatedBadgeTemplates BadgeTemplate[] @relation("BadgeTemplateUpdatedBy")
 
   // NextAuth fields
   accounts      Account[]
@@ -80,6 +82,7 @@ model Family {
   badges      Badge[]
   achievementBadges AchievementBadge[]
   sightWords  SightWord[]
+  badgeTemplates BadgeTemplate[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -102,6 +105,7 @@ model Chore {
 
   pointEntries  PointEntry[]
   badges        Badge[]
+  badgeTemplates BadgeTemplate[]
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -405,4 +409,38 @@ model SightWordProgress {
   @@unique([kidId, sightWordId])
   @@index([kidId])
   @@index([sightWordId])
+}
+
+model BadgeTemplate {
+  id              String   @id @default(cuid())
+  familyId        String
+  family          Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  builtInBadgeId  String?  // For overriding achievement badges (e.g., "streak_7_days_10pts")
+  choreId         String?  // For chore-specific badge customization
+  chore           Chore?   @relation(fields: [choreId], references: [id], onDelete: Cascade)
+
+  type            String   @default("custom")  // "achievement" | "chore_level" | "custom"
+
+  name            String?
+  nameZh          String?
+  description     String?
+  descriptionZh   String?
+  imageUrl        String?  // Custom uploaded image (replaces emoji)
+  icon            String?  // Custom emoji fallback
+
+  ruleConfig      Json?    // For custom badges: rule configuration
+  isActive        Boolean  @default(true)
+
+  createdById     String
+  createdBy       User     @relation("BadgeTemplateCreatedBy", fields: [createdById], references: [id])
+  updatedById     String
+  updatedBy       User     @relation("BadgeTemplateUpdatedBy", fields: [updatedById], references: [id])
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([familyId, builtInBadgeId])
+  @@unique([familyId, choreId, type])
+  @@index([familyId])
 }
