@@ -119,21 +119,21 @@ export default function KidPointsView({ kidId, readOnly = false }: KidPointsView
       </div>
 
       {/* Calendar and Badges Side by Side */}
-      <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6 md:items-stretch">
         {/* Calendar Section */}
-        <div>
+        <div className="flex flex-col">
           <h2 className="text-xl font-bold text-gray-900 mb-3">
             {t("myCalendar")}
           </h2>
-          <PointsCalendar entries={entries} />
+          <PointsCalendar entries={entries} className="flex-1" />
         </div>
 
         {/* Badges Section */}
-        <div>
+        <div className="flex flex-col">
           <h2 className="text-xl font-bold text-gray-900 mb-3">
             {tBadges("myBadges")}
           </h2>
-          <div className="bg-white rounded-2xl shadow-lg p-4">
+          <div className="bg-white rounded-2xl shadow-lg p-4 flex-1">
             <BadgeShowcase kidId={kidId} />
           </div>
         </div>

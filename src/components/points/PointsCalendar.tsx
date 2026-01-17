@@ -21,9 +21,10 @@ type PointEntry = {
 
 type PointsCalendarProps = {
   entries: PointEntry[];
+  className?: string;
 };
 
-export default function PointsCalendar({ entries }: PointsCalendarProps) {
+export default function PointsCalendar({ entries, className = "" }: PointsCalendarProps) {
   const [today, setToday] = useState<Date | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
@@ -83,7 +84,7 @@ export default function PointsCalendar({ entries }: PointsCalendarProps) {
 
   if (!today) {
     return (
-      <div className="bg-white rounded-2xl shadow-lg p-3 sm:p-4 animate-pulse">
+      <div className={`bg-white rounded-2xl shadow-lg p-3 sm:p-4 animate-pulse ${className}`}>
         <div className="h-6 bg-gray-200 rounded mb-3"></div>
         <div className="grid grid-cols-7 gap-0.5">
           {Array.from({ length: 35 }).map((_, i) => (
@@ -95,7 +96,7 @@ export default function PointsCalendar({ entries }: PointsCalendarProps) {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-3 sm:p-4">
+    <div className={`bg-white rounded-2xl shadow-lg p-3 sm:p-4 ${className}`}>
       {/* Header with month navigation */}
       <div className="flex items-center justify-between mb-3">
         <button
