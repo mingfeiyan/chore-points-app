@@ -83,11 +83,11 @@ export default function PointsCalendar({ entries }: PointsCalendarProps) {
 
   if (!today) {
     return (
-      <div className="bg-white rounded-2xl shadow-lg p-3 sm:p-4 max-w-sm mx-auto animate-pulse">
+      <div className="bg-white rounded-2xl shadow-lg p-3 sm:p-4 animate-pulse">
         <div className="h-6 bg-gray-200 rounded mb-3"></div>
         <div className="grid grid-cols-7 gap-0.5">
           {Array.from({ length: 35 }).map((_, i) => (
-            <div key={i} className="w-10 h-10 bg-gray-100 rounded-md"></div>
+            <div key={i} className="aspect-square bg-gray-100 rounded-md"></div>
           ))}
         </div>
       </div>
@@ -95,7 +95,7 @@ export default function PointsCalendar({ entries }: PointsCalendarProps) {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-3 sm:p-4 max-w-sm mx-auto">
+    <div className="bg-white rounded-2xl shadow-lg p-3 sm:p-4">
       {/* Header with month navigation */}
       <div className="flex items-center justify-between mb-3">
         <button
@@ -169,7 +169,7 @@ export default function PointsCalendar({ entries }: PointsCalendarProps) {
       <div className="grid grid-cols-7 gap-0.5">
         {/* Empty cells for days before the first of the month */}
         {Array.from({ length: firstDayOfMonth }).map((_, i) => (
-          <div key={`empty-${i}`} className="w-10 h-10" />
+          <div key={`empty-${i}`} className="aspect-square" />
         ))}
 
         {/* Day cells */}
@@ -186,7 +186,7 @@ export default function PointsCalendar({ entries }: PointsCalendarProps) {
               key={dateKey}
               onClick={() => hasActivity && setSelectedDate(dateKey)}
               disabled={!hasActivity}
-              className={`w-10 h-10 flex flex-col items-center justify-center rounded-md transition-colors ${
+              className={`aspect-square flex flex-col items-center justify-center rounded-md transition-colors ${
                 todayClass
                   ? "bg-blue-100 ring-1 ring-blue-400"
                   : futureDay

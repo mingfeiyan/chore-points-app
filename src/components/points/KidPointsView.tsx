@@ -118,20 +118,25 @@ export default function KidPointsView({ kidId, readOnly = false }: KidPointsView
         </div>
       </div>
 
-      {/* Calendar Section */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          {t("myCalendar")}
-        </h2>
-        <PointsCalendar entries={entries} />
-      </div>
+      {/* Calendar and Badges Side by Side */}
+      <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Calendar Section */}
+        <div>
+          <h2 className="text-xl font-bold text-gray-900 mb-3">
+            {t("myCalendar")}
+          </h2>
+          <PointsCalendar entries={entries} />
+        </div>
 
-      {/* Badges Section */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          {tBadges("myBadges")}
-        </h2>
-        <BadgeShowcase kidId={kidId} />
+        {/* Badges Section */}
+        <div>
+          <h2 className="text-xl font-bold text-gray-900 mb-3">
+            {tBadges("myBadges")}
+          </h2>
+          <div className="bg-white rounded-2xl shadow-lg p-4">
+            <BadgeShowcase kidId={kidId} />
+          </div>
+        </div>
       </div>
 
       {/* Chore Flashcards Section */}
