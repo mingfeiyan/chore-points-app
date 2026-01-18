@@ -261,7 +261,10 @@ export default function BadgeImageUpload({
           </button>
         </div>
       ) : (
-        <label className="flex flex-col items-center justify-center w-24 h-24 border-2 border-dashed border-gray-300 rounded-full cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-colors">
+        <label
+          htmlFor="badge-image-upload"
+          className="flex flex-col items-center justify-center w-24 h-24 border-2 border-dashed border-gray-300 rounded-full cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-colors"
+        >
           <svg
             className="w-8 h-8 text-gray-400"
             fill="none"
@@ -276,6 +279,8 @@ export default function BadgeImageUpload({
             />
           </svg>
           <input
+            id="badge-image-upload"
+            key={imageUrl ? "has-image" : "no-image"}
             ref={fileInputRef}
             type="file"
             accept="image/jpeg,image/png,image/gif,image/webp"
