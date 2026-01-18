@@ -73,6 +73,7 @@ export default function CalendarMonthView({
   const t = useTranslations("calendar");
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [selectedDayEvents, setSelectedDayEvents] = useState<{ date: Date; events: CalendarEvent[] } | null>(null);
 
   const { days, firstDayOfWeek } = useMemo(() => {
     const year = selectedDate.getFullYear();
@@ -392,9 +393,16 @@ export default function CalendarMonthView({
                     );
                   })}
                   {dayEvents.length > 3 && (
-                    <div className="text-xs text-gray-500">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const dayDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), day);
+                        setSelectedDayEvents({ date: dayDate, events: dayEvents });
+                      }}
+                      className="text-xs text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+                    >
                       +{dayEvents.length - 3} {t("more")}
-                    </div>
+                    </button>
                   )}
                 </div>
               )}
@@ -524,6 +532,75 @@ export default function CalendarMonthView({
                 </div>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Day Events Modal - Shows all events for a day */}
+      {selectedDayEvents && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          onClick={() => setSelectedDayEvents(null)}
+        >
+          <div
+            className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[80vh] overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b bg-gray-50">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {selectedDayEvents.date.toLocaleDateString(undefined, {
+                  weekday: "long",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </h3>
+              <button
+                onClick={() => setSelectedDayEvents(null)}
+                className="text-gray-400 hover:text-gray-600 transition"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Events List */}
+            <div className="overflow-auto flex-1 p-4 space-y-2">
+              {selectedDayEvents.events.map((event) => {
+                const eventColor = getEventColor(event.summary);
+                const dateStr = toLocalDateString(selectedDayEvents.date);
+                const eventTime = formatEventTime(event, dateStr);
+                return (
+                  <button
+                    key={event.id}
+                    onClick={() => {
+                      setSelectedDayEvents(null);
+                      setSelectedEvent(event);
+                    }}
+                    className={`w-full text-left ${eventColor.color} px-3 py-2 rounded-lg hover:opacity-80 transition cursor-pointer`}
+                  >
+                    <div className="font-medium text-sm">{event.summary}</div>
+                    {eventTime && (
+                      <div className="text-xs opacity-75 mt-0.5">{eventTime}</div>
+                    )}
+                    {event.start.date && (
+                      <div className="text-xs opacity-75 mt-0.5">{t("allDay")}</div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 border-t bg-gray-50">
+              <button
+                onClick={() => setSelectedDayEvents(null)}
+                className="w-full px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition"
+              >
+                {t("close") || "Close"}
+              </button>
+            </div>
           </div>
         </div>
       )}
