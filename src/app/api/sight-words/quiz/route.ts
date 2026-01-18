@@ -61,9 +61,8 @@ export async function POST(req: Request) {
       });
     }
 
-    // Check if already completed today
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Check if already completed today (using UTC for timezone-agnostic comparison)
+    const todayUTC = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
 
     const existingProgress = await prisma.sightWordProgress.findUnique({
       where: {
@@ -77,9 +76,10 @@ export async function POST(req: Request) {
     // Check if already passed today
     let alreadyPassedToday = false;
     if (existingProgress?.quizPassedAt) {
-      const passedDate = new Date(existingProgress.quizPassedAt);
-      passedDate.setHours(0, 0, 0, 0);
-      alreadyPassedToday = passedDate >= today;
+      const passedDateUTC = new Date(existingProgress.quizPassedAt)
+        .toISOString()
+        .split("T")[0];
+      alreadyPassedToday = passedDateUTC === todayUTC;
     }
 
     if (alreadyPassedToday) {

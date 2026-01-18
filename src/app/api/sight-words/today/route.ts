@@ -56,12 +56,11 @@ export async function GET(req: Request) {
     // Build a map of wordId -> progress
     const progressMap = new Map(progress.map((p) => [p.sightWordId, p]));
 
-    // Get today's date at midnight for comparison
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Get today's date in UTC for timezone-agnostic comparison
+    const todayUTC = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
 
     // Find the first word that hasn't been completed today
-    // A word is "completed for today" if quizPassedAt is today or later
+    // A word is "completed for today" if quizPassedAt is today (in UTC)
     let todaysWord = null;
     let completedCount = 0;
     let alreadyCompletedToday = false;
@@ -70,11 +69,12 @@ export async function GET(req: Request) {
       const wordProgress = progressMap.get(word.id);
 
       if (wordProgress?.quizPassedAt) {
-        const passedDate = new Date(wordProgress.quizPassedAt);
-        passedDate.setHours(0, 0, 0, 0);
+        const passedDateUTC = new Date(wordProgress.quizPassedAt)
+          .toISOString()
+          .split("T")[0];
 
-        if (passedDate >= today) {
-          // This word was completed today
+        if (passedDateUTC === todayUTC) {
+          // This word was completed today (in UTC)
           completedCount++;
           if (!todaysWord) {
             // This is today's word (already completed)
@@ -82,7 +82,7 @@ export async function GET(req: Request) {
             alreadyCompletedToday = true;
           }
         } else {
-          // Completed before today - counts toward overall progress
+          // Completed on a different day - counts toward overall progress
           // but should NOT be selected as today's word (we want to advance to next uncompleted word)
           completedCount++;
         }
