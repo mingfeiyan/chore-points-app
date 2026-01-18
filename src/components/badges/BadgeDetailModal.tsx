@@ -125,7 +125,7 @@ export default function BadgeDetailModal(props: BadgeDetailModalProps) {
             {/* Large Badge */}
             <div className={`mb-4 ${props.earned ? "" : "grayscale opacity-40"}`}>
               <BadgeIcon
-                imageUrl={props.earned ? props.earnedBadge?.customImageUrl : null}
+                imageUrl={props.earnedBadge?.customImageUrl || props.badge.customImageUrl}
                 emoji={props.badge.icon}
                 size="2xl"
                 alt={props.badge.name}
