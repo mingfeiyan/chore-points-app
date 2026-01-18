@@ -130,7 +130,7 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
               {/* Sticker */}
               <div className={`${earned ? "" : "grayscale opacity-30"} transition-all`}>
                 <BadgeIcon
-                  imageUrl={earned ? earnedBadge?.customImageUrl : null}
+                  imageUrl={earnedBadge?.customImageUrl || badge.customImageUrl}
                   emoji={badge.icon}
                   size="2xl"
                   alt={badge.name}
