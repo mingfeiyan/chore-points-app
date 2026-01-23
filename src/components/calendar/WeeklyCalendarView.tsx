@@ -144,7 +144,7 @@ export default function WeeklyCalendarView() {
 
       if (res.ok) {
         setEvents(data.events || []);
-      } else if (res.status === 401) {
+      } else if (res.status === 401 || res.status === 403) {
         // Token expired/revoked - need to reconnect
         setSettings((prev) => prev ? { ...prev, isConnected: false } : null);
         setEvents([]);
@@ -284,7 +284,7 @@ export default function WeeklyCalendarView() {
         setIsDeleting(false);
         setSelectedEvent(null);
         loadEvents();
-      } else if (res.status === 401) {
+      } else if (res.status === 401 || res.status === 403) {
         // Token expired/revoked - need to reconnect
         setSettings((prev) => prev ? { ...prev, isConnected: false } : null);
         setEvents([]);

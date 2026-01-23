@@ -44,6 +44,18 @@ export async function GET() {
       );
     }
 
+    // Check if it's a scope/permission error
+    if (
+      message.includes("insufficientPermissions") ||
+      message.includes("PERMISSION_DENIED") ||
+      message.includes("insufficient authentication scopes")
+    ) {
+      return NextResponse.json(
+        { error: "Calendar permissions are missing. Please reconnect with Google Calendar access." },
+        { status: 403 }
+      );
+    }
+
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -96,6 +96,17 @@ export async function GET(request: NextRequest, context: RouteContext) {
       );
     }
 
+    if (
+      message.includes("insufficientPermissions") ||
+      message.includes("PERMISSION_DENIED") ||
+      message.includes("insufficient authentication scopes")
+    ) {
+      return NextResponse.json(
+        { error: "Calendar permissions are missing. Please reconnect with Google Calendar access." },
+        { status: 403 }
+      );
+    }
+
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
@@ -204,6 +215,17 @@ export async function PUT(request: NextRequest, context: RouteContext) {
       );
     }
 
+    if (
+      message.includes("insufficientPermissions") ||
+      message.includes("PERMISSION_DENIED") ||
+      message.includes("insufficient authentication scopes")
+    ) {
+      return NextResponse.json(
+        { error: "Calendar permissions are missing. Please reconnect with Google Calendar access." },
+        { status: 403 }
+      );
+    }
+
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
@@ -254,6 +276,17 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
       return NextResponse.json(
         { error: "Google calendar access has expired. Please reconnect the calendar." },
         { status: 401 }
+      );
+    }
+
+    if (
+      message.includes("insufficientPermissions") ||
+      message.includes("PERMISSION_DENIED") ||
+      message.includes("insufficient authentication scopes")
+    ) {
+      return NextResponse.json(
+        { error: "Calendar permissions are missing. Please reconnect with Google Calendar access." },
+        { status: 403 }
       );
     }
 
