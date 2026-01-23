@@ -83,6 +83,19 @@ export async function GET(request: NextRequest, context: RouteContext) {
   } catch (error) {
     console.error("Error getting event:", error);
     const message = error instanceof Error ? error.message : "Failed to get event";
+
+    if (
+      message.includes("No Google account") ||
+      message.includes("refresh token") ||
+      message.includes("Failed to refresh token") ||
+      message.includes("invalid_grant")
+    ) {
+      return NextResponse.json(
+        { error: "Google calendar access has expired. Please reconnect the calendar." },
+        { status: 401 }
+      );
+    }
+
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
@@ -178,6 +191,19 @@ export async function PUT(request: NextRequest, context: RouteContext) {
   } catch (error) {
     console.error("Error updating event:", error);
     const message = error instanceof Error ? error.message : "Failed to update event";
+
+    if (
+      message.includes("No Google account") ||
+      message.includes("refresh token") ||
+      message.includes("Failed to refresh token") ||
+      message.includes("invalid_grant")
+    ) {
+      return NextResponse.json(
+        { error: "Google calendar access has expired. Please reconnect the calendar." },
+        { status: 401 }
+      );
+    }
+
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
@@ -218,6 +244,19 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
   } catch (error) {
     console.error("Error deleting event:", error);
     const message = error instanceof Error ? error.message : "Failed to delete event";
+
+    if (
+      message.includes("No Google account") ||
+      message.includes("refresh token") ||
+      message.includes("Failed to refresh token") ||
+      message.includes("invalid_grant")
+    ) {
+      return NextResponse.json(
+        { error: "Google calendar access has expired. Please reconnect the calendar." },
+        { status: 401 }
+      );
+    }
+
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

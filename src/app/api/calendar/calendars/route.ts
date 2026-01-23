@@ -31,8 +31,13 @@ export async function GET() {
     console.error("Error listing calendars:", error);
     const message = error instanceof Error ? error.message : "Failed to list calendars";
 
-    // Check if it's a token error
-    if (message.includes("No Google account") || message.includes("refresh token")) {
+    // Check if it's a token error (account missing, no refresh token, or token revoked/expired)
+    if (
+      message.includes("No Google account") ||
+      message.includes("refresh token") ||
+      message.includes("Failed to refresh token") ||
+      message.includes("invalid_grant")
+    ) {
       return NextResponse.json(
         { error: "Please sign in with Google to access calendars" },
         { status: 401 }

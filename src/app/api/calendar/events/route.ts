@@ -90,6 +90,20 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Error listing events:", error);
     const message = error instanceof Error ? error.message : "Failed to list events";
+
+    // Check if it's a token error (account missing, no refresh token, or token revoked/expired)
+    if (
+      message.includes("No Google account") ||
+      message.includes("refresh token") ||
+      message.includes("Failed to refresh token") ||
+      message.includes("invalid_grant")
+    ) {
+      return NextResponse.json(
+        { error: "Google calendar access has expired. Please reconnect the calendar." },
+        { status: 401 }
+      );
+    }
+
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
@@ -171,6 +185,20 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error creating event:", error);
     const message = error instanceof Error ? error.message : "Failed to create event";
+
+    // Check if it's a token error (account missing, no refresh token, or token revoked/expired)
+    if (
+      message.includes("No Google account") ||
+      message.includes("refresh token") ||
+      message.includes("Failed to refresh token") ||
+      message.includes("invalid_grant")
+    ) {
+      return NextResponse.json(
+        { error: "Google calendar access has expired. Please reconnect the calendar." },
+        { status: 401 }
+      );
+    }
+
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
