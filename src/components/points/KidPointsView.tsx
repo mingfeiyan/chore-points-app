@@ -74,7 +74,7 @@ export default function KidPointsView({ kidId, readOnly = false }: KidPointsView
         <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl shadow-lg p-8 text-white">
           <div className="text-center">
             {/* Mario-style Coin Counter */}
-            <div className="flex items-center justify-center gap-4 mt-4">
+            <div className="flex items-center justify-center gap-4 mt-4 whitespace-nowrap">
               <div className="relative w-16 h-16 animate-spin-slow">
                 {/* Outer gold ring */}
                 <div className="absolute inset-0 rounded-full bg-gradient-to-b from-yellow-300 via-yellow-400 to-yellow-600 shadow-lg" />
