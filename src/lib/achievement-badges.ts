@@ -110,6 +110,28 @@ export const ACHIEVEMENT_BADGES: AchievementBadgeDefinition[] = [
       return evaluateTotalPointsMilestone(ctx, 1000);
     },
   },
+  {
+    id: "milestone_1500_points",
+    name: "Legend",
+    nameZh: "传奇",
+    description: "Earned a total of 1500 points",
+    descriptionZh: "累计获得1500分",
+    icon: "💎",
+    evaluate: async (ctx) => {
+      return evaluateTotalPointsMilestone(ctx, 1500);
+    },
+  },
+  {
+    id: "milestone_2000_points",
+    name: "Grand Master",
+    nameZh: "大宗师",
+    description: "Earned a total of 2000 points",
+    descriptionZh: "累计获得2000分",
+    icon: "👑",
+    evaluate: async (ctx) => {
+      return evaluateTotalPointsMilestone(ctx, 2000);
+    },
+  },
 
   // ---------------------------------------------------------------------------
   // VARIETY BADGES - Different Chores
