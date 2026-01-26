@@ -410,7 +410,7 @@ export default function CalendarEventForm({
           )}
 
           {/* Start Date/Time */}
-          <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t("startDate")} *
@@ -420,7 +420,7 @@ export default function CalendarEventForm({
                 value={startDate}
                 onChange={(e) => handleStartDateChange(e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                className="w-full h-11 px-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
               />
             </div>
             {!allDay && (
@@ -432,7 +432,7 @@ export default function CalendarEventForm({
                   value={startTime}
                   onChange={(e) => handleStartTimeChange(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full h-11 px-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
                 >
                   {TIME_OPTIONS.map((time) => (
                     <option key={time} value={time}>
@@ -445,7 +445,7 @@ export default function CalendarEventForm({
           </div>
 
           {/* End Date/Time */}
-          <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t("endDate")} *
@@ -455,7 +455,7 @@ export default function CalendarEventForm({
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                className="w-full h-11 px-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
               />
             </div>
             {!allDay && (
@@ -467,7 +467,7 @@ export default function CalendarEventForm({
                   value={endTime}
                   onChange={(e) => handleEndTimeChange(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full h-11 px-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
                 >
                   {TIME_OPTIONS.map((time) => (
                     <option key={time} value={time}>
