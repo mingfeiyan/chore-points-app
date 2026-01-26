@@ -410,7 +410,7 @@ export default function CalendarEventForm({
           )}
 
           {/* Start Date/Time */}
-          <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t("startDate")} *
@@ -445,7 +445,7 @@ export default function CalendarEventForm({
           </div>
 
           {/* End Date/Time */}
-          <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t("endDate")} *
