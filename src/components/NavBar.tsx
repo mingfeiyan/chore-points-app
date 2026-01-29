@@ -92,15 +92,6 @@ export default function NavBar() {
           {/* Navigation links */}
           {session.user.familyId && (
             <div className="hidden sm:flex items-center gap-4 text-sm">
-              <Link
-                href="/dashboard"
-                className={`hover:text-gray-300 transition ${
-                  pathname === "/dashboard" ? "text-blue-400" : ""
-                }`}
-              >
-                {t("dashboard")}
-              </Link>
-
               {isParent && isKidMode ? (
                 // Kid Mode navigation for parents
                 <>
@@ -140,6 +131,14 @@ export default function NavBar() {
               ) : isParent ? (
                 // Normal parent navigation
                 <>
+                  <Link
+                    href="/meals"
+                    className={`hover:text-gray-300 transition ${
+                      pathname.startsWith("/meals") ? "text-blue-400" : ""
+                    }`}
+                  >
+                    {t("meals")}
+                  </Link>
                   <Link
                     href="/chores"
                     className={`hover:text-gray-300 transition ${
