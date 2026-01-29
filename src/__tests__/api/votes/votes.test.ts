@@ -23,6 +23,7 @@ vi.mock('@/lib/db', () => {
         findMany: vi.fn(),
         create: vi.fn(),
         findFirst: vi.fn(),
+        delete: vi.fn(),
       },
       dish: {
         findFirst: vi.fn(),
@@ -36,6 +37,7 @@ import { prisma } from '@/lib/db'
 const mockPrisma = vi.mocked(prisma)
 
 import { GET, POST } from '@/app/api/votes/route'
+import { DELETE } from '@/app/api/votes/[id]/route'
 
 describe('Votes API', () => {
   beforeEach(() => {
@@ -190,6 +192,191 @@ describe('Votes API', () => {
 
       expect(status).toBe(201)
       expect(data.vote.suggestedDishName).toBe('Sushi Night')
+    })
+
+    it('should return 400 when both dishId and suggestedDishName are provided', async () => {
+      mockSession = {
+        user: {
+          id: 'user-1',
+          email: 'test@example.com',
+          role: Role.PARENT,
+          familyId: 'family-1',
+        },
+      }
+
+      const request = createMockRequest('POST', { dishId: 'dish-1', suggestedDishName: 'Sushi Night' })
+      const response = await POST(request)
+      const { status, data } = await parseResponse(response)
+
+      expect(status).toBe(400)
+      expect(data.error).toBe('Provide either dishId or suggestedDishName, not both')
+    })
+
+    it('should return 400 when duplicate vote is attempted', async () => {
+      mockSession = {
+        user: {
+          id: 'user-1',
+          email: 'test@example.com',
+          role: Role.PARENT,
+          familyId: 'family-1',
+        },
+      }
+
+      mockPrisma.dish.findFirst.mockResolvedValue({
+        id: 'dish-1',
+        name: 'Beef Stir Fry',
+        photoUrl: 'https://example.com/beef.jpg',
+        totalVotes: 2,
+        familyId: 'family-1',
+        createdById: 'user-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+
+      // Simulate existing vote
+      mockPrisma.weeklyVote.findFirst.mockResolvedValue({
+        id: 'vote-1',
+        familyId: 'family-1',
+        dishId: 'dish-1',
+        suggestedDishName: null,
+        voterId: 'user-1',
+        weekStart: new Date('2026-01-26'),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+
+      const request = createMockRequest('POST', { dishId: 'dish-1' })
+      const response = await POST(request)
+      const { status, data } = await parseResponse(response)
+
+      expect(status).toBe(400)
+      expect(data.error).toBe('You have already voted for this dish this week')
+    })
+  })
+
+  describe('DELETE /api/votes/[id]', () => {
+    it('should return 404 if vote not found or not users vote', async () => {
+      mockSession = {
+        user: {
+          id: 'user-1',
+          email: 'test@example.com',
+          role: Role.PARENT,
+          familyId: 'family-1',
+        },
+      }
+
+      mockPrisma.weeklyVote.findFirst.mockResolvedValue(null)
+
+      const request = new Request('http://localhost/api/votes/vote-999', {
+        method: 'DELETE',
+      })
+      const response = await DELETE(request, { params: Promise.resolve({ id: 'vote-999' }) })
+      const { status, data } = await parseResponse(response)
+
+      expect(status).toBe(404)
+      expect(data.error).toBe('Vote not found or not yours to delete')
+    })
+
+    it('should successfully delete users own vote', async () => {
+      mockSession = {
+        user: {
+          id: 'user-1',
+          email: 'test@example.com',
+          role: Role.PARENT,
+          familyId: 'family-1',
+        },
+      }
+
+      mockPrisma.weeklyVote.findFirst.mockResolvedValue({
+        id: 'vote-1',
+        familyId: 'family-1',
+        dishId: null,
+        suggestedDishName: 'Sushi Night',
+        voterId: 'user-1',
+        weekStart: new Date('2026-01-26'),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+
+      mockPrisma.weeklyVote.delete.mockResolvedValue({
+        id: 'vote-1',
+        familyId: 'family-1',
+        dishId: null,
+        suggestedDishName: 'Sushi Night',
+        voterId: 'user-1',
+        weekStart: new Date('2026-01-26'),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+
+      const request = new Request('http://localhost/api/votes/vote-1', {
+        method: 'DELETE',
+      })
+      const response = await DELETE(request, { params: Promise.resolve({ id: 'vote-1' }) })
+      const { status, data } = await parseResponse<{ success: boolean }>(response)
+
+      expect(status).toBe(200)
+      expect(data.success).toBe(true)
+      expect(mockPrisma.weeklyVote.delete).toHaveBeenCalledWith({
+        where: { id: 'vote-1' },
+      })
+    })
+
+    it('should decrement dish totalVotes when vote was for an existing dish', async () => {
+      mockSession = {
+        user: {
+          id: 'user-1',
+          email: 'test@example.com',
+          role: Role.PARENT,
+          familyId: 'family-1',
+        },
+      }
+
+      mockPrisma.weeklyVote.findFirst.mockResolvedValue({
+        id: 'vote-1',
+        familyId: 'family-1',
+        dishId: 'dish-1',
+        suggestedDishName: null,
+        voterId: 'user-1',
+        weekStart: new Date('2026-01-26'),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+
+      mockPrisma.dish.update.mockResolvedValue({
+        id: 'dish-1',
+        name: 'Beef Stir Fry',
+        photoUrl: 'https://example.com/beef.jpg',
+        totalVotes: 2,
+        familyId: 'family-1',
+        createdById: 'user-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+
+      mockPrisma.weeklyVote.delete.mockResolvedValue({
+        id: 'vote-1',
+        familyId: 'family-1',
+        dishId: 'dish-1',
+        suggestedDishName: null,
+        voterId: 'user-1',
+        weekStart: new Date('2026-01-26'),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+
+      const request = new Request('http://localhost/api/votes/vote-1', {
+        method: 'DELETE',
+      })
+      const response = await DELETE(request, { params: Promise.resolve({ id: 'vote-1' }) })
+      const { status, data } = await parseResponse<{ success: boolean }>(response)
+
+      expect(status).toBe(200)
+      expect(data.success).toBe(true)
+      expect(mockPrisma.dish.update).toHaveBeenCalledWith({
+        where: { id: 'dish-1' },
+        data: { totalVotes: { decrement: 1 } },
+      })
     })
   })
 })
