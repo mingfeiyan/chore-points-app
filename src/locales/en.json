@@ -512,8 +512,8 @@
     "createBadge": "Create Badge"
   },
   "learn": {
-    "pageTitle": "Learn Words",
-    "pageDesc": "Practice spelling sight words",
+    "pageTitle": "Learning Center",
+    "pageDesc": "Daily sight words and math practice",
     "todaysWord": "Today's Word",
     "takeQuiz": "Take Quiz",
     "alreadyCompleted": "Done for today! Come back tomorrow.",
@@ -526,7 +526,19 @@
     "wordsLearned": "{count} of {total} words learned",
     "allComplete": "Amazing! You've learned all the words!",
     "noWordsYet": "No words to learn yet",
-    "back": "Back"
+    "back": "Back",
+    "sightWord": "Sight Word",
+    "math": "Math",
+    "mathLocked": "Complete sight word first",
+    "addition": "Addition",
+    "subtraction": "Subtraction",
+    "typeMathAnswer": "Type your answer",
+    "allDoneToday": "All done for today!",
+    "mathComplete": "Math complete!",
+    "todaysProgress": "Today's Progress",
+    "pointEarned": "+1 point earned!",
+    "step": "Step",
+    "of": "of"
   },
   "sightWords": {
     "pageTitle": "Sight Words",

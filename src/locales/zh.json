@@ -512,8 +512,8 @@
     "createBadge": "创建徽章"
   },
   "learn": {
-    "pageTitle": "学习单词",
-    "pageDesc": "练习拼写高频词",
+    "pageTitle": "学习中心",
+    "pageDesc": "每日单词和数学练习",
     "todaysWord": "今天的单词",
     "takeQuiz": "开始测验",
     "alreadyCompleted": "今天完成了！明天再来。",
@@ -526,7 +526,19 @@
     "wordsLearned": "已学习 {count}/{total} 个单词",
     "allComplete": "太棒了！你已经学完所有单词了！",
     "noWordsYet": "还没有要学习的单词",
-    "back": "返回"
+    "back": "返回",
+    "sightWord": "单词",
+    "math": "数学",
+    "mathLocked": "先完成单词练习",
+    "addition": "加法",
+    "subtraction": "减法",
+    "typeMathAnswer": "输入答案",
+    "allDoneToday": "今天全部完成了！",
+    "mathComplete": "数学完成！",
+    "todaysProgress": "今日进度",
+    "pointEarned": "+1 分！",
+    "step": "步骤",
+    "of": "/"
   },
   "sightWords": {
     "pageTitle": "高频词",
