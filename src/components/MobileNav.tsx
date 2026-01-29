@@ -39,7 +39,7 @@ export default function MobileNav() {
     { href: "/calendar", label: t("calendar"), icon: "📅" },
     { href: "/gallery", label: t("gallery"), icon: "📷" },
     { href: "/milestones", label: t("milestones"), icon: "🏆" },
-    { href: "/sight-words", label: t("sightWords"), icon: "📚" },
+    { href: "/sight-words", label: t("learn"), icon: "📚" },
     { href: "/settings", label: t("settings"), icon: "⚙️" },
   ];
 
