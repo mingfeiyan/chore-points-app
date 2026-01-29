@@ -31,7 +31,10 @@ export default function LogDishForm({ onClose, onSuccess }: LogDishFormProps) {
   const [isNewDish, setIsNewDish] = useState(false);
   const [newDishName, setNewDishName] = useState("");
   const [mealType, setMealType] = useState<"BREAKFAST" | "LUNCH" | "DINNER">("DINNER");
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [date, setDate] = useState(() => {
+    const today = new Date();
+    return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  });
   const [cookedById, setCookedById] = useState<string>("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -318,7 +321,7 @@ export default function LogDishForm({ onClose, onSuccess }: LogDishFormProps) {
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md"
+                className="w-full max-w-full box-border px-3 py-2 border rounded-md"
               />
             </div>
 
