@@ -209,7 +209,7 @@ export default function MathModule({ kidId, locked, onComplete }: Props) {
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
             placeholder={t("typeMathAnswer")}
-            className="w-full max-w-[200px] text-center text-4xl font-bold py-4 px-6 rounded-2xl border-4 border-white/30 bg-white/90 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-white mb-6"
+            className="w-full max-w-[240px] text-center text-4xl font-bold py-4 px-6 rounded-2xl border-4 border-white/30 bg-white/90 text-gray-800 placeholder:text-xl placeholder:font-normal placeholder-gray-400 focus:outline-none focus:border-white mb-6"
             autoComplete="off"
             autoFocus
           />
