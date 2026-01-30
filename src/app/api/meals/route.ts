@@ -102,12 +102,16 @@ export async function POST(req: Request) {
       );
     }
 
+    // Parse date as local noon to avoid UTC midnight timezone issues
+    // "2026-01-29" without time is parsed as UTC, which can shift the day in local timezones
+    const parsedDate = date ? new Date(`${date}T12:00:00`) : new Date();
+
     const meal = await prisma.mealLog.create({
       data: {
         familyId: session.user.familyId!,
         dishId: finalDishId,
         mealType: mealType as MealType,
-        date: date ? new Date(date) : new Date(),
+        date: parsedDate,
         loggedById: session.user.id,
         cookedById: cookedById || null,
       },

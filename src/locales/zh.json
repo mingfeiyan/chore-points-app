@@ -600,6 +600,8 @@
     "weekResets": "每周一重置",
     "manageMeals": "一起计划家庭餐食",
     "cookedBy": "谁做的",
-    "selectCook": "谁做了这道菜？"
+    "selectCook": "谁做了这道菜？",
+    "editMeal": "编辑用餐记录",
+    "edit": "编辑"
   }
 }

@@ -19,6 +19,7 @@ type Meal = {
     email: string;
   };
   cookedBy: {
+    id: string;
     name: string | null;
     email: string;
   } | null;
@@ -31,6 +32,7 @@ export default function RecentMeals() {
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [editingMeal, setEditingMeal] = useState<Meal | null>(null);
 
   useEffect(() => {
     fetchMeals();
@@ -52,7 +54,12 @@ export default function RecentMeals() {
 
   const handleSuccess = () => {
     setShowForm(false);
+    setEditingMeal(null);
     fetchMeals();
+  };
+
+  const handleEdit = (meal: Meal) => {
+    setEditingMeal(meal);
   };
 
   const mealTypeLabel = (type: string) => {
@@ -131,6 +138,15 @@ export default function RecentMeals() {
                   )}
                 </p>
               </div>
+              <button
+                onClick={() => handleEdit(meal)}
+                className="p-2 text-gray-400 hover:text-orange-500 transition-colors"
+                title={t("edit")}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+              </button>
             </div>
           ))}
         </div>
@@ -138,6 +154,14 @@ export default function RecentMeals() {
 
       {showForm && (
         <LogDishForm onClose={() => setShowForm(false)} onSuccess={handleSuccess} />
+      )}
+
+      {editingMeal && (
+        <LogDishForm
+          meal={editingMeal}
+          onClose={() => setEditingMeal(null)}
+          onSuccess={handleSuccess}
+        />
       )}
     </div>
   );

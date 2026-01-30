@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useSession } from "next-auth/react";
 import DishCard from "./DishCard";
 
 type Dish = {
@@ -21,6 +22,7 @@ type Vote = {
 export default function VotingGrid() {
   const t = useTranslations("meals");
   const tCommon = useTranslations("common");
+  const { data: session } = useSession();
 
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [votes, setVotes] = useState<Vote[]>([]);
@@ -29,9 +31,12 @@ export default function VotingGrid() {
   const [suggestName, setSuggestName] = useState("");
   const [suggesting, setSuggesting] = useState(false);
 
+  const currentUserId = session?.user?.id;
+
   useEffect(() => {
     Promise.all([fetchDishes(), fetchVotes()]).then(() => setLoading(false));
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUserId]);
 
   const fetchDishes = async () => {
     try {
@@ -51,10 +56,10 @@ export default function VotingGrid() {
       const data = await response.json();
       if (response.ok) {
         setVotes(data.votes);
-        // Extract my votes (assumes current user is in the response)
+        // Extract only the current user's votes
         const myDishVotes = new Set<string>(
           data.votes
-            .filter((v: Vote) => v.dishId)
+            .filter((v: Vote) => v.dishId && v.voter.id === currentUserId)
             .map((v: Vote) => v.dishId as string)
         );
         setMyVotes(myDishVotes);
@@ -86,7 +91,8 @@ export default function VotingGrid() {
   };
 
   const handleUnvote = async (dishId: string) => {
-    const vote = votes.find((v) => v.dishId === dishId);
+    // Find the current user's vote for this dish
+    const vote = votes.find((v) => v.dishId === dishId && v.voter.id === currentUserId);
     if (!vote) return;
 
     try {

@@ -15,24 +15,34 @@ type Parent = {
   email: string;
 };
 
+type Meal = {
+  id: string;
+  mealType: "BREAKFAST" | "LUNCH" | "DINNER";
+  date: string;
+  dish: Dish;
+  cookedBy: { id: string; name: string | null; email: string } | null;
+};
+
 type LogDishFormProps = {
+  meal?: Meal | null;
   onClose: () => void;
   onSuccess: () => void;
 };
 
-export default function LogDishForm({ onClose, onSuccess }: LogDishFormProps) {
+export default function LogDishForm({ meal, onClose, onSuccess }: LogDishFormProps) {
   const t = useTranslations("meals");
   const tCommon = useTranslations("common");
+  const isEditMode = !!meal;
 
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [parents, setParents] = useState<Parent[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
+  const [selectedDish, setSelectedDish] = useState<Dish | null>(meal?.dish || null);
   const [isNewDish, setIsNewDish] = useState(false);
   const [newDishName, setNewDishName] = useState("");
-  const [mealType, setMealType] = useState<"BREAKFAST" | "LUNCH" | "DINNER">("DINNER");
+  const [mealType, setMealType] = useState<"BREAKFAST" | "LUNCH" | "DINNER">(meal?.mealType || "DINNER");
   const [date, setDate] = useState("");
-  const [cookedById, setCookedById] = useState<string>("");
+  const [cookedById, setCookedById] = useState<string>(meal?.cookedBy?.id || "");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -40,11 +50,17 @@ export default function LogDishForm({ onClose, onSuccess }: LogDishFormProps) {
 
   useEffect(() => {
     // Set date on client side to use local timezone
-    const today = new Date();
-    setDate(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`);
+    if (meal) {
+      // For edit mode, parse existing date
+      const mealDate = new Date(meal.date);
+      setDate(`${mealDate.getFullYear()}-${String(mealDate.getMonth() + 1).padStart(2, '0')}-${String(mealDate.getDate()).padStart(2, '0')}`);
+    } else {
+      const today = new Date();
+      setDate(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`);
+    }
     fetchDishes();
     fetchParents();
-  }, []);
+  }, [meal]);
 
   const fetchDishes = async () => {
     try {
@@ -111,6 +127,28 @@ export default function LogDishForm({ onClose, onSuccess }: LogDishFormProps) {
     setSaving(true);
 
     try {
+      // Edit mode - only update mealType, date, cookedById
+      if (isEditMode && meal) {
+        const response = await fetch(`/api/meals/${meal.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            mealType,
+            date,
+            cookedById: cookedById || null,
+          }),
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || "Failed to update meal");
+        }
+
+        onSuccess();
+        return;
+      }
+
+      // Create mode
       let photoUrl: string | null = null;
 
       // Upload photo if provided
@@ -168,7 +206,9 @@ export default function LogDishForm({ onClose, onSuccess }: LogDishFormProps) {
       <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-gray-900">{t("logDish")}</h2>
+            <h2 className="text-xl font-bold text-gray-900">
+              {isEditMode ? t("editMeal") : t("logDish")}
+            </h2>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600"
@@ -184,8 +224,22 @@ export default function LogDishForm({ onClose, onSuccess }: LogDishFormProps) {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Dish Selection */}
-            {!isNewDish ? (
+            {/* Dish Display (read-only in edit mode) */}
+            {isEditMode && meal ? (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t("dishName")}
+                </label>
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-md">
+                  <img
+                    src={meal.dish.photoUrl}
+                    alt={meal.dish.name}
+                    className="w-12 h-12 rounded object-cover"
+                  />
+                  <span className="font-medium text-gray-900">{meal.dish.name}</span>
+                </div>
+              </div>
+            ) : !isNewDish ? (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   {t("selectExisting")}
@@ -260,8 +314,8 @@ export default function LogDishForm({ onClose, onSuccess }: LogDishFormProps) {
               </div>
             )}
 
-            {/* Photo Upload (required for new, optional for existing) */}
-            <div>
+            {/* Photo Upload (required for new, optional for existing, hidden in edit mode) */}
+            {!isEditMode && <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t("photo")} {isNewDish ? `(${t("photoRequired")})` : `(${t("photoOptional")})`}
               </label>
@@ -294,7 +348,7 @@ export default function LogDishForm({ onClose, onSuccess }: LogDishFormProps) {
                   />
                 </label>
               )}
-            </div>
+            </div>}
 
             {/* Meal Type */}
             <div>

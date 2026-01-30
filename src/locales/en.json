@@ -600,6 +600,8 @@
     "weekResets": "Week resets Monday",
     "manageMeals": "Plan family meals together",
     "cookedBy": "Cooked by",
-    "selectCook": "Who cooked this?"
+    "selectCook": "Who cooked this?",
+    "editMeal": "Edit Meal",
+    "edit": "Edit"
   }
 }
