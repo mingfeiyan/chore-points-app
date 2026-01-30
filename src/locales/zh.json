@@ -619,6 +619,22 @@
     "copyList": "复制清单",
     "listCopied": "已复制到剪贴板！",
     "gotIt": "买好了",
-    "clearAll": "清除全部"
+    "clearAll": "清除全部",
+    "healthFeedback": "健康反馈",
+    "getFeedback": "获取健康反馈",
+    "refreshFeedback": "刷新反馈",
+    "analyzingMealPlan": "正在分析您的餐食计划...",
+    "retry": "重试",
+    "feedbackSummary": "总结",
+    "feedbackBreakdown": "营养分析",
+    "feedbackSuggestions": "建议",
+    "feedbackProteins": "蛋白质",
+    "feedbackVegetables": "蔬菜",
+    "feedbackGrains": "谷物",
+    "feedbackDairy": "乳制品",
+    "feedbackFruits": "水果",
+    "feedbackNone": "无",
+    "feedbackMissingIngredients": "{count} 道菜缺少食材信息，添加后可获得更准确的反馈。",
+    "feedbackPrompt": "获取 AI 智能健康反馈"
   }
 }

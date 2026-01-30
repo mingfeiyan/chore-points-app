@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
 import EditDishModal from "./EditDishModal";
+import MealPlanFeedback from "./MealPlanFeedback";
 
 type Dish = {
   id: string;
@@ -28,6 +29,8 @@ export default function MealPlanSelector({ onPlanSaved }: MealPlanSelectorProps)
   const [saving, setSaving] = useState(false);
   const [savedMessage, setSavedMessage] = useState(false);
   const [editingDish, setEditingDish] = useState<Dish | null>(null);
+  const [feedbackDishes, setFeedbackDishes] = useState<Dish[]>([]);
+  const [autoFetchFeedback, setAutoFetchFeedback] = useState(false);
 
   const fetchDishes = useCallback(async () => {
     try {
@@ -50,6 +53,9 @@ export default function MealPlanSelector({ onPlanSaved }: MealPlanSelectorProps)
           data.plan.plannedMeals.map((pm: { dish: { id: string } }) => pm.dish.id)
         );
         setSelectedDishIds(plannedDishIds);
+        // Set feedback dishes from existing plan
+        const plannedDishes = data.plan.plannedMeals.map((pm: { dish: Dish }) => pm.dish);
+        setFeedbackDishes(plannedDishes);
       }
     } catch (err) {
       console.error("Failed to fetch plan:", err);
@@ -95,6 +101,12 @@ export default function MealPlanSelector({ onPlanSaved }: MealPlanSelectorProps)
         // Pass selected dishes to parent
         const selectedDishes = dishes.filter((d) => selectedDishIds.has(d.id));
         onPlanSaved(selectedDishes);
+
+        // Trigger feedback auto-fetch
+        setFeedbackDishes(selectedDishes);
+        setAutoFetchFeedback(true);
+        // Reset auto-fetch flag after a short delay
+        setTimeout(() => setAutoFetchFeedback(false), 100);
       }
     } catch (err) {
       console.error("Failed to save plan:", err);
@@ -227,6 +239,14 @@ export default function MealPlanSelector({ onPlanSaved }: MealPlanSelectorProps)
             <span className="text-green-600 text-sm">{t("planSaved")}</span>
           )}
         </div>
+      )}
+
+      {/* Health Feedback */}
+      {isParent && feedbackDishes.length > 0 && (
+        <MealPlanFeedback
+          dishes={feedbackDishes}
+          autoFetch={autoFetchFeedback}
+        />
       )}
 
       {/* Edit Dish Modal */}

@@ -619,6 +619,22 @@
     "copyList": "Copy List",
     "listCopied": "Copied to clipboard!",
     "gotIt": "Got it",
-    "clearAll": "Clear All"
+    "clearAll": "Clear All",
+    "healthFeedback": "Health Feedback",
+    "getFeedback": "Get Health Feedback",
+    "refreshFeedback": "Refresh Feedback",
+    "analyzingMealPlan": "Analyzing your meal plan...",
+    "retry": "Retry",
+    "feedbackSummary": "Summary",
+    "feedbackBreakdown": "Nutritional Breakdown",
+    "feedbackSuggestions": "Suggestions",
+    "feedbackProteins": "Proteins",
+    "feedbackVegetables": "Vegetables",
+    "feedbackGrains": "Grains",
+    "feedbackDairy": "Dairy",
+    "feedbackFruits": "Fruits",
+    "feedbackNone": "none",
+    "feedbackMissingIngredients": "{count} dishes are missing ingredients. Add them for more accurate feedback.",
+    "feedbackPrompt": "Get AI-powered health feedback on your meal plan"
   }
 }
