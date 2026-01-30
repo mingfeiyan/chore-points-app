@@ -13,6 +13,11 @@ vi.mock('@/lib/permissions', () => ({
   }),
 }))
 
+// Mock badge evaluator to avoid complex badge logic in points tests
+vi.mock('@/lib/badge-evaluator', () => ({
+  evaluateAndAwardBadges: vi.fn(() => Promise.resolve([])),
+}))
+
 // Mock Prisma - define inside the factory to avoid hoisting issues
 vi.mock('@/lib/db', () => {
   return {

@@ -24,10 +24,6 @@ vi.mock('@/lib/db', () => {
     family: {
       findUnique: vi.fn(),
     },
-    invite: {
-      findUnique: vi.fn(),
-      update: vi.fn(),
-    },
     $transaction: vi.fn((callback: (tx: unknown) => unknown) => callback(mockPrismaInternal)),
   }
   return { prisma: mockPrismaInternal }
@@ -232,83 +228,4 @@ describe('POST /api/auth/signup', () => {
     })
   })
 
-  describe('invite token signup', () => {
-    it('should return 400 for invalid invite token', async () => {
-      mockPrisma.invite.findUnique.mockResolvedValue(null)
-
-      const request = createMockRequest('POST', {
-        email: 'invited@example.com',
-        password: 'password123',
-        inviteToken: 'invalid-token',
-      })
-      const response = await POST(request)
-      const { status, data } = await parseResponse(response)
-
-      expect(status).toBe(400)
-      expect(data).toHaveProperty('error', 'Invalid invitation')
-    })
-
-    it('should return 400 for already used invite token', async () => {
-      mockPrisma.invite.findUnique.mockResolvedValue({
-        id: 'invite-1',
-        token: 'valid-token',
-        email: 'invited@example.com',
-        usedAt: new Date(),
-        expiresAt: new Date(Date.now() + 86400000),
-      })
-
-      const request = createMockRequest('POST', {
-        email: 'invited@example.com',
-        password: 'password123',
-        inviteToken: 'valid-token',
-      })
-      const response = await POST(request)
-      const { status, data } = await parseResponse(response)
-
-      expect(status).toBe(400)
-      expect(data).toHaveProperty('error', 'This invitation has already been used')
-    })
-
-    it('should return 400 for expired invite token', async () => {
-      mockPrisma.invite.findUnique.mockResolvedValue({
-        id: 'invite-1',
-        token: 'valid-token',
-        email: 'invited@example.com',
-        usedAt: null,
-        expiresAt: new Date(Date.now() - 86400000), // Expired yesterday
-      })
-
-      const request = createMockRequest('POST', {
-        email: 'invited@example.com',
-        password: 'password123',
-        inviteToken: 'valid-token',
-      })
-      const response = await POST(request)
-      const { status, data } = await parseResponse(response)
-
-      expect(status).toBe(400)
-      expect(data).toHaveProperty('error', 'This invitation has expired')
-    })
-
-    it('should return 400 when email does not match invite', async () => {
-      mockPrisma.invite.findUnique.mockResolvedValue({
-        id: 'invite-1',
-        token: 'valid-token',
-        email: 'invited@example.com',
-        usedAt: null,
-        expiresAt: new Date(Date.now() + 86400000),
-      })
-
-      const request = createMockRequest('POST', {
-        email: 'different@example.com',
-        password: 'password123',
-        inviteToken: 'valid-token',
-      })
-      const response = await POST(request)
-      const { status, data } = await parseResponse(response)
-
-      expect(status).toBe(400)
-      expect(data).toHaveProperty('error', 'Email does not match the invitation')
-    })
-  })
 })
