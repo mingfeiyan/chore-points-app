@@ -1,52 +1,86 @@
-# Chore Points App
+# GemSteps - Build Great Habits
 
-A family chore management and rewards system built with Next.js, TypeScript, and PostgreSQL.
+A family engagement platform for tracking chores, earning points, and building lasting habits. Built with Next.js, TypeScript, and PostgreSQL.
 
 ## Features
 
-- Parent and Kid roles with different permissions
-- Chore management (CRUD operations for parents)
-- Points ledger with full audit trail
-- Reward system with redemption approval workflow
-- Multi-provider authentication (Email, Google, Apple)
-- Family invite code system
+### Core Features
+
+- **Chores Management** - Parents create and manage chores with default point values and icons
+- **Points System** - Award points for completed chores with photo evidence and notes
+- **Rewards & Redemption** - Kids redeem points for custom rewards with parent approval workflow
+- **Badge System** - Two types of badges:
+  - *Chore-Level Badges*: Progressive levels (Starter → Legendary) for repeated chore completion
+  - *Achievement Badges*: Unlocked for streaks, milestones, and special accomplishments
+
+### Learning Center
+
+- **Sight Words** - Flashcard-style learning with quizzes and progress tracking
+- **Daily Math** - Addition and subtraction practice with point rewards
+- **Bilingual Support** - Full English and Chinese language support
+
+### Meal Planning
+
+- **Dish Library** - Create dishes with photos and ingredients
+- **Weekly Voting** - Family members vote on preferred meals for the week
+- **Meal Planning** - Plan weekly meals based on voting results
+- **AI Health Feedback** - Get nutrition insights on meal plans
+
+### Family Features
+
+- **Photo Gallery** - Store and browse family memories with captions
+- **Milestone Tracking** - Record special achievements and moments
+- **Google Calendar Integration** - Sync and view family events
+- **Family Todo List** - Shared tasks with assignments and due dates
+
+### User Roles
+
+- **Parents**: Full access to manage chores, rewards, badges, meals, and approve redemptions
+- **Kids**: View points, complete learning activities, redeem rewards, participate in meal voting
+- **Kid Mode**: Parents can preview the kid experience without switching accounts
 
 ## Tech Stack
 
-- **Framework**: Next.js 14+ with App Router
+- **Framework**: Next.js 16 with App Router
 - **Language**: TypeScript
 - **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: NextAuth.js v5
+- **Authentication**: NextAuth.js v5 (Email, Google OAuth)
 - **Styling**: Tailwind CSS
+- **Storage**: Vercel Blob
+- **AI**: Anthropic Claude SDK
+- **i18n**: next-intl (English/Chinese)
+- **Testing**: Vitest
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+
-- PostgreSQL database (or use a free provider like Neon or Supabase)
+- PostgreSQL database (or use Neon/Supabase)
 
 ### Setup
 
-1. Install dependencies (already done):
+1. Install dependencies:
    ```bash
    npm install
    ```
 
-2. Set up your environment variables:
+2. Set up environment variables:
    ```bash
    cp .env.example .env
    ```
 
-3. Update the `.env` file with your database connection string and other credentials:
-   - `DATABASE_URL`: Your PostgreSQL connection string
-   - `NEXTAUTH_SECRET`: Generate with `openssl rand -base64 32`
-   - Optional: Google/Apple OAuth credentials
+3. Update `.env` with your credentials:
+   - `DATABASE_URL` - PostgreSQL connection string
+   - `NEXTAUTH_SECRET` - Generate with `openssl rand -base64 32`
+   - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` - For Google OAuth & Calendar
+   - `BLOB_READ_WRITE_TOKEN` - For Vercel Blob storage
+   - `ANTHROPIC_API_KEY` - For AI features (optional)
 
 4. Generate Prisma client and run migrations:
    ```bash
    npx prisma generate
-   npx prisma migrate dev --name init
+   npx prisma migrate dev
    ```
 
 5. Run the development server:
@@ -54,44 +88,37 @@ A family chore management and rewards system built with Next.js, TypeScript, and
    npm run dev
    ```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## Database Schema
-
-The app uses the following main models:
-
-- **User**: Parent or Kid accounts with role-based access
-- **Family**: Container for users with unique invite codes
-- **Chore**: Reusable chores with default point values
-- **PointEntry**: Ledger of all point additions/deductions (includes audit trail)
-- **Reward**: Items kids can redeem with their points
-- **Redemption**: Requests for rewards with approval workflow
-
-## Development Status
-
-- [x] Phase 1: Project Setup & Database Schema
-- [ ] Phase 2: Authentication & Family Setup
-- [ ] Phase 3: Chores Management
-- [ ] Phase 4: Points Ledger
-- [ ] Phase 5: Rewards & Redemption
-- [ ] Phase 6: Polish & Testing
+6. Open [http://localhost:3000](http://localhost:3000)
 
 ## Project Structure
 
 ```
-chore-points-app/
-├── src/
-│   ├── app/              # Next.js App Router pages and API routes
-│   ├── components/       # Reusable React components
-│   ├── lib/             # Utility functions and configurations
-│   └── types/           # TypeScript type definitions
-├── prisma/
-│   └── schema.prisma    # Database schema
-└── public/              # Static assets
+src/
+├── app/                 # Next.js App Router
+│   ├── (auth)/         # Login & signup pages
+│   ├── (kid)/          # Kid-only pages (points, learn, redeem)
+│   ├── (parent)/       # Parent-only pages (chores, rewards, ledger)
+│   └── api/            # API routes
+├── components/         # React components
+│   ├── badges/         # Badge display & notifications
+│   ├── calendar/       # Calendar views & forms
+│   ├── chores/         # Chore management
+│   ├── learn/          # Sight words & math
+│   ├── meals/          # Meal planning & voting
+│   ├── milestones/     # Milestone tracking
+│   ├── photos/         # Photo gallery
+│   ├── points/         # Points ledger & forms
+│   └── rewards/        # Rewards & redemption
+├── lib/                # Utilities & configurations
+└── messages/           # i18n translation files
 ```
 
-## Deploy on Vercel
+## Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new) from the creators of Next.js.
+Deploy easily on [Vercel](https://vercel.com):
 
-Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Connect your GitHub repository
+2. Configure environment variables
+3. Deploy
+
+See [Next.js deployment docs](https://nextjs.org/docs/app/building-your-application/deploying) for details.
