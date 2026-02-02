@@ -253,22 +253,22 @@ export default function PointsLedger() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {entry.createdBy.name || entry.createdBy.email}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     {!entry.redemption && (
-                      <>
+                      <div className="inline-flex gap-2">
                         <button
                           onClick={() => handleEdit(entry)}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="text-blue-600 hover:text-blue-900 px-2 py-1 hover:bg-blue-50 rounded"
                         >
                           {t("edit")}
                         </button>
                         <button
                           onClick={() => handleDelete(entry.id)}
-                          className="text-red-600 hover:text-red-900"
+                          className="text-red-600 hover:text-red-900 px-2 py-1 hover:bg-red-50 rounded"
                         >
                           {t("delete")}
                         </button>
-                      </>
+                      </div>
                     )}
                   </td>
                 </tr>
