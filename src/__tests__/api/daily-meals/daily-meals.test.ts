@@ -24,6 +24,10 @@ vi.mock('@/lib/db', () => {
   }
 })
 
+vi.mock('@/lib/meal-plan-convert', () => ({
+  autoConvertPlannedMeals: vi.fn(),
+}))
+
 import { prisma } from '@/lib/db'
 const mockPrisma = vi.mocked(prisma)
 

@@ -13,7 +13,14 @@ export async function GET(req: Request) {
     let weekStart: Date;
 
     if (weekParam) {
-      weekStart = getWeekStart(new Date(`${weekParam}T12:00:00`));
+      const parsedDate = new Date(`${weekParam}T12:00:00`);
+      if (isNaN(parsedDate.getTime())) {
+        return NextResponse.json(
+          { error: "Invalid week date format. Use YYYY-MM-DD" },
+          { status: 400 }
+        );
+      }
+      weekStart = getWeekStart(parsedDate);
     } else {
       // Default to next week
       const today = new Date();
@@ -89,7 +96,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "weekStart is required" }, { status: 400 });
     }
 
-    const weekStart = getWeekStart(new Date(`${weekStartParam}T12:00:00`));
+    const parsedWeekStart = new Date(`${weekStartParam}T12:00:00`);
+    if (isNaN(parsedWeekStart.getTime())) {
+      return NextResponse.json(
+        { error: "Invalid weekStart date format. Use YYYY-MM-DD" },
+        { status: 400 }
+      );
+    }
+
+    const weekStart = getWeekStart(parsedWeekStart);
 
     const plan = await prisma.mealPlan.upsert({
       where: {

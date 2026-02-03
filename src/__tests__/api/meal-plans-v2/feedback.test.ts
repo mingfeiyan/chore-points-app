@@ -16,7 +16,7 @@ vi.mock('@/lib/db', () => {
   return {
     prisma: {
       mealPlan: {
-        findUnique: vi.fn(),
+        findFirst: vi.fn(),
         update: vi.fn(),
       },
     }
@@ -89,7 +89,7 @@ describe('Meal Plans V2 Feedback API', () => {
         user: { id: 'user-1', email: 'parent@example.com', role: Role.PARENT, familyId: 'family-1' },
       }
 
-      mockPrisma.mealPlan.findUnique.mockResolvedValue(null)
+      mockPrisma.mealPlan.findFirst.mockResolvedValue(null)
 
       const request = createMockRequest('POST', { planId: 'plan-1' })
       const response = await POST(request)
@@ -104,18 +104,9 @@ describe('Meal Plans V2 Feedback API', () => {
         user: { id: 'user-1', email: 'parent@example.com', role: Role.PARENT, familyId: 'family-1' },
       }
 
-      mockPrisma.mealPlan.findUnique.mockResolvedValue({
-        id: 'plan-1',
-        familyId: 'family-2', // Different family
-        weekStart: new Date('2026-02-07'),
-        weeklyStaples: [],
-        aiRecommendation: null,
-        aiGeneratedAt: null,
-        createdById: 'user-2',
-        plannedDays: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
+      // With the secure query pattern, plans from other families won't be found
+      // (query includes familyId in where clause)
+      mockPrisma.mealPlan.findFirst.mockResolvedValue(null)
 
       const request = createMockRequest('POST', { planId: 'plan-1' })
       const response = await POST(request)
@@ -189,7 +180,7 @@ describe('Meal Plans V2 Feedback API', () => {
         updatedAt: new Date(),
       }
 
-      mockPrisma.mealPlan.findUnique.mockResolvedValue(mockPlan)
+      mockPrisma.mealPlan.findFirst.mockResolvedValue(mockPlan)
 
       const mockFeedback = {
         summary: 'Good variety of proteins and vegetables.',
@@ -286,7 +277,7 @@ describe('Meal Plans V2 Feedback API', () => {
         updatedAt: new Date(),
       }
 
-      mockPrisma.mealPlan.findUnique.mockResolvedValue(mockPlan)
+      mockPrisma.mealPlan.findFirst.mockResolvedValue(mockPlan)
 
       const mockFeedback = {
         summary: 'Limited information available.',
@@ -336,7 +327,7 @@ describe('Meal Plans V2 Feedback API', () => {
         updatedAt: new Date(),
       }
 
-      mockPrisma.mealPlan.findUnique.mockResolvedValue(mockPlan)
+      mockPrisma.mealPlan.findFirst.mockResolvedValue(mockPlan)
 
       // Return invalid JSON from AI
       mockMessagesCreate.mockResolvedValue({
@@ -380,7 +371,7 @@ describe('Meal Plans V2 Feedback API', () => {
         updatedAt: new Date(),
       }
 
-      mockPrisma.mealPlan.findUnique.mockResolvedValue(mockPlan)
+      mockPrisma.mealPlan.findFirst.mockResolvedValue(mockPlan)
 
       const request = createMockRequest('POST', { planId: 'plan-1' })
       const response = await POST(request)

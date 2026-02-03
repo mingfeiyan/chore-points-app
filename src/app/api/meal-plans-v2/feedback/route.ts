@@ -64,9 +64,12 @@ export async function POST(req: Request) {
       );
     }
 
-    // Fetch the meal plan with all nested data
-    const plan = await prisma.mealPlan.findUnique({
-      where: { id: planId },
+    // Fetch the meal plan with all nested data, scoped to user's family
+    const plan = await prisma.mealPlan.findFirst({
+      where: {
+        id: planId,
+        familyId: session.user.familyId!,
+      },
       include: {
         plannedDays: {
           include: {
@@ -87,8 +90,7 @@ export async function POST(req: Request) {
       },
     });
 
-    // Return 404 if plan not found or doesn't belong to user's family
-    if (!plan || plan.familyId !== session.user.familyId) {
+    if (!plan) {
       return NextResponse.json(
         { error: "Meal plan not found" },
         { status: 404 }

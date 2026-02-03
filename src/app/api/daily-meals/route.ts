@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireFamily } from "@/lib/permissions";
+import { autoConvertPlannedMeals } from "@/lib/meal-plan-convert";
 
 // GET /api/daily-meals - Get daily meal logs for a date range
 export async function GET(req: Request) {
@@ -18,9 +19,30 @@ export async function GET(req: Request) {
       );
     }
 
-    // Parse as local dates
+    // Parse and validate dates
     const start = new Date(`${startParam}T00:00:00`);
     const end = new Date(`${endParam}T23:59:59`);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return NextResponse.json(
+        { error: "Invalid date format. Use YYYY-MM-DD" },
+        { status: 400 }
+      );
+    }
+
+    if (start > end) {
+      return NextResponse.json(
+        { error: "start date must be before or equal to end date" },
+        { status: 400 }
+      );
+    }
+
+    // Auto-convert planned meals to logs for past dates in the range
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (start < today) {
+      await autoConvertPlannedMeals(session.user.familyId!);
+    }
 
     const logs = await prisma.dailyMealLog.findMany({
       where: {
@@ -76,6 +98,13 @@ export async function POST(req: Request) {
     }
 
     const parsedDate = new Date(`${date}T12:00:00`);
+
+    if (isNaN(parsedDate.getTime())) {
+      return NextResponse.json(
+        { error: "Invalid date format. Use YYYY-MM-DD" },
+        { status: 400 }
+      );
+    }
 
     // Upsert the daily log with nested creates
     const log = await prisma.dailyMealLog.upsert({
