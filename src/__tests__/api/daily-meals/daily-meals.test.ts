@@ -27,7 +27,15 @@ vi.mock('@/lib/db', () => {
 import { prisma } from '@/lib/db'
 const mockPrisma = vi.mocked(prisma)
 
-import { GET } from '@/app/api/daily-meals/route'
+import { GET, POST } from '@/app/api/daily-meals/route'
+
+function createMockRequest(method: string, body: unknown) {
+  return new Request('http://localhost/api/daily-meals', {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+}
 
 describe('Daily Meals API', () => {
   beforeEach(() => {
@@ -128,6 +136,87 @@ describe('Daily Meals API', () => {
 
       expect(status).toBe(400)
       expect(data).toHaveProperty('error')
+    })
+  })
+
+  describe('POST /api/daily-meals', () => {
+    it('should return 401 if not authenticated', async () => {
+      const request = createMockRequest('POST', {
+        date: '2026-02-03',
+        meals: [],
+        dailyItems: [],
+      })
+      const response = await POST(request)
+      const { status } = await parseResponse(response)
+
+      expect(status).toBe(401)
+    })
+
+    it('should return 400 if date is missing', async () => {
+      mockSession = {
+        user: {
+          id: 'user-1',
+          email: 'test@example.com',
+          role: Role.PARENT,
+          familyId: 'family-1',
+        },
+      }
+
+      const request = createMockRequest('POST', {
+        meals: [],
+        dailyItems: [],
+      })
+      const response = await POST(request)
+      const { status, data } = await parseResponse(response)
+
+      expect(status).toBe(400)
+      expect(data).toHaveProperty('error')
+    })
+
+    it('should create a daily log with meals', async () => {
+      mockSession = {
+        user: {
+          id: 'user-1',
+          email: 'test@example.com',
+          role: Role.PARENT,
+          familyId: 'family-1',
+        },
+      }
+
+      mockPrisma.dailyMealLog.upsert.mockResolvedValue({
+        id: 'log-1',
+        familyId: 'family-1',
+        date: new Date('2026-02-03'),
+        notes: null,
+        meals: [
+          {
+            id: 'meal-1',
+            mealType: 'dinner',
+            dishes: [{ id: 'd-1', dishName: 'Kung Pao Chicken', isFreeForm: false }],
+          },
+        ],
+        dailyItems: [{ id: 'item-1', name: 'Apples' }],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+
+      const request = createMockRequest('POST', {
+        date: '2026-02-03',
+        meals: [
+          {
+            mealType: 'dinner',
+            dishes: [{ dishId: 'dish-1', dishName: 'Kung Pao Chicken' }],
+          },
+        ],
+        dailyItems: ['Apples', 'Milk'],
+      })
+
+      const response = await POST(request)
+      const { status, data } = await parseResponse<{ log: { id: string } }>(response)
+
+      expect(status).toBe(200)
+      expect(data.log).toBeDefined()
+      expect(mockPrisma.dailyMealLog.upsert).toHaveBeenCalled()
     })
   })
 })
