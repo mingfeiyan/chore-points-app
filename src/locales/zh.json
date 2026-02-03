@@ -647,6 +647,9 @@
     "feedbackFruits": "水果",
     "feedbackNone": "无",
     "feedbackMissingIngredients": "{count} 道菜缺少食材信息，添加后可获得更准确的反馈。",
-    "feedbackPrompt": "获取 AI 智能健康反馈"
+    "feedbackPrompt": "获取 AI 智能健康反馈",
+    "voteResults": "投票结果",
+    "goToVote": "去投票",
+    "planMeals": "规划餐食"
   }
 }

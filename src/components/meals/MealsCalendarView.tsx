@@ -5,9 +5,8 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import WeeklyCalendar from "./WeeklyCalendar";
 import DayDetailModal from "./DayDetailModal";
-import BulkPlanningModal from "./BulkPlanningModal";
 
-type Tab = "calendar" | "vote" | "results";
+type Tab = "calendar" | "vote" | "plan";
 
 export default function MealsCalendarView() {
   const t = useTranslations("meals");
@@ -18,20 +17,12 @@ export default function MealsCalendarView() {
   // State for DayDetailModal
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-  // State for BulkPlanningModal
-  const [showPlanningModal, setShowPlanningModal] = useState(false);
-
   // Refresh key to force calendar refresh after saves
   const [refreshKey, setRefreshKey] = useState(0);
 
   // Handler for day click - opens DayDetailModal
   const handleDayClick = useCallback((date: Date) => {
     setSelectedDate(date);
-  }, []);
-
-  // Handler for "Plan Week" button - opens BulkPlanningModal
-  const handlePlanWeek = useCallback(() => {
-    setShowPlanningModal(true);
   }, []);
 
   // Handler for modal save - triggers calendar refresh
@@ -42,11 +33,6 @@ export default function MealsCalendarView() {
   // Handler to close DayDetailModal
   const handleCloseDayModal = useCallback(() => {
     setSelectedDate(null);
-  }, []);
-
-  // Handler to close BulkPlanningModal
-  const handleClosePlanningModal = useCallback(() => {
-    setShowPlanningModal(false);
   }, []);
 
   return (
@@ -68,12 +54,12 @@ export default function MealsCalendarView() {
         >
           {t("vote")}
         </Link>
-        <button
-          onClick={handlePlanWeek}
+        <Link
+          href="/meals/plan"
           className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
         >
           {t("planNextWeek")}
-        </button>
+        </Link>
       </div>
 
       {/* Calendar View */}
@@ -87,14 +73,6 @@ export default function MealsCalendarView() {
         <DayDetailModal
           date={selectedDate}
           onClose={handleCloseDayModal}
-          onSave={handleSave}
-        />
-      )}
-
-      {/* Bulk Planning Modal */}
-      {showPlanningModal && (
-        <BulkPlanningModal
-          onClose={handleClosePlanningModal}
           onSave={handleSave}
         />
       )}

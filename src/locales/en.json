@@ -647,6 +647,9 @@
     "feedbackFruits": "Fruits",
     "feedbackNone": "none",
     "feedbackMissingIngredients": "{count} dishes are missing ingredients. Add them for more accurate feedback.",
-    "feedbackPrompt": "Get AI-powered health feedback on your meal plan"
+    "feedbackPrompt": "Get AI-powered health feedback on your meal plan",
+    "voteResults": "Vote Results",
+    "goToVote": "Go to voting",
+    "planMeals": "Plan Meals"
   }
 }
