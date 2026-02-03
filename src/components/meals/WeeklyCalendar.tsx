@@ -13,11 +13,19 @@ const DAILY_ITEM_EMOJI: Record<string, string> = {
   yogurt: "🥛",
 };
 
-// Helper to format date as YYYY-MM-DD
+// Helper to format date as YYYY-MM-DD (local time)
 function toDateString(date: Date): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+// Helper to format date as YYYY-MM-DD (UTC time - for parsing API dates)
+function toDateStringUTC(date: Date): string {
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
@@ -123,9 +131,10 @@ export default function WeeklyCalendar({ onDayClick }: WeeklyCalendarProps) {
   const logsByDate = useMemo(() => {
     const map: Record<string, DailyMealLog> = {};
     logs.forEach((log) => {
-      // Parse the date and convert to local date string
+      // Parse the date using UTC to avoid timezone shift
+      // API stores dates at noon UTC, so we use UTC methods to extract the date portion
       const logDate = new Date(log.date);
-      const dateStr = toDateString(logDate);
+      const dateStr = toDateStringUTC(logDate);
       map[dateStr] = log;
     });
     return map;
