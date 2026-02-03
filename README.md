@@ -21,10 +21,18 @@ A family engagement platform for tracking chores, earning points, and building l
 
 ### Meal Planning
 
-- **Dish Library** - Create dishes with photos and ingredients
+- **Weekly Calendar View** - Day-centric meal tracking with Saturday-Friday weeks
+- **Daily Meal Logging** - Record breakfast, lunch, dinner, and snacks for each day
+- **Daily Items** - Track recurring items like fruits, milk, vitamins (not tied to specific meals)
+- **Dish Library** - Create dishes with photos and ingredients for easy reuse
 - **Weekly Voting** - Family members vote on preferred meals for the week
-- **Meal Planning** - Plan weekly meals based on voting results
-- **AI Health Feedback** - Get nutrition insights on meal plans
+- **Meal Planning Page** - Step-by-step planning workflow:
+  1. Review voting results to see family preferences
+  2. Select weekly staples (daily items auto-added to logs)
+  3. Plan meals day-by-day for the upcoming week
+  4. Get AI-powered health feedback on nutrition balance
+- **Auto-Convert** - Planned meals automatically become daily records when the day arrives
+- **AI Health Feedback** - Nutritional analysis with breakdown by food groups and suggestions
 
 ### Family Features
 
