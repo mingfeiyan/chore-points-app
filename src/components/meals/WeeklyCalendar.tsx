@@ -56,10 +56,9 @@ type DailyMealLog = {
 
 type WeeklyCalendarProps = {
   onDayClick: (date: Date) => void;
-  onPlanWeek: () => void;
 };
 
-export default function WeeklyCalendar({ onDayClick, onPlanWeek }: WeeklyCalendarProps) {
+export default function WeeklyCalendar({ onDayClick }: WeeklyCalendarProps) {
   const t = useTranslations("meals");
   const tCommon = useTranslations("common");
   const tCalendar = useTranslations("calendar");
@@ -321,16 +320,6 @@ export default function WeeklyCalendar({ onDayClick, onPlanWeek }: WeeklyCalenda
               d="M9 5l7 7-7 7"
             />
           </svg>
-        </button>
-      </div>
-
-      {/* Plan Next Week button */}
-      <div className="px-4 py-2 bg-gray-50 border-b">
-        <button
-          onClick={onPlanWeek}
-          className="w-full sm:w-auto px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 font-medium text-sm transition"
-        >
-          {t("planNextWeek")}
         </button>
       </div>
 
