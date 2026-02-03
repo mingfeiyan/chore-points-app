@@ -66,6 +66,7 @@ model User {
   cookedMeals       MealLog[]    @relation("MealCookedBy")
   weeklyVotes       WeeklyVote[] @relation("VoteCastBy")
   weeklyPlans       WeeklyPlan[] @relation("WeeklyPlanCreatedBy")
+  createdMealPlans  MealPlan[]   @relation("MealPlanCreatedBy")
 
   // NextAuth fields
   accounts      Account[]
@@ -99,6 +100,8 @@ model Family {
   mealLogs    MealLog[]
   weeklyVotes WeeklyVote[]
   weeklyPlans WeeklyPlan[]
+  dailyMealLogs  DailyMealLog[]
+  mealPlans      MealPlan[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -495,6 +498,8 @@ model Dish {
   mealLogs    MealLog[]
   weeklyVotes WeeklyVote[]
   plannedMeals PlannedMeal[]
+  dailyMealDishes    DailyMealDish[]
+  plannedDayMealDishes PlannedDayMealDish[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -584,5 +589,141 @@ model PlannedMeal {
   updatedAt   DateTime @updatedAt
 
   @@index([planId])
+  @@index([dishId])
+}
+
+model DailyMealLog {
+  id          String   @id @default(cuid())
+  familyId    String
+  family      Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  date        DateTime @db.Date
+  notes       String?
+
+  meals       DailyMeal[]
+  dailyItems  DailyItem[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([familyId, date])
+  @@index([familyId])
+  @@index([familyId, date])
+}
+
+model DailyMeal {
+  id            String   @id @default(cuid())
+  dailyLogId    String
+  dailyLog      DailyMealLog @relation(fields: [dailyLogId], references: [id], onDelete: Cascade)
+
+  mealType      String   // "breakfast", "lunch", "dinner", "snack", or custom
+  notes         String?
+
+  dishes        DailyMealDish[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([dailyLogId])
+}
+
+model DailyMealDish {
+  id          String   @id @default(cuid())
+  mealId      String
+  meal        DailyMeal @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  dishId      String?
+  dish        Dish?    @relation(fields: [dishId], references: [id], onDelete: SetNull)
+  dishName    String   // Always store name (from library or free-form)
+  isFreeForm  Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([mealId])
+  @@index([dishId])
+}
+
+model DailyItem {
+  id          String   @id @default(cuid())
+  dailyLogId  String
+  dailyLog    DailyMealLog @relation(fields: [dailyLogId], references: [id], onDelete: Cascade)
+
+  name        String   // e.g., "Apples", "Whole milk"
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([dailyLogId])
+}
+
+model MealPlan {
+  id              String   @id @default(cuid())
+  familyId        String
+  family          Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  weekStart       DateTime @db.Date
+  weeklyStaples   String[] @default([])
+  aiRecommendation String?
+  aiGeneratedAt   DateTime?
+
+  createdById     String
+  createdBy       User     @relation("MealPlanCreatedBy", fields: [createdById], references: [id])
+
+  plannedDays     PlannedDay[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([familyId, weekStart])
+  @@index([familyId])
+}
+
+model PlannedDay {
+  id          String   @id @default(cuid())
+  planId      String
+  plan        MealPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  date        DateTime @db.Date
+
+  meals       PlannedDayMeal[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([planId, date])
+  @@index([planId])
+}
+
+model PlannedDayMeal {
+  id          String   @id @default(cuid())
+  dayId       String
+  day         PlannedDay @relation(fields: [dayId], references: [id], onDelete: Cascade)
+
+  mealType    String   // "breakfast", "lunch", "dinner", "snack"
+  notes       String?
+
+  dishes      PlannedDayMealDish[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([dayId])
+}
+
+model PlannedDayMealDish {
+  id          String   @id @default(cuid())
+  mealId      String
+  meal        PlannedDayMeal @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  dishId      String?
+  dish        Dish?    @relation(fields: [dishId], references: [id], onDelete: SetNull)
+  dishName    String
+  isFreeForm  Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([mealId])
   @@index([dishId])
 }
