@@ -57,7 +57,7 @@ export async function GET(req: Request) {
           },
         },
       },
-      orderBy: { date: "desc" },
+      orderBy: { createdAt: "desc" },
     });
 
     // Calculate total points for kid
