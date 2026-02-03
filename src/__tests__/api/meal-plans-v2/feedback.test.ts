@@ -247,6 +247,119 @@ describe('Meal Plans V2 Feedback API', () => {
       )
     })
 
+    it('should track missingIngredientsDishes for free-form dishes', async () => {
+      mockSession = {
+        user: { id: 'user-1', email: 'parent@example.com', role: Role.PARENT, familyId: 'family-1' },
+      }
+
+      const mockPlan = {
+        id: 'plan-1',
+        familyId: 'family-1',
+        weekStart: new Date('2026-02-07'),
+        weeklyStaples: [],
+        aiRecommendation: null,
+        aiGeneratedAt: null,
+        createdById: 'user-1',
+        plannedDays: [
+          {
+            id: 'day-1',
+            date: new Date('2026-02-08'),
+            meals: [
+              {
+                id: 'meal-1',
+                mealType: 'dinner',
+                notes: null,
+                dishes: [
+                  {
+                    id: 'dish-ref-1',
+                    dishId: null,
+                    dishName: 'Salad',
+                    isFreeForm: true,
+                    dish: null, // No ingredients available
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+
+      mockPrisma.mealPlan.findUnique.mockResolvedValue(mockPlan)
+
+      const mockFeedback = {
+        summary: 'Limited information available.',
+        breakdown: {
+          proteins: { status: 'missing', items: [] },
+          vegetables: { status: 'limited', items: [] },
+          grains: { status: 'missing', items: [] },
+          dairy: { status: 'missing', items: [] },
+          fruits: { status: 'missing', items: [] },
+        },
+        suggestions: ['Add more details to dishes'],
+      }
+
+      mockMessagesCreate.mockResolvedValue({
+        content: [{ type: 'text', text: JSON.stringify(mockFeedback) }],
+      })
+
+      mockPrisma.mealPlan.update.mockResolvedValue({
+        ...mockPlan,
+        aiRecommendation: JSON.stringify(mockFeedback),
+        aiGeneratedAt: new Date(),
+      })
+
+      const request = createMockRequest('POST', { planId: 'plan-1' })
+      const response = await POST(request)
+      const { status, data } = await parseResponse<{ feedback: { missingIngredientsDishes: string[] } }>(response)
+
+      expect(status).toBe(200)
+      expect(data.feedback.missingIngredientsDishes).toContain('Salad')
+    })
+
+    it('should handle invalid JSON response from AI with fallback', async () => {
+      mockSession = {
+        user: { id: 'user-1', email: 'parent@example.com', role: Role.PARENT, familyId: 'family-1' },
+      }
+
+      const mockPlan = {
+        id: 'plan-1',
+        familyId: 'family-1',
+        weekStart: new Date('2026-02-07'),
+        weeklyStaples: [],
+        aiRecommendation: null,
+        aiGeneratedAt: null,
+        createdById: 'user-1',
+        plannedDays: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+
+      mockPrisma.mealPlan.findUnique.mockResolvedValue(mockPlan)
+
+      // Return invalid JSON from AI
+      mockMessagesCreate.mockResolvedValue({
+        content: [{ type: 'text', text: 'This is not valid JSON at all' }],
+      })
+
+      mockPrisma.mealPlan.update.mockResolvedValue({
+        ...mockPlan,
+        aiRecommendation: '{}',
+        aiGeneratedAt: new Date(),
+      })
+
+      const request = createMockRequest('POST', { planId: 'plan-1' })
+      const response = await POST(request)
+      const { status, data } = await parseResponse<{ feedback: { summary: string; breakdown: object; suggestions: string[] } }>(response)
+
+      expect(status).toBe(200)
+      // Fallback response should have the expected structure
+      expect(data.feedback.summary).toBeDefined()
+      expect(data.feedback.breakdown).toBeDefined()
+      expect(data.feedback.suggestions).toContain('Unable to parse detailed feedback. Please try again.')
+    })
+
     it('should return 503 if Anthropic API key is not configured', async () => {
       vi.stubEnv('ANTHROPIC_API_KEY', '')
 
