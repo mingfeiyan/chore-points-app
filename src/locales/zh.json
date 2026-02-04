@@ -143,7 +143,8 @@
     "familyName": "家庭名称",
     "familyMembers": "家庭成员",
     "inviteCode": "邀请码",
-    "inviteCodeHint": "分享此邀请码让家庭成员加入"
+    "inviteCodeHint": "分享此邀请码让家庭成员加入",
+    "smartHome": "智能家居"
   },
   "chores": {
     "noChoresYet": "还没有家务任务",
@@ -728,5 +729,31 @@
     "changePhoto": "更换",
     "nameRequired": "名称为必填项",
     "clickToUploadPhoto": "点击上传照片"
+  },
+  "hue": {
+    "title": "智能灯光",
+    "connect": "连接飞利浦Hue",
+    "connectDesc": "从仪表板控制您的飞利浦Hue灯光",
+    "disconnect": "断开连接",
+    "disconnecting": "断开中...",
+    "connected": "已连接",
+    "notConnected": "未连接",
+    "connectError": "连接失败",
+    "connectDenied": "连接被拒绝",
+    "rooms": "房间",
+    "scenes": "场景",
+    "noRooms": "未找到房间。请先在Hue应用中设置房间。",
+    "noScenes": "没有可用场景",
+    "allOff": "全部关闭",
+    "on": "开",
+    "off": "关",
+    "brightness": "亮度",
+    "loading": "加载灯光中...",
+    "error": "加载灯光失败",
+    "retry": "重试",
+    "refresh": "刷新",
+    "seeAll": "查看全部",
+    "unavailable": "Hue不可用",
+    "reconnect": "重新连接"
   }
 }
