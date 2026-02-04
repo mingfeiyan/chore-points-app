@@ -103,6 +103,7 @@ model Family {
   weeklyPlans WeeklyPlan[]
   dailyMealLogs  DailyMealLog[]
   mealPlans      MealPlan[]
+  mathSettings   MathSettings?
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -465,6 +466,47 @@ model MathAttempt {
   @@index([kidId])
   @@index([kidId, createdAt])
   @@index([kidId, questionType])
+}
+
+model MathSettings {
+  id                    String  @id @default(cuid())
+  familyId              String  @unique
+  family                Family  @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  dailyQuestionCount    Int     @default(2)
+
+  additionEnabled       Boolean @default(true)
+  subtractionEnabled    Boolean @default(true)
+  multiplicationEnabled Boolean @default(false)
+  divisionEnabled       Boolean @default(false)
+
+  additionMinA          Int     @default(1)
+  additionMaxA          Int     @default(9)
+  additionMinB          Int     @default(10)
+  additionMaxB          Int     @default(99)
+  allowCarrying         Boolean @default(true)
+
+  subtractionMinA       Int     @default(10)
+  subtractionMaxA       Int     @default(99)
+  subtractionMinB       Int     @default(1)
+  subtractionMaxB       Int     @default(9)
+  allowBorrowing        Boolean @default(true)
+
+  multiplicationMinA    Int     @default(1)
+  multiplicationMaxA    Int     @default(10)
+  multiplicationMinB    Int     @default(1)
+  multiplicationMaxB    Int     @default(10)
+
+  divisionMinDividend   Int     @default(1)
+  divisionMaxDividend   Int     @default(100)
+  divisionMinDivisor    Int     @default(1)
+  divisionMaxDivisor    Int     @default(10)
+
+  adaptiveDifficulty    Boolean @default(false)
+  focusAreas            Json    @default("[]")
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 }
 
 model BadgeTemplate {
