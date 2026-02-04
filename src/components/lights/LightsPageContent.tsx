@@ -102,16 +102,23 @@ export default function LightsPageContent() {
     }
   };
 
+  const [sceneError, setSceneError] = useState<string | null>(null);
+
   const activateScene = async (sceneId: string, groupId?: string) => {
+    setSceneError(null);
     try {
-      await fetch(`/api/hue/scenes/${sceneId}/activate`, {
+      const response = await fetch(`/api/hue/scenes/${sceneId}/activate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ groupId }),
       });
+      if (!response.ok) {
+        setSceneError(t("error"));
+        return;
+      }
       fetchLights();
     } catch {
-      // Silent fail
+      setSceneError(t("error"));
     }
   };
 
@@ -222,13 +229,16 @@ export default function LightsPageContent() {
       {/* Scenes Section */}
       {scenes.length > 0 && (
         <section>
+          {sceneError && (
+            <p className="text-red-500 text-sm mb-2">{sceneError}</p>
+          )}
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
             {t("scenes")}
           </h2>
 
           {Object.entries(scenesByRoom).map(([groupId, groupScenes]) => {
             const room = rooms.find((r) => r.id === groupId);
-            const groupName = room?.name || "All Rooms";
+            const groupName = room?.name || t("allRooms");
 
             return (
               <div key={groupId} className="mb-4">

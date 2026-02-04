@@ -118,15 +118,19 @@ export default function LightsWidget() {
 
   const activateScene = async (sceneId: string, groupId?: string) => {
     try {
-      await fetch(`/api/hue/scenes/${sceneId}/activate`, {
+      const response = await fetch(`/api/hue/scenes/${sceneId}/activate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ groupId }),
       });
+      if (!response.ok) {
+        setError(t("error"));
+        return;
+      }
       // Refresh room states after scene activation
       fetchLights();
     } catch {
-      // Silent fail for scene activation
+      setError(t("error"));
     }
   };
 

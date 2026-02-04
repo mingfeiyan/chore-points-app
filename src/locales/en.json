@@ -754,6 +754,7 @@
     "refresh": "Refresh",
     "seeAll": "See all",
     "unavailable": "Hue unavailable",
-    "reconnect": "Reconnect"
+    "reconnect": "Reconnect",
+    "allRooms": "All Rooms"
   }
 }

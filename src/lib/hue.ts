@@ -26,6 +26,10 @@ export function getHueAuthUrl(state: string): string {
     response_type: "code",
     state,
   });
+  // Add redirect_uri if configured
+  if (process.env.HUE_REDIRECT_URI) {
+    params.set("redirect_uri", process.env.HUE_REDIRECT_URI);
+  }
   return `${HUE_OAUTH_URL}/authorize?${params}`;
 }
 
@@ -127,23 +131,28 @@ export async function getHueAccessToken(
     };
   }
 
-  // Refresh the token
-  const tokenData = await refreshHueToken(family.hueRefreshToken);
+  // Refresh the token - if refresh fails, return null to trigger reconnect
+  try {
+    const tokenData = await refreshHueToken(family.hueRefreshToken);
 
-  // Update the family with new token
-  await prisma.family.update({
-    where: { id: familyId },
-    data: {
-      hueAccessToken: tokenData.accessToken,
-      hueRefreshToken: tokenData.refreshToken,
-      hueTokenExpiry: new Date(Date.now() + tokenData.expiresIn * 1000),
-    },
-  });
+    // Update the family with new token
+    await prisma.family.update({
+      where: { id: familyId },
+      data: {
+        hueAccessToken: tokenData.accessToken,
+        hueRefreshToken: tokenData.refreshToken,
+        hueTokenExpiry: new Date(Date.now() + tokenData.expiresIn * 1000),
+      },
+    });
 
-  return {
-    accessToken: tokenData.accessToken,
-    username: family.hueUsername,
-  };
+    return {
+      accessToken: tokenData.accessToken,
+      username: family.hueUsername,
+    };
+  } catch {
+    // Token refresh failed - user needs to reconnect
+    return null;
+  }
 }
 
 /**

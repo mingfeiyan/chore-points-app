@@ -754,6 +754,7 @@
     "refresh": "刷新",
     "seeAll": "查看全部",
     "unavailable": "Hue不可用",
-    "reconnect": "重新连接"
+    "reconnect": "重新连接",
+    "allRooms": "所有房间"
   }
 }
