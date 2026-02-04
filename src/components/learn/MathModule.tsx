@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useTranslations } from "next-intl";
 import confetti from "canvas-confetti";
 
@@ -19,11 +19,10 @@ type MathData = {
 
 type Props = {
   kidId?: string;
-  locked: boolean;
   onComplete: () => void;
 };
 
-export default function MathModule({ kidId, locked, onComplete }: Props) {
+export default function MathModule({ kidId, onComplete }: Props) {
   const [data, setData] = useState<MathData | null>(null);
   const [loading, setLoading] = useState(true);
   const [answer, setAnswer] = useState("");
@@ -33,6 +32,7 @@ export default function MathModule({ kidId, locked, onComplete }: Props) {
     pointAwarded: boolean;
   } | null>(null);
   const [shake, setShake] = useState(false);
+  const questionStartTime = useRef<number>(Date.now());
   const t = useTranslations("learn");
 
   // Current step: "addition" or "subtraction"
@@ -40,10 +40,13 @@ export default function MathModule({ kidId, locked, onComplete }: Props) {
   const bothComplete = data?.additionComplete && data?.subtractionComplete;
 
   useEffect(() => {
-    if (!locked) {
-      fetchMathData();
-    }
-  }, [locked, kidId]);
+    fetchMathData();
+  }, [kidId]);
+
+  // Reset timer when moving to next question
+  useEffect(() => {
+    questionStartTime.current = Date.now();
+  }, [currentStep]);
 
   const fetchMathData = async () => {
     try {
@@ -73,6 +76,7 @@ export default function MathModule({ kidId, locked, onComplete }: Props) {
     const numAnswer = parseInt(answer, 10);
     if (isNaN(numAnswer)) return;
 
+    const responseTimeMs = Date.now() - questionStartTime.current;
     setSubmitting(true);
     setResult(null);
 
@@ -86,6 +90,8 @@ export default function MathModule({ kidId, locked, onComplete }: Props) {
           answer: numAnswer,
           kidId,
           timezone,
+          responseTimeMs,
+          source: "daily",
         }),
       });
 
@@ -106,6 +112,7 @@ export default function MathModule({ kidId, locked, onComplete }: Props) {
             : null
         );
         setAnswer("");
+        questionStartTime.current = Date.now();
 
         if (result.pointAwarded) {
           confetti({
@@ -126,19 +133,6 @@ export default function MathModule({ kidId, locked, onComplete }: Props) {
       setSubmitting(false);
     }
   };
-
-  // Locked state
-  if (locked) {
-    return (
-      <div className="text-center py-8">
-        <div className="bg-gray-100 rounded-3xl p-8 opacity-60">
-          <span className="text-6xl mb-4 block">🔒</span>
-          <h2 className="text-xl font-bold text-gray-500">{t("math")}</h2>
-          <p className="text-gray-400 mt-2">{t("mathLocked")}</p>
-        </div>
-      </div>
-    );
-  }
 
   // Loading state
   if (loading) {
