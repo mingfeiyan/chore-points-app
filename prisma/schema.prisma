@@ -58,6 +58,7 @@ model User {
   sightWordProgress   SightWordProgress[] @relation("KidSightWordProgress")
   mathProgress        MathProgress[] @relation("KidMathProgress")
   mathAttempts        MathAttempt[] @relation("KidMathAttempts")
+  customMathQuestions CustomMathQuestion[] @relation("CustomMathQuestionCreatedBy")
   createdSightWords   SightWord[]   @relation("SightWordCreatedBy")
   updatedSightWords   SightWord[]   @relation("SightWordUpdatedBy")
   createdBadgeTemplates BadgeTemplate[] @relation("BadgeTemplateCreatedBy")
@@ -104,6 +105,7 @@ model Family {
   dailyMealLogs  DailyMealLog[]
   mealPlans      MealPlan[]
   mathSettings   MathSettings?
+  customMathQuestions CustomMathQuestion[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -507,6 +509,28 @@ model MathSettings {
 
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
+}
+
+model CustomMathQuestion {
+  id          String   @id @default(cuid())
+  familyId    String
+  family      Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  createdById String
+  createdBy   User     @relation("CustomMathQuestionCreatedBy", fields: [createdById], references: [id])
+
+  question    String
+  answer      Int
+  questionType String
+  tags        Json     @default("[]")
+
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([familyId])
+  @@index([familyId, isActive])
 }
 
 model BadgeTemplate {
