@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import FamilyInviteCode from "@/components/family/FamilyInviteCode";
 import BadgeManagementTabs from "@/components/settings/BadgeManagementTabs";
@@ -14,11 +15,45 @@ type Props = {
   familyName: string;
   inviteCode: string;
   kids: Kid[];
+  isHueConnected: boolean;
 };
 
-export default function SettingsPageContent({ familyName, inviteCode, kids }: Props) {
+export default function SettingsPageContent({ familyName, inviteCode, kids, isHueConnected }: Props) {
   const t = useTranslations("settings");
   const tParent = useTranslations("parent");
+  const tHue = useTranslations("hue");
+  const [hueConnected, setHueConnected] = useState(isHueConnected);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
+
+  const handleConnectHue = async () => {
+    setIsConnecting(true);
+    try {
+      const response = await fetch("/api/hue/auth");
+      const data = await response.json();
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch {
+      console.error("Failed to initiate Hue connection");
+    } finally {
+      setIsConnecting(false);
+    }
+  };
+
+  const handleDisconnectHue = async () => {
+    setIsDisconnecting(true);
+    try {
+      const response = await fetch("/api/hue/disconnect", { method: "DELETE" });
+      if (response.ok) {
+        setHueConnected(false);
+      }
+    } catch {
+      console.error("Failed to disconnect Hue");
+    } finally {
+      setIsDisconnecting(false);
+    }
+  };
 
   return (
     <>
@@ -75,6 +110,39 @@ export default function SettingsPageContent({ familyName, inviteCode, kids }: Pr
 
       {/* Badge Management */}
       <BadgeManagementTabs />
+
+      {/* Smart Home */}
+      <div className="bg-white shadow rounded-lg p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          {t("smartHome")}
+        </h2>
+
+        <div className="flex items-center justify-between py-3">
+          <div>
+            <div className="font-medium text-gray-900">Philips Hue</div>
+            <div className="text-sm text-gray-500">
+              {hueConnected ? tHue("connected") : tHue("notConnected")}
+            </div>
+          </div>
+          {hueConnected ? (
+            <button
+              onClick={handleDisconnectHue}
+              disabled={isDisconnecting}
+              className="px-4 py-2 text-red-600 border border-red-200 rounded-lg hover:bg-red-50 disabled:opacity-50"
+            >
+              {isDisconnecting ? tHue("disconnecting") : tHue("disconnect")}
+            </button>
+          ) : (
+            <button
+              onClick={handleConnectHue}
+              disabled={isConnecting}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            >
+              {isConnecting ? "..." : tHue("connect")}
+            </button>
+          )}
+        </div>
+      </div>
     </>
   );
 }
