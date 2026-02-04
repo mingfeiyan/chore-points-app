@@ -15,12 +15,14 @@ export async function POST(req: Request) {
       answer,
       kidId,
       timezone = "America/Los_Angeles",
+      responseTimeMs,
+      source = "daily",
     } = await req.json();
 
     // Validate type
-    if (type !== "addition" && type !== "subtraction") {
+    if (!["addition", "subtraction", "multiplication", "division"].includes(type)) {
       return NextResponse.json(
-        { error: "type must be 'addition' or 'subtraction'" },
+        { error: "Invalid question type" },
         { status: 400 }
       );
     }
@@ -55,11 +57,40 @@ export async function POST(req: Request) {
 
     // Generate today's problems
     const problems = generateDailyMathProblems(todayStr, targetKidId);
-    const expectedAnswer =
-      type === "addition" ? problems.addition.answer : problems.subtraction.answer;
 
-    // Check if correct
+    let expectedAnswer: number;
+    let questionStr: string;
+
+    if (type === "addition") {
+      expectedAnswer = problems.addition.answer;
+      questionStr = `${problems.addition.a} + ${problems.addition.b}`;
+    } else if (type === "subtraction") {
+      expectedAnswer = problems.subtraction.answer;
+      questionStr = `${problems.subtraction.a} - ${problems.subtraction.b}`;
+    } else {
+      // For multiplication/division, we'll need settings-based generation
+      // For now, return error as they're not yet implemented
+      return NextResponse.json(
+        { error: "Question type not yet supported" },
+        { status: 400 }
+      );
+    }
+
     const isCorrect = answer === expectedAnswer;
+
+    // Log the attempt
+    await prisma.mathAttempt.create({
+      data: {
+        kidId: targetKidId,
+        questionType: type,
+        question: questionStr,
+        correctAnswer: expectedAnswer,
+        givenAnswer: answer,
+        isCorrect,
+        responseTimeMs: responseTimeMs ? Math.round(responseTimeMs) : null,
+        source,
+      },
+    });
 
     if (!isCorrect) {
       return NextResponse.json({
@@ -145,10 +176,8 @@ export async function POST(req: Request) {
       correct: true,
       pointAwarded,
     });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Something went wrong" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Something went wrong";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
