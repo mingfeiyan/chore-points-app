@@ -39,7 +39,8 @@ export default function MobileNav() {
     { href: "/calendar", label: t("calendar"), icon: "📅" },
     { href: "/gallery", label: t("gallery"), icon: "📷" },
     { href: "/milestones", label: t("milestones"), icon: "🏆" },
-    { href: "/sight-words", label: t("learn"), icon: "📚" },
+    { href: "/sight-words", label: t("sightWords"), icon: "📚" },
+    { href: "/learn/progress", label: t("math"), icon: "🔢" },
     { href: "/settings", label: t("settings"), icon: "⚙️" },
   ];
 
@@ -70,7 +71,11 @@ export default function MobileNav() {
   }
 
   // Check if any secondary link is active
-  const isSecondaryActive = secondaryLinks.some(link => pathname === link.href);
+  const isSecondaryActive = secondaryLinks.some(link =>
+    link.href === "/learn/progress"
+      ? pathname.startsWith("/learn/progress")
+      : pathname === link.href
+  );
 
   return (
     <>
@@ -86,7 +91,9 @@ export default function MobileNav() {
       {showMore && secondaryLinks.length > 0 && (
         <div className="sm:hidden fixed bottom-20 right-2 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-50 min-w-[160px]">
           {secondaryLinks.map((link) => {
-            const isActive = pathname === link.href;
+            const isActive = link.href === "/learn/progress"
+              ? pathname.startsWith("/learn/progress")
+              : pathname === link.href;
             return (
               <Link
                 key={link.href}

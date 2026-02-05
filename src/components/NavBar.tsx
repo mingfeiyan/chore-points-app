@@ -193,7 +193,15 @@ export default function NavBar() {
                       pathname === "/sight-words" ? "text-blue-400" : ""
                     }`}
                   >
-                    {t("learn")}
+                    {t("sightWords")}
+                  </Link>
+                  <Link
+                    href="/learn/progress"
+                    className={`hover:text-gray-300 transition ${
+                      pathname.startsWith("/learn/progress") ? "text-blue-400" : ""
+                    }`}
+                  >
+                    {t("math")}
                   </Link>
                   <Link
                     href="/settings"
