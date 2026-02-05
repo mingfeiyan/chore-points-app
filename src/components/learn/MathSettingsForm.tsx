@@ -132,7 +132,14 @@ export default function MathSettingsForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <>
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">{t("mathSettings")}</h1>
+        <p className="text-gray-600 mt-1">{t("mathSettingsDesc")}</p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
       {/* Daily Question Count */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -540,5 +547,6 @@ export default function MathSettingsForm() {
         )}
       </div>
     </form>
+    </>
   );
 }
