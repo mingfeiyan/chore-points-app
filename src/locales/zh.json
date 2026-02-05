@@ -586,7 +586,17 @@
     "todaysProgress": "今日进度",
     "pointEarned": "+1 分！",
     "step": "步骤",
-    "of": "/"
+    "of": "/",
+    "kid": "孩子",
+    "unnamed": "未命名",
+    "period": "时间段",
+    "last7Days": "最近7天",
+    "last30Days": "最近30天",
+    "last90Days": "最近90天",
+    "correct": "正确答案",
+    "analyzeInsightsDesc": "点击「分析错误」获取关于{name}学习模式的AI智能分析。",
+    "noDataAvailable": "暂无数据。",
+    "noKidsYet": "你的家庭还没有孩子。"
   },
   "sightWords": {
     "pageTitle": "高频词",

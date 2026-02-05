@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
 
 type Kid = { id: string; name: string | null };
 
@@ -42,6 +43,7 @@ export default function MathAnalytics({ kids, defaultKidId }: Props) {
   const [insights, setInsights] = useState<Insight[]>([]);
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
+  const t = useTranslations("learn");
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -97,7 +99,7 @@ export default function MathAnalytics({ kids, defaultKidId }: Props) {
       <div className="flex flex-wrap gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Kid
+            {t("kid")}
           </label>
           <select
             value={selectedKidId}
@@ -106,23 +108,23 @@ export default function MathAnalytics({ kids, defaultKidId }: Props) {
           >
             {kids.map((kid) => (
               <option key={kid.id} value={kid.id}>
-                {kid.name || "Unnamed"}
+                {kid.name || t("unnamed")}
               </option>
             ))}
           </select>
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Period
+            {t("period")}
           </label>
           <select
             value={days}
             onChange={(e) => setDays(Number(e.target.value))}
             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
           >
-            <option value={7}>Last 7 days</option>
-            <option value={30}>Last 30 days</option>
-            <option value={90}>Last 90 days</option>
+            <option value={7}>{t("last7Days")}</option>
+            <option value={30}>{t("last30Days")}</option>
+            <option value={90}>{t("last90Days")}</option>
           </select>
         </div>
       </div>
@@ -136,23 +138,23 @@ export default function MathAnalytics({ kids, defaultKidId }: Props) {
           {/* Summary Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-white rounded-lg shadow p-4">
-              <div className="text-sm text-gray-500">Total Questions</div>
+              <div className="text-sm text-gray-500">{t("totalQuestions")}</div>
               <div className="text-2xl font-bold">{stats.total}</div>
             </div>
             <div className="bg-white rounded-lg shadow p-4">
-              <div className="text-sm text-gray-500">Accuracy</div>
+              <div className="text-sm text-gray-500">{t("accuracy")}</div>
               <div className="text-2xl font-bold text-green-600">
                 {stats.accuracy}%
               </div>
             </div>
             <div className="bg-white rounded-lg shadow p-4">
-              <div className="text-sm text-gray-500">Current Streak</div>
+              <div className="text-sm text-gray-500">{t("currentStreak")}</div>
               <div className="text-2xl font-bold text-orange-500">
-                {stats.streak} days
+                {stats.streak} {t("days")}
               </div>
             </div>
             <div className="bg-white rounded-lg shadow p-4">
-              <div className="text-sm text-gray-500">Correct</div>
+              <div className="text-sm text-gray-500">{t("correct")}</div>
               <div className="text-2xl font-bold">
                 {stats.correct}/{stats.total}
               </div>
@@ -161,11 +163,11 @@ export default function MathAnalytics({ kids, defaultKidId }: Props) {
 
           {/* By Type */}
           <div className="bg-white rounded-lg shadow p-4">
-            <h3 className="font-semibold mb-3">Accuracy by Type</h3>
+            <h3 className="font-semibold mb-3">{t("accuracyByType")}</h3>
             <div className="space-y-2">
               {Object.entries(stats.byType).map(([type, data]) => (
                 <div key={type} className="flex items-center gap-3">
-                  <span className="w-24 capitalize">{type}</span>
+                  <span className="w-24 capitalize">{t(type as "addition" | "subtraction" | "multiplication" | "division")}</span>
                   <div className="flex-1 bg-gray-200 rounded-full h-4">
                     <div
                       className="bg-indigo-500 h-4 rounded-full"
@@ -184,13 +186,13 @@ export default function MathAnalytics({ kids, defaultKidId }: Props) {
           {/* AI Insights */}
           <div className="bg-white rounded-lg shadow p-4">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold">AI Insights</h3>
+              <h3 className="font-semibold">{t("aiInsights")}</h3>
               <button
                 onClick={handleAnalyze}
                 disabled={analyzing}
                 className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
               >
-                {analyzing ? "Analyzing..." : "Analyze Mistakes"}
+                {analyzing ? t("analyzing") : t("analyzeBtn")}
               </button>
             </div>
             {insights.length > 0 ? (
@@ -216,25 +218,24 @@ export default function MathAnalytics({ kids, defaultKidId }: Props) {
               </ul>
             ) : (
               <p className="text-gray-500">
-                Click &quot;Analyze Mistakes&quot; to get AI-powered insights about{" "}
-                {selectedKid?.name || "your child"}&apos;s learning patterns.
+                {t("analyzeInsightsDesc", { name: selectedKid?.name || t("unnamed") })}
               </p>
             )}
           </div>
 
           {/* Mistake Log */}
           <div className="bg-white rounded-lg shadow p-4">
-            <h3 className="font-semibold mb-3">Recent Mistakes</h3>
+            <h3 className="font-semibold mb-3">{t("recentMistakes")}</h3>
             {attempts.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left py-2">Date</th>
-                      <th className="text-left py-2">Question</th>
-                      <th className="text-left py-2">Given</th>
-                      <th className="text-left py-2">Correct</th>
-                      <th className="text-left py-2">Type</th>
+                      <th className="text-left py-2">{t("date")}</th>
+                      <th className="text-left py-2">{t("question")}</th>
+                      <th className="text-left py-2">{t("given")}</th>
+                      <th className="text-left py-2">{t("correctAnswer")}</th>
+                      <th className="text-left py-2">{t("type")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -251,7 +252,7 @@ export default function MathAnalytics({ kids, defaultKidId }: Props) {
                           {attempt.correctAnswer}
                         </td>
                         <td className="py-2 capitalize">
-                          {attempt.questionType}
+                          {t(attempt.questionType as "addition" | "subtraction" | "multiplication" | "division")}
                         </td>
                       </tr>
                     ))}
@@ -259,12 +260,12 @@ export default function MathAnalytics({ kids, defaultKidId }: Props) {
                 </table>
               </div>
             ) : (
-              <p className="text-gray-500">No mistakes recorded yet!</p>
+              <p className="text-gray-500">{t("noMistakes")}</p>
             )}
           </div>
         </>
       ) : (
-        <p className="text-gray-500">No data available.</p>
+        <p className="text-gray-500">{t("noDataAvailable")}</p>
       )}
     </div>
   );

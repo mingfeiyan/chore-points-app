@@ -586,7 +586,17 @@
     "todaysProgress": "Today's Progress",
     "pointEarned": "+1 point earned!",
     "step": "Step",
-    "of": "of"
+    "of": "of",
+    "kid": "Kid",
+    "unnamed": "Unnamed",
+    "period": "Period",
+    "last7Days": "Last 7 days",
+    "last30Days": "Last 30 days",
+    "last90Days": "Last 90 days",
+    "correct": "Correct",
+    "analyzeInsightsDesc": "Click \"Analyze Mistakes\" to get AI-powered insights about {name}'s learning patterns.",
+    "noDataAvailable": "No data available.",
+    "noKidsYet": "No kids in your family yet."
   },
   "sightWords": {
     "pageTitle": "Sight Words",
