@@ -466,9 +466,11 @@ function MealCard({
   onDishCreated,
 }: MealCardProps) {
   const t = useTranslations("meals");
+  const tCommon = useTranslations("common");
   const [showDishSelector, setShowDishSelector] = useState(false);
-  const [freeFormDish, setFreeFormDish] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [showQuickCreate, setShowQuickCreate] = useState(false);
+  const [newDishName, setNewDishName] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -496,6 +498,14 @@ function MealCard({
     setUploadError("");
   };
 
+  const resetState = () => {
+    setShowDishSelector(false);
+    setShowQuickCreate(false);
+    setSearchQuery("");
+    setNewDishName("");
+    clearPhoto();
+  };
+
   // Filter dishes based on search
   const filteredDishes = dishes.filter((dish) =>
     dish.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -503,59 +513,48 @@ function MealCard({
 
   const handleSelectDish = (dish: Dish) => {
     onAddDish(dish.id, dish.name);
-    setShowDishSelector(false);
-    setSearchQuery("");
+    resetState();
   };
 
-  const handleAddFreeForm = async () => {
-    const trimmed = freeFormDish.trim();
-    if (!trimmed) return;
+  const handleQuickCreate = async () => {
+    const trimmed = newDishName.trim();
+    if (!trimmed || !photoFile) return;
 
-    // If there's a photo, create a proper dish with the photo
-    if (photoFile) {
-      setUploading(true);
-      setUploadError("");
-      try {
-        // Upload photo first
-        const formData = new FormData();
-        formData.append("file", photoFile);
-        const uploadRes = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-        if (!uploadRes.ok) {
-          throw new Error("Failed to upload photo");
-        }
-        const uploadData = await uploadRes.json();
-        const photoUrl = uploadData.url;
-
-        // Create the dish
-        const dishRes = await fetch("/api/dishes", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: trimmed, photoUrl }),
-        });
-        if (!dishRes.ok) {
-          throw new Error("Failed to create dish");
-        }
-        const dishData = await dishRes.json();
-
-        // Add the new dish to the meal and update the dish library
-        onDishCreated(dishData.dish);
-        onAddDish(dishData.dish.id, dishData.dish.name);
-        setFreeFormDish("");
-        clearPhoto();
-        setShowDishSelector(false);
-      } catch (err) {
-        setUploadError(err instanceof Error ? err.message : "Upload failed");
-      } finally {
-        setUploading(false);
+    setUploading(true);
+    setUploadError("");
+    try {
+      // Upload photo
+      const formData = new FormData();
+      formData.append("file", photoFile);
+      const uploadRes = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (!uploadRes.ok) {
+        throw new Error("Failed to upload photo");
       }
-    } else {
-      // No photo - add as free-form dish
-      onAddDish(null, trimmed);
-      setFreeFormDish("");
-      setShowDishSelector(false);
+      const uploadData = await uploadRes.json();
+      const photoUrl = uploadData.url;
+
+      // Create the dish
+      const dishRes = await fetch("/api/dishes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: trimmed, photoUrl }),
+      });
+      if (!dishRes.ok) {
+        throw new Error("Failed to create dish");
+      }
+      const dishData = await dishRes.json();
+
+      // Add the new dish to the meal and update the dish library
+      onDishCreated(dishData.dish);
+      onAddDish(dishData.dish.id, dishData.dish.name);
+      resetState();
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -578,11 +577,7 @@ function MealCard({
           {meal.dishes.map((dish) => (
             <div
               key={dish.id}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm ${
-                dish.isFreeForm
-                  ? "bg-gray-100 text-gray-700 border border-gray-200"
-                  : "bg-orange-50 text-orange-700 border border-orange-200"
-              }`}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm bg-orange-50 text-orange-700 border border-orange-200"
             >
               <span>{dish.dishName}</span>
               <button
@@ -602,64 +597,79 @@ function MealCard({
           onClick={() => setShowDishSelector(true)}
           className="text-sm text-orange-600 hover:text-orange-800"
         >
-          + Add dish
+          + {t("addDish")}
         </button>
       ) : (
         <div className="space-y-2 p-3 bg-gray-50 rounded-lg">
-          {/* Search/select from library */}
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search dishes..."
-            className="w-full px-3 py-2 border rounded-md text-sm"
-          />
-
-          {/* Dish list */}
-          {loadingDishes ? (
-            <div className="text-sm text-gray-500">Loading dishes...</div>
-          ) : filteredDishes.length > 0 ? (
-            <div className="max-h-32 overflow-y-auto space-y-1">
-              {filteredDishes.map((dish) => (
-                <button
-                  key={dish.id}
-                  onClick={() => handleSelectDish(dish)}
-                  className="w-full text-left px-3 py-2 text-sm hover:bg-orange-50 rounded-md flex items-center gap-2"
-                >
-                  {dish.photoUrl && (
-                    <Image
-                      src={dish.photoUrl}
-                      alt={dish.name}
-                      width={24}
-                      height={24}
-                      className="w-6 h-6 rounded object-cover"
-                    />
-                  )}
-                  <span>{dish.name}</span>
-                </button>
-              ))}
-            </div>
-          ) : (
-            <div className="text-sm text-gray-500 py-2">No matching dishes</div>
-          )}
-
-          {/* Or add free-form */}
-          <div className="border-t pt-2 mt-2">
-            <div className="text-xs text-gray-500 mb-1">Or add a new dish:</div>
-            <div className="space-y-2">
+          {!showQuickCreate ? (
+            <>
+              {/* Search/select from library */}
               <input
                 type="text"
-                value={freeFormDish}
-                onChange={(e) => setFreeFormDish(e.target.value)}
-                placeholder="Dish name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t("searchDishes")}
+                className="w-full px-3 py-2 border rounded-md text-sm"
+              />
+
+              {/* Dish list */}
+              {loadingDishes ? (
+                <div className="text-sm text-gray-500">Loading dishes...</div>
+              ) : filteredDishes.length > 0 ? (
+                <div className="max-h-32 overflow-y-auto space-y-1">
+                  {filteredDishes.map((dish) => (
+                    <button
+                      key={dish.id}
+                      onClick={() => handleSelectDish(dish)}
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-orange-50 rounded-md flex items-center gap-2"
+                    >
+                      {dish.photoUrl && (
+                        <Image
+                          src={dish.photoUrl}
+                          alt={dish.name}
+                          width={24}
+                          height={24}
+                          className="w-6 h-6 rounded object-cover"
+                        />
+                      )}
+                      <span>{dish.name}</span>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-sm text-gray-500 py-2">{t("noMatchingDishes")}</div>
+              )}
+
+              {/* Create new dish button */}
+              <button
+                onClick={() => {
+                  setShowQuickCreate(true);
+                  // Pre-fill name from search query if user was searching
+                  if (searchQuery.trim()) {
+                    setNewDishName(searchQuery.trim());
+                  }
+                }}
+                className="w-full text-left px-3 py-2 text-sm text-orange-600 hover:bg-orange-50 rounded-md border border-dashed border-orange-300"
+              >
+                + {t("createNewDish")}
+              </button>
+            </>
+          ) : (
+            <>
+              {/* Quick create form: name + photo */}
+              <div className="text-sm font-medium text-gray-700 mb-1">
+                {t("quickCreate")}
+              </div>
+              <input
+                type="text"
+                value={newDishName}
+                onChange={(e) => setNewDishName(e.target.value)}
+                placeholder={t("dishNamePlaceholder")}
                 className="w-full px-3 py-1.5 border rounded-md text-sm"
               />
 
               {/* Photo upload */}
               <div>
-                <div className="text-xs text-gray-500 mb-1">
-                  {t("photo")} ({t("photoOptionalShort")})
-                </div>
                 {photoPreview ? (
                   <div className="relative inline-block">
                     <img
@@ -677,7 +687,7 @@ function MealCard({
                   </div>
                 ) : (
                   <label className="block w-full p-2 border border-dashed rounded-md text-center cursor-pointer hover:border-orange-400 text-sm text-gray-500">
-                    Click to add photo
+                    {t("photo")} ({t("photoRequired")})
                     <input
                       type="file"
                       accept="image/*"
@@ -693,23 +703,29 @@ function MealCard({
               )}
 
               <button
-                onClick={handleAddFreeForm}
-                disabled={!freeFormDish.trim() || uploading}
+                onClick={handleQuickCreate}
+                disabled={!newDishName.trim() || !photoFile || uploading}
                 className="w-full px-3 py-1.5 bg-orange-500 text-white rounded-md text-sm hover:bg-orange-600 disabled:opacity-50"
               >
-                {uploading ? "Adding..." : photoFile ? "Add with Photo" : "Add without Photo"}
+                {uploading ? tCommon("saving") : t("createDish")}
               </button>
-            </div>
-          </div>
+
+              <button
+                onClick={() => {
+                  setShowQuickCreate(false);
+                  setNewDishName("");
+                  clearPhoto();
+                }}
+                className="text-sm text-gray-500 hover:text-gray-700"
+              >
+                {t("searchDishes")}
+              </button>
+            </>
+          )}
 
           {/* Cancel */}
           <button
-            onClick={() => {
-              setShowDishSelector(false);
-              setSearchQuery("");
-              setFreeFormDish("");
-              clearPhoto();
-            }}
+            onClick={resetState}
             className="text-sm text-gray-500 hover:text-gray-700"
           >
             Cancel

@@ -714,6 +714,19 @@
     "thisWeek": "本周",
     "weeksAhead": "{count}周后",
     "weeksAgo": "{count}周前",
-    "itemsRemaining": "剩余 {remaining} / {total} 项"
+    "itemsRemaining": "剩余 {remaining} / {total} 项",
+    "dishLibrary": "菜品库",
+    "dishLibraryDesc": "管理家庭菜品收藏",
+    "addNewDish": "添加新菜品",
+    "deleteDish": "删除菜品",
+    "confirmDeleteDish": "确定要删除这道菜吗？此操作无法撤消。",
+    "createDish": "创建菜品",
+    "quickCreate": "快速创建",
+    "noDishesInLibrary": "还没有菜品，添加你的第一道菜吧！",
+    "ingredientCount": "{count} 种食材",
+    "createNewDish": "创建新菜品",
+    "changePhoto": "更换",
+    "nameRequired": "名称为必填项",
+    "clickToUploadPhoto": "点击上传照片"
   }
 }

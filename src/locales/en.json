@@ -714,6 +714,19 @@
     "thisWeek": "This Week",
     "weeksAhead": "{count} weeks ahead",
     "weeksAgo": "{count} weeks ago",
-    "itemsRemaining": "{remaining} / {total} items remaining"
+    "itemsRemaining": "{remaining} / {total} items remaining",
+    "dishLibrary": "Dish Library",
+    "dishLibraryDesc": "Manage your family's dish collection",
+    "addNewDish": "Add New Dish",
+    "deleteDish": "Delete Dish",
+    "confirmDeleteDish": "Are you sure you want to delete this dish? This cannot be undone.",
+    "createDish": "Create Dish",
+    "quickCreate": "Quick Create",
+    "noDishesInLibrary": "No dishes yet. Add your first dish!",
+    "ingredientCount": "{count} ingredients",
+    "createNewDish": "Create new dish",
+    "changePhoto": "Change",
+    "nameRequired": "Name is required",
+    "clickToUploadPhoto": "Click to upload photo"
   }
 }

@@ -33,7 +33,7 @@ export async function POST(req: Request) {
   try {
     const session = await requireFamily();
 
-    const { name, photoUrl } = await req.json();
+    const { name, photoUrl, ingredients } = await req.json();
 
     if (!name || typeof name !== "string") {
       return NextResponse.json(
@@ -49,10 +49,25 @@ export async function POST(req: Request) {
       );
     }
 
+    // Clean up ingredients if provided
+    let cleanedIngredients: string[] = [];
+    if (ingredients !== undefined) {
+      if (!Array.isArray(ingredients)) {
+        return NextResponse.json(
+          { error: "Ingredients must be an array" },
+          { status: 400 }
+        );
+      }
+      cleanedIngredients = ingredients
+        .map((i: unknown) => String(i).trim())
+        .filter((i: string) => i.length > 0);
+    }
+
     const dish = await prisma.dish.create({
       data: {
         name: name.trim(),
         photoUrl,
+        ingredients: cleanedIngredients,
         familyId: session.user.familyId!,
         createdById: session.user.id,
       },
