@@ -66,6 +66,12 @@ export default function MealsCalendarView() {
         >
           {t("groceryList")}
         </Link>
+        <Link
+          href="/meals/dishes"
+          className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
+        >
+          {t("dishLibrary")}
+        </Link>
       </div>
 
       {/* Calendar View */}

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
-import EditDishModal from "./EditDishModal";
+import Link from "next/link";
 import MealPlanFeedback from "./MealPlanFeedback";
 
 type Dish = {
@@ -28,7 +28,6 @@ export default function MealPlanSelector({ onPlanSaved }: MealPlanSelectorProps)
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [savedMessage, setSavedMessage] = useState(false);
-  const [editingDish, setEditingDish] = useState<Dish | null>(null);
   const [feedbackDishes, setFeedbackDishes] = useState<Dish[]>([]);
   const [autoFetchFeedback, setAutoFetchFeedback] = useState(false);
 
@@ -115,26 +114,6 @@ export default function MealPlanSelector({ onPlanSaved }: MealPlanSelectorProps)
     }
   };
 
-  const handleDishSaved = (updatedDish: Dish) => {
-    setDishes((prev) =>
-      prev.map((d) => (d.id === updatedDish.id ? updatedDish : d))
-    );
-    setEditingDish(null);
-
-    // Update onPlanSaved if this dish is selected
-    if (selectedDishIds.has(updatedDish.id)) {
-      const selectedDishes = dishes.map((d) =>
-        d.id === updatedDish.id ? updatedDish : d
-      ).filter((d) => selectedDishIds.has(d.id));
-      onPlanSaved(selectedDishes);
-    }
-  };
-
-  const handleEditClick = (e: React.MouseEvent, dish: Dish) => {
-    e.stopPropagation(); // Prevent toggling selection
-    setEditingDish(dish);
-  };
-
   if (loading) {
     return <div className="text-center py-4">{tCommon("loading")}</div>;
   }
@@ -202,11 +181,11 @@ export default function MealPlanSelector({ onPlanSaved }: MealPlanSelectorProps)
                   </div>
                 )}
               </button>
-              {/* Edit button - always visible for parents */}
+              {/* Edit link - navigate to dish library */}
               {isParent && (
-                <button
-                  type="button"
-                  onClick={(e) => handleEditClick(e, dish)}
+                <Link
+                  href="/meals/dishes"
+                  onClick={(e) => e.stopPropagation()}
                   className="absolute top-1 left-1 bg-white/90 text-gray-700 rounded-full w-6 h-6 flex items-center justify-center shadow-sm hover:bg-white"
                   title={t("editDish")}
                 >
@@ -218,7 +197,7 @@ export default function MealPlanSelector({ onPlanSaved }: MealPlanSelectorProps)
                   >
                     <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
                   </svg>
-                </button>
+                </Link>
               )}
             </div>
           );
@@ -246,15 +225,6 @@ export default function MealPlanSelector({ onPlanSaved }: MealPlanSelectorProps)
         <MealPlanFeedback
           dishes={feedbackDishes}
           autoFetch={autoFetchFeedback}
-        />
-      )}
-
-      {/* Edit Dish Modal */}
-      {editingDish && (
-        <EditDishModal
-          dish={editingDish}
-          onClose={() => setEditingDish(null)}
-          onSave={handleDishSaved}
         />
       )}
     </div>
