@@ -33,9 +33,9 @@ export default async function DashboardPage() {
             <WeeklyCalendarView />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <FamilyTodoList />
-              <LightsWidget />
+              <PhotoCarousel />
             </div>
-            <PhotoCarousel />
+            <LightsWidget />
           </div>
         </div>
       </div>
