@@ -5,6 +5,7 @@
  * Called automatically by `npm run dev`.
  */
 import { execSync } from "child_process";
+import { existsSync, rmSync } from "fs";
 import { PGlite } from "@electric-sql/pglite";
 
 async function main() {
@@ -15,18 +16,27 @@ async function main() {
     return;
   }
 
-  const client = new PGlite(dataDir);
+  let client = new PGlite(dataDir);
 
-  // Check if tables already exist
-  const result = await client.query<{ count: string }>(
-    "SELECT COUNT(*) as count FROM pg_tables WHERE schemaname = 'public'"
-  );
-  if (Number(result.rows[0].count) > 0) {
+  // Check if schema is already initialized by looking for critical tables
+  try {
+    await client.query('SELECT 1 FROM "User" LIMIT 1');
+    await client.query('SELECT 1 FROM "Family" LIMIT 1');
+    await client.query('SELECT 1 FROM "Chore" LIMIT 1');
+    // All critical tables exist — database is already initialized
     await client.close();
     return;
+  } catch {
+    // Tables don't exist or database is corrupted — delete and recreate
+    await client.close();
+    if (existsSync(dataDir)) {
+      console.log(`Database incomplete or corrupted — removing ${dataDir}`);
+      rmSync(dataDir, { recursive: true, force: true });
+    }
   }
 
   console.log(`Initializing PGlite database at: ${dataDir}`);
+  client = new PGlite(dataDir);
 
   // Generate the full schema SQL from Prisma
   const sql = execSync(
