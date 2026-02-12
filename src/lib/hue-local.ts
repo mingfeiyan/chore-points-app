@@ -209,17 +209,32 @@ export const HUE_ROOMS = {
 } as const;
 
 // Local celebration server (bypasses HTTPS→HTTP restriction)
-const CELEBRATION_SERVER = "http://localhost:3001";
+// Uses the Mac's local IP so it works from any device on the network
+const CELEBRATION_SERVER_IP = "http://192.168.86.226:3001";
+const CELEBRATION_SERVER_LOCALHOST = "http://localhost:3001";
 
 /**
  * Try to trigger celebration via local server first, fall back to direct bridge
+ * Tries both the network IP (for phones/tablets) and localhost (for Mac browser)
  */
 async function triggerCelebration(
   endpoint: string,
   fallback: () => Promise<void>
 ): Promise<void> {
+  // Try network IP first (works from any device on the network)
   try {
-    const response = await fetch(`${CELEBRATION_SERVER}${endpoint}`, {
+    const response = await fetch(`${CELEBRATION_SERVER_IP}${endpoint}`, {
+      method: "POST",
+      signal: AbortSignal.timeout(2000),
+    });
+    if (response.ok) return;
+  } catch {
+    // Network IP failed, try localhost
+  }
+  
+  // Try localhost (works when viewing on the Mac itself)
+  try {
+    const response = await fetch(`${CELEBRATION_SERVER_LOCALHOST}${endpoint}`, {
       method: "POST",
       signal: AbortSignal.timeout(2000),
     });
@@ -227,6 +242,7 @@ async function triggerCelebration(
   } catch {
     // Server not running, try direct bridge (works on localhost dev)
   }
+  
   return fallback();
 }
 
