@@ -597,7 +597,21 @@
     "correct": "正确答案",
     "analyzeInsightsDesc": "点击「分析错误」获取关于{name}学习模式的AI智能分析。",
     "noDataAvailable": "暂无数据。",
-    "noKidsYet": "你的家庭还没有孩子。"
+    "noKidsYet": "你的家庭还没有孩子。",
+    "scheduleQuestions": "安排题目",
+    "scheduleQuestionsDesc": "为指定日期设置自定义数学题",
+    "selectDate": "选择日期",
+    "selectKid": "选择孩子",
+    "questionPlaceholder": "例如：3 + 5",
+    "expectedAnswer": "答案",
+    "addQuestion": "+ 添加题目",
+    "maxQuestionsReached": "每天最多10道题",
+    "questionsScheduled": "题目已保存！",
+    "savingQuestions": "保存中...",
+    "saveQuestions": "保存题目",
+    "clearDay": "清除当天",
+    "addAtLeastOne": "至少添加一道题",
+    "answersNumbers": "所有答案必须是数字"
   },
   "sightWords": {
     "pageTitle": "高频词",

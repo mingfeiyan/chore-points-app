@@ -597,7 +597,21 @@
     "correct": "Correct",
     "analyzeInsightsDesc": "Click \"Analyze Mistakes\" to get AI-powered insights about {name}'s learning patterns.",
     "noDataAvailable": "No data available.",
-    "noKidsYet": "No kids in your family yet."
+    "noKidsYet": "No kids in your family yet.",
+    "scheduleQuestions": "Schedule Questions",
+    "scheduleQuestionsDesc": "Set custom math questions for a specific day",
+    "selectDate": "Select Date",
+    "selectKid": "Select Kid",
+    "questionPlaceholder": "e.g., 3 + 5",
+    "expectedAnswer": "Answer",
+    "addQuestion": "+ Add Question",
+    "maxQuestionsReached": "Maximum 10 questions per day",
+    "questionsScheduled": "Questions saved!",
+    "savingQuestions": "Saving...",
+    "saveQuestions": "Save Questions",
+    "clearDay": "Clear Day",
+    "addAtLeastOne": "Add at least one question",
+    "answersNumbers": "All answers must be numbers"
   },
   "sightWords": {
     "pageTitle": "Sight Words",

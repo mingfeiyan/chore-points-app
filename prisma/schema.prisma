@@ -59,6 +59,7 @@ model User {
   mathProgress        MathProgress[] @relation("KidMathProgress")
   mathAttempts        MathAttempt[] @relation("KidMathAttempts")
   customMathQuestions CustomMathQuestion[] @relation("CustomMathQuestionCreatedBy")
+  scheduledMathQuestions CustomMathQuestion[] @relation("CustomMathQuestionKid")
   createdSightWords   SightWord[]   @relation("SightWordCreatedBy")
   updatedSightWords   SightWord[]   @relation("SightWordUpdatedBy")
   createdBadgeTemplates BadgeTemplate[] @relation("BadgeTemplateCreatedBy")
@@ -534,11 +535,16 @@ model CustomMathQuestion {
   isActive    Boolean  @default(true)
   sortOrder   Int      @default(0)
 
+  scheduledDate String?  // "YYYY-MM-DD" — if set, this question appears on that date
+  kidId         String?  // Which kid this is scheduled for
+  kid           User?    @relation("CustomMathQuestionKid", fields: [kidId], references: [id])
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@index([familyId])
   @@index([familyId, isActive])
+  @@index([familyId, kidId, scheduledDate])
 }
 
 model BadgeTemplate {

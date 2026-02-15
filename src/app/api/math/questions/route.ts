@@ -14,6 +14,8 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const tag = searchParams.get("tag");
     const activeOnly = searchParams.get("activeOnly") !== "false";
+    const scheduledDate = searchParams.get("scheduledDate");
+    const kidIdParam = searchParams.get("kidId");
 
     const where: Record<string, unknown> = {
       familyId: session.user.familyId,
@@ -25,6 +27,14 @@ export async function GET(req: Request) {
 
     if (tag) {
       where.tags = { has: tag };
+    }
+
+    if (scheduledDate) {
+      where.scheduledDate = scheduledDate;
+    }
+
+    if (kidIdParam) {
+      where.kidId = kidIdParam;
     }
 
     const questions = await prisma.customMathQuestion.findMany({
@@ -75,6 +85,8 @@ export async function POST(req: Request) {
           tags: q.tags || [],
           isActive: q.isActive !== false,
           sortOrder: q.sortOrder || 0,
+          scheduledDate: q.scheduledDate || null,
+          kidId: q.kidId || null,
         },
       });
       created.push(question);
