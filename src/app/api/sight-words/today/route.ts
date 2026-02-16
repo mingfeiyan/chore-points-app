@@ -104,12 +104,64 @@ export async function GET(req: Request) {
       }
     }
 
-    // If all words have been completed, show the last one or cycle back
+    // If all words have been completed, recycle through them
     if (!todaysWord) {
-      // All words completed - show completion message or cycle
+      // Check if any word was already quizzed today
+      const anyCompletedToday = allWords.some((word) => {
+        const wp = progressMap.get(word.id);
+        if (!wp?.quizPassedAt) return false;
+        return getLocalDateString(new Date(wp.quizPassedAt), timezone) === todayLocal;
+      });
+
+      if (anyCompletedToday) {
+        return NextResponse.json({
+          sightWord: null,
+          message: "alreadyCompletedToday",
+          isReview: true,
+          progress: { current: allWords.length, total: allWords.length },
+        });
+      }
+
+      // Find first word (by sort order) where pointAwarded = true → reset and serve
+      let reviewWord = null;
+      for (const word of allWords) {
+        const wp = progressMap.get(word.id);
+        if (wp?.pointAwarded) {
+          await prisma.sightWordProgress.update({
+            where: {
+              kidId_sightWordId: { kidId: targetKidId, sightWordId: word.id },
+            },
+            data: { pointAwarded: false },
+          });
+          reviewWord = word;
+          break;
+        }
+      }
+
+      if (!reviewWord) {
+        // All words have pointAwarded = false (full cycle done) — reset all and start over
+        await prisma.sightWordProgress.updateMany({
+          where: { kidId: targetKidId, sightWordId: { in: allWords.map((w) => w.id) } },
+          data: { pointAwarded: true },
+        });
+        const firstWord = allWords[0];
+        await prisma.sightWordProgress.update({
+          where: {
+            kidId_sightWordId: { kidId: targetKidId, sightWordId: firstWord.id },
+          },
+          data: { pointAwarded: false },
+        });
+        reviewWord = firstWord;
+      }
+
       return NextResponse.json({
-        sightWord: null,
-        message: "allComplete",
+        sightWord: {
+          id: reviewWord.id,
+          word: reviewWord.word,
+          imageUrl: reviewWord.imageUrl,
+        },
+        alreadyCompletedToday: false,
+        isReview: true,
         progress: { current: allWords.length, total: allWords.length },
       });
     }
@@ -121,6 +173,7 @@ export async function GET(req: Request) {
         imageUrl: todaysWord.imageUrl,
       },
       alreadyCompletedToday,
+      isReview: false,
       progress: {
         current: completedCount,
         total: allWords.length,
