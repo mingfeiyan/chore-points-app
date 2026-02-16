@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 interface MathSettings {
@@ -547,6 +548,20 @@ export default function MathSettingsForm() {
         )}
       </div>
     </form>
+
+      {/* Custom Questions Link */}
+      <div className="mt-8 p-6 bg-white rounded-xl shadow-sm border border-gray-200">
+        <h3 className="text-lg font-semibold text-gray-800 mb-2">{t("customQuestionsTitle")}</h3>
+        <p className="text-gray-600 mb-4">
+          {t("customQuestionsLinkDesc")}
+        </p>
+        <Link
+          href="/learn/questions"
+          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+        >
+          {t("scheduleCustomQuestions")} →
+        </Link>
+      </div>
     </>
   );
 }

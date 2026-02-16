@@ -619,7 +619,10 @@
     "questionList": "Questions",
     "noQuestionsYet": "No questions yet. Use Quick Add above or add a custom question.",
     "howItWorks": "How it works",
-    "howItWorksDesc": "When {name} opens the Learning Center on this date, these custom questions will replace the auto-generated ones. Each correct answer earns 1 point."
+    "howItWorksDesc": "When {name} opens the Learning Center on this date, these custom questions will replace the auto-generated ones. Each correct answer earns 1 point.",
+    "customQuestionsTitle": "Custom Math Questions",
+    "customQuestionsLinkDesc": "Schedule your own math questions for specific dates. Perfect for grandparents or parents who want to create personalized practice!",
+    "scheduleCustomQuestions": "Schedule Custom Questions"
   },
   "sightWords": {
     "pageTitle": "Sight Words",

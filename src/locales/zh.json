@@ -619,7 +619,10 @@
     "questionList": "题目列表",
     "noQuestionsYet": "还没有题目。用上面的快速出题或添加自定义题目。",
     "howItWorks": "使用说明",
-    "howItWorksDesc": "{name}在这天打开学习中心时，会看到这些自定义题目替代自动生成的题。每答对一题得1分。"
+    "howItWorksDesc": "{name}在这天打开学习中心时，会看到这些自定义题目替代自动生成的题。每答对一题得1分。",
+    "customQuestionsTitle": "自定义数学题",
+    "customQuestionsLinkDesc": "为特定日期设置自定义数学题。非常适合爷爷奶奶或家长创建个性化练习！",
+    "scheduleCustomQuestions": "设置自定义题目"
   },
   "sightWords": {
     "pageTitle": "高频词",

@@ -134,25 +134,21 @@ export default function ScheduleMathQuestions({ kids }: Props) {
     setSaving(true);
 
     try {
-      // Delete existing questions for this date+kid
-      for (const id of existingIds) {
-        await fetch(`/api/math/questions/${id}`, { method: "DELETE" });
-      }
-
-      // Create new questions
-      const questions = validRows.map((r, i) => ({
+      // Atomic replace: delete old + create new in one server transaction
+      const questions = validRows.map((r) => ({
         question: r.question.trim(),
         answer: parseInt(r.answer),
         questionType: "custom",
-        scheduledDate: selectedDate,
-        kidId: selectedKid,
-        sortOrder: i,
       }));
 
       const res = await fetch("/api/math/questions", {
-        method: "POST",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(questions),
+        body: JSON.stringify({
+          kidId: selectedKid,
+          scheduledDate: selectedDate,
+          questions,
+        }),
       });
 
       if (res.ok) {
@@ -173,9 +169,11 @@ export default function ScheduleMathQuestions({ kids }: Props) {
   const handleClear = async () => {
     setSaving(true);
     try {
-      for (const id of existingIds) {
-        await fetch(`/api/math/questions/${id}`, { method: "DELETE" });
-      }
+      const params = new URLSearchParams({
+        kidId: selectedKid,
+        scheduledDate: selectedDate,
+      });
+      await fetch(`/api/math/questions?${params}`, { method: "DELETE" });
       setRows([]);
       setExistingIds([]);
       setSaved(true);
@@ -280,7 +278,8 @@ export default function ScheduleMathQuestions({ kids }: Props) {
           </button>
         </div>
         {/* Preview */}
-        {quickA && quickB && !isNaN(parseInt(quickA)) && !isNaN(parseInt(quickB)) && (
+        {quickA && quickB && !isNaN(parseInt(quickA)) && !isNaN(parseInt(quickB)) &&
+          !(quickOp === "÷" && parseInt(quickB) === 0) && (
           <div className="mt-3 text-gray-500 text-sm">
             {t("preview")}: {quickA} {quickOp} {quickB} ={" "}
             {operations.find((o) => o.key === quickOp)!.calc(parseInt(quickA), parseInt(quickB))}
