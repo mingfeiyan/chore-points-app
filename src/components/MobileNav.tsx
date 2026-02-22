@@ -46,6 +46,7 @@ export default function MobileNav() {
   // Learn sub-links
   const learnSubLinks = [
     { href: "/sight-words", label: t("sightWords"), icon: "📚" },
+    { href: "/learn/questions", label: t("scheduleQuestions"), icon: "✏️" },
     { href: "/learn/progress", label: t("mathProgress"), icon: "📊" },
     { href: "/learn/settings", label: t("mathSettings"), icon: "🔢" },
   ];

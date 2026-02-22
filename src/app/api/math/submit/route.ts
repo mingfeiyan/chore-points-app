@@ -54,39 +54,69 @@ export async function POST(req: Request) {
     // Get today's date in user's timezone
     const todayStr = getLocalDateString(new Date(), timezone);
 
-    // Fetch family's math settings
-    const settings = await prisma.mathSettings.findUnique({
-      where: { familyId: session.user.familyId! },
+    // Check for custom scheduled questions first
+    const customQuestions = await prisma.customMathQuestion.findMany({
+      where: {
+        familyId: session.user.familyId!,
+        kidId: targetKidId,
+        scheduledDate: todayStr,
+        isActive: true,
+      },
+      orderBy: { sortOrder: "asc" },
     });
 
-    const questionsTarget = settings?.dailyQuestionCount ?? 2;
+    let expectedAnswer: number;
+    let questionType: string;
+    let questionText: string;
+    let questionsTarget: number;
+    let actualSource: string;
 
-    // Generate today's questions
-    const questions = generateQuestionsWithSettings(todayStr, targetKidId, settings || {});
+    if (customQuestions.length > 0) {
+      if (questionIndex >= customQuestions.length) {
+        return NextResponse.json(
+          { error: "Invalid question index" },
+          { status: 400 }
+        );
+      }
+      const cq = customQuestions[questionIndex];
+      expectedAnswer = cq.answer;
+      questionType = cq.questionType;
+      questionText = cq.question;
+      questionsTarget = customQuestions.length;
+      actualSource = "custom";
+    } else {
+      const settings = await prisma.mathSettings.findUnique({
+        where: { familyId: session.user.familyId! },
+      });
+      questionsTarget = settings?.dailyQuestionCount ?? 2;
+      const questions = generateQuestionsWithSettings(todayStr, targetKidId, settings || {});
 
-    // Validate question index
-    if (questionIndex >= questions.length) {
-      return NextResponse.json(
-        { error: "Invalid question index" },
-        { status: 400 }
-      );
+      if (questionIndex >= questions.length) {
+        return NextResponse.json(
+          { error: "Invalid question index" },
+          { status: 400 }
+        );
+      }
+      const q = questions[questionIndex];
+      expectedAnswer = q.answer;
+      questionType = q.type;
+      questionText = q.question;
+      actualSource = source;
     }
 
-    const question = questions[questionIndex];
-    const expectedAnswer = question.answer;
     const isCorrect = answer === expectedAnswer;
 
     // Log the attempt
     await prisma.mathAttempt.create({
       data: {
         kidId: targetKidId,
-        questionType: question.type,
-        question: question.question,
+        questionType,
+        question: questionText,
         correctAnswer: expectedAnswer,
         givenAnswer: answer,
         isCorrect,
         responseTimeMs: responseTimeMs ? Math.round(responseTimeMs) : null,
-        source,
+        source: actualSource,
       },
     });
 
@@ -109,7 +139,6 @@ export async function POST(req: Request) {
 
     const currentCompleted = existingProgress?.questionsCompleted ?? 0;
 
-    // Check if this question was already completed (by checking if we're past this index)
     if (questionIndex < currentCompleted) {
       return NextResponse.json({
         correct: true,
@@ -118,7 +147,6 @@ export async function POST(req: Request) {
       });
     }
 
-    // Only increment if this is the next expected question
     if (questionIndex !== currentCompleted) {
       return NextResponse.json({
         correct: true,
@@ -127,55 +155,53 @@ export async function POST(req: Request) {
       });
     }
 
-    // Update progress
     const newCompleted = currentCompleted + 1;
-    const updatedProgress = await prisma.mathProgress.upsert({
-      where: {
-        kidId_date: {
+    const allComplete = newCompleted >= questionsTarget;
+    const isCustom = customQuestions.length > 0;
+
+    // Award 1 point per correct answer for both custom and auto-generated
+    const pointNote = isCustom ? "Math: custom question" : "Math: daily practice";
+
+    const updatedProgress = await prisma.$transaction(async (tx) => {
+      const progress = await tx.mathProgress.upsert({
+        where: {
+          kidId_date: {
+            kidId: targetKidId,
+            date: todayStr,
+          },
+        },
+        create: {
           kidId: targetKidId,
           date: todayStr,
+          questionsCompleted: 1,
+          questionsTarget,
+          pointAwarded: allComplete,
         },
-      },
-      create: {
-        kidId: targetKidId,
-        date: todayStr,
-        questionsCompleted: 1,
-        questionsTarget,
-      },
-      update: {
-        questionsCompleted: newCompleted,
-        questionsTarget,
-      },
+        update: {
+          questionsCompleted: newCompleted,
+          questionsTarget,
+          pointAwarded: allComplete ? true : undefined,
+        },
+      });
+
+      // Award 1 point for each correct answer
+      await tx.pointEntry.create({
+        data: {
+          familyId: session.user.familyId!,
+          kidId: targetKidId,
+          points: 1,
+          note: pointNote,
+          createdById: session.user.id,
+          updatedById: session.user.id,
+        },
+      });
+
+      return progress;
     });
-
-    // Check if all questions are now complete and point not yet awarded
-    const allComplete = updatedProgress.questionsCompleted >= questionsTarget;
-    let pointAwarded = false;
-
-    if (allComplete && !updatedProgress.pointAwarded) {
-      // Award point
-      await prisma.$transaction([
-        prisma.mathProgress.update({
-          where: { id: updatedProgress.id },
-          data: { pointAwarded: true },
-        }),
-        prisma.pointEntry.create({
-          data: {
-            familyId: session.user.familyId!,
-            kidId: targetKidId,
-            points: 1,
-            note: "Math: daily practice",
-            createdById: session.user.id,
-            updatedById: session.user.id,
-          },
-        }),
-      ]);
-      pointAwarded = true;
-    }
 
     return NextResponse.json({
       correct: true,
-      pointAwarded,
+      pointAwarded: true,
       questionsCompleted: updatedProgress.questionsCompleted,
       questionsTarget,
       allComplete,

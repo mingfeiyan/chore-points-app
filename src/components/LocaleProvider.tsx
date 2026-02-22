@@ -10,7 +10,7 @@ type Locale = "en" | "zh";
 
 const messages: Record<Locale, typeof enMessages> = {
   en: enMessages,
-  zh: zhMessages,
+  zh: zhMessages as typeof enMessages,
 };
 
 type LocaleContextType = {

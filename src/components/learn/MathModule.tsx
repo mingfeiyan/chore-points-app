@@ -6,9 +6,9 @@ import confetti from "canvas-confetti";
 
 type Question = {
   index: number;
-  type: "addition" | "subtraction" | "multiplication" | "division";
-  a: number;
-  b: number;
+  type: string;
+  a?: number;
+  b?: number;
   question: string;
 };
 
@@ -18,6 +18,7 @@ type MathData = {
   questionsTarget: number;
   allComplete: boolean;
   pointAwarded: boolean;
+  source: "custom" | "auto";
 };
 
 type Props = {
@@ -42,6 +43,7 @@ export default function MathModule({ kidId, onComplete }: Props) {
     pointAwarded: boolean;
   } | null>(null);
   const [shake, setShake] = useState(false);
+  const [pointFlash, setPointFlash] = useState(false);
   const questionStartTime = useRef<number>(Date.now());
   const t = useTranslations("learn");
 
@@ -102,7 +104,7 @@ export default function MathModule({ kidId, onComplete }: Props) {
           kidId,
           timezone,
           responseTimeMs,
-          source: "daily",
+          source: data?.source === "custom" ? "custom" : "daily",
         }),
       });
 
@@ -124,7 +126,13 @@ export default function MathModule({ kidId, onComplete }: Props) {
         setAnswer("");
         questionStartTime.current = Date.now();
 
-        if (result.pointAwarded) {
+        // Show +1 point flash after each correct answer
+        if (result.pointAwarded && !result.allComplete) {
+          setPointFlash(true);
+          setTimeout(() => setPointFlash(false), 1200);
+        }
+
+        if (result.allComplete) {
           confetti({
             particleCount: 100,
             spread: 70,
@@ -171,7 +179,9 @@ export default function MathModule({ kidId, onComplete }: Props) {
         <div className="bg-gradient-to-br from-green-400 to-teal-500 rounded-3xl p-8">
           <span className="text-6xl mb-4 block">🎉</span>
           <h2 className="text-2xl font-bold text-white">{t("mathComplete")}</h2>
-          <p className="text-white/80 mt-2">{t("pointEarned")}</p>
+          <p className="text-white/80 mt-2">
+            +{data.questionsTarget} {data.questionsTarget === 1 ? "point" : "points"} earned!
+          </p>
         </div>
       </div>
     );
@@ -188,7 +198,7 @@ export default function MathModule({ kidId, onComplete }: Props) {
 
   // Active problem state
   const operator = operatorMap[currentQuestion.type] || "+";
-  const typeLabel = t(currentQuestion.type);
+  const typeLabel = data?.source === "custom" ? t("customPractice") : t(currentQuestion.type);
 
   return (
     <div className="text-center">
@@ -201,9 +211,15 @@ export default function MathModule({ kidId, onComplete }: Props) {
       >
         {/* Problem Display */}
         <div className="text-white mb-6">
-          <span className="text-6xl sm:text-7xl font-bold tracking-wide">
-            {currentQuestion.a} {operator} {currentQuestion.b} = ?
-          </span>
+          {data?.source === "custom" ? (
+            <span className="text-4xl sm:text-5xl font-bold tracking-wide">
+              {currentQuestion.question} = ?
+            </span>
+          ) : (
+            <span className="text-6xl sm:text-7xl font-bold tracking-wide">
+              {currentQuestion.a} {operator} {currentQuestion.b} = ?
+            </span>
+          )}
         </div>
 
         {/* Result feedback */}
@@ -240,6 +256,13 @@ export default function MathModule({ kidId, onComplete }: Props) {
       <div className="mt-4 text-sm text-gray-500">
         {t("step")} {currentIndex + 1} {t("of")} {data.questionsTarget}
       </div>
+
+      {/* Point flash for custom questions */}
+      {pointFlash && (
+        <div className="mt-3 text-green-600 font-bold text-lg animate-bounce">
+          +1 ⭐
+        </div>
+      )}
     </div>
   );
 }

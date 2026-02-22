@@ -241,6 +241,15 @@ export default function NavBar() {
                           {t("mathProgress")}
                         </Link>
                         <Link
+                          href="/learn/questions"
+                          onClick={() => setLearnDropdownOpen(false)}
+                          className={`block px-4 py-2 hover:bg-gray-600 transition ${
+                            pathname === "/learn/questions" ? "text-blue-400" : ""
+                          }`}
+                        >
+                          {t("scheduleQuestions")}
+                        </Link>
+                        <Link
                           href="/learn/settings"
                           onClick={() => setLearnDropdownOpen(false)}
                           className={`block px-4 py-2 hover:bg-gray-600 transition ${

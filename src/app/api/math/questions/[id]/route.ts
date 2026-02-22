@@ -36,6 +36,8 @@ export async function PUT(req: Request, context: RouteContext) {
         tags: data.tags,
         isActive: data.isActive,
         sortOrder: data.sortOrder,
+        scheduledDate: data.scheduledDate ?? undefined,
+        kidId: data.kidId ?? undefined,
       },
     });
 

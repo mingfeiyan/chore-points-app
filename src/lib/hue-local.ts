@@ -208,20 +208,67 @@ export const HUE_ROOMS = {
   GUEST_ROOM: "3",
 } as const;
 
+// Local celebration server (bypasses HTTPS→HTTP restriction)
+// Uses the Mac's local IP so it works from any device on the network
+const CELEBRATION_SERVER_IP = "http://192.168.86.226:3001";
+const CELEBRATION_SERVER_LOCALHOST = "http://localhost:3001";
+
+/**
+ * Try to trigger celebration via local server first, fall back to direct bridge
+ * Tries both the network IP (for phones/tablets) and localhost (for Mac browser)
+ */
+async function triggerCelebration(
+  endpoint: string,
+  fallback: () => Promise<void>
+): Promise<void> {
+  // Try network IP first (works from any device on the network)
+  try {
+    const response = await fetch(`${CELEBRATION_SERVER_IP}${endpoint}`, {
+      method: "POST",
+      signal: AbortSignal.timeout(2000),
+    });
+    if (response.ok) return;
+  } catch {
+    // Network IP failed, try localhost
+  }
+  
+  // Try localhost (works when viewing on the Mac itself)
+  try {
+    const response = await fetch(`${CELEBRATION_SERVER_LOCALHOST}${endpoint}`, {
+      method: "POST",
+      signal: AbortSignal.timeout(2000),
+    });
+    if (response.ok) return;
+  } catch {
+    // Server not running, try direct bridge (works on localhost dev)
+  }
+  
+  return fallback();
+}
+
 // Preset celebration effects
 export const celebrationEffects = {
   /**
    * Flash bedroom blue 3 times - for points celebration
    */
-  pointsCelebration: () => flashLights(HUE_ROOMS.BEDROOM, "blue", 3, 600),
+  pointsCelebration: () => triggerCelebration(
+    "/celebrate/points",
+    () => flashLights(HUE_ROOMS.BEDROOM, "blue", 3, 600)
+  ),
   
   /**
-   * Flash living room green 3 times - for achievement unlocked
+   * Flash bedroom green 3 times - for achievement unlocked
    */
-  achievementUnlocked: () => flashLights(HUE_ROOMS.LIVING_ROOM, "green", 3, 500),
+  achievementUnlocked: () => triggerCelebration(
+    "/celebrate/achievement",
+    () => flashLights(HUE_ROOMS.BEDROOM, "green", 3, 500)
+  ),
   
   /**
-   * Flash living room yellow 5 times - for milestone reached
+   * Flash bedroom yellow 5 times - for milestone reached
    */
-  milestoneReached: () => flashLights(HUE_ROOMS.LIVING_ROOM, "yellow", 5, 400),
+  milestoneReached: () => triggerCelebration(
+    "/celebrate/milestone",
+    () => flashLights(HUE_ROOMS.BEDROOM, "yellow", 5, 400)
+  ),
 };

@@ -13,6 +13,7 @@ type SightWord = {
 type TodayResponse = {
   sightWord: SightWord | null;
   alreadyCompletedToday?: boolean;
+  isReview?: boolean;
   message?: string;
   progress: { current: number; total: number };
 };
@@ -148,17 +149,17 @@ export default function LearnView({ kidId, onComplete }: Props) {
     );
   }
 
-  // All words completed
-  if (data?.message === "allComplete") {
+  // All words completed and already reviewed today
+  if (data?.message === "alreadyCompletedToday") {
     return (
       <div className="text-center py-16">
-        <span className="text-8xl mb-4 block">🎉</span>
-        <h2 className="text-2xl font-bold text-gray-700 mb-2">{t("allComplete")}</h2>
-        <p className="text-gray-500">You've learned all the words! Amazing job!</p>
+        <span className="text-8xl mb-4 block">✅</span>
+        <h2 className="text-2xl font-bold text-gray-700 mb-2">{t("allDoneToday")}</h2>
+        <p className="text-gray-500">{t("allDoneTodayDesc")}</p>
         <div className="mt-6">
           <div className="inline-flex items-center px-4 py-2 bg-green-100 text-green-700 rounded-full">
             <span className="font-bold">{data.progress.total}/{data.progress.total}</span>
-            <span className="ml-2">words mastered!</span>
+            <span className="ml-2">{t("wordsMastered")}</span>
           </div>
         </div>
       </div>
@@ -172,7 +173,7 @@ export default function LearnView({ kidId, onComplete }: Props) {
       {/* Progress Bar */}
       <div className="mb-8">
         <div className="flex justify-between text-sm text-gray-600 mb-2">
-          <span>{t("progress")}</span>
+          <span>{data?.isReview ? t("reviewProgress") : t("progress")}</span>
           <span>{progress.current}/{progress.total}</span>
         </div>
         <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
@@ -186,7 +187,16 @@ export default function LearnView({ kidId, onComplete }: Props) {
       {/* Flashcard */}
       {!showQuiz ? (
         <div className="text-center">
-          <h2 className="text-lg font-semibold text-gray-600 mb-4">{t("todaysWord")}</h2>
+          {data.isReview && (
+            <div className="mb-2">
+              <span className="inline-flex items-center px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">
+                🔄 {t("reviewWord")}
+              </span>
+            </div>
+          )}
+          <h2 className="text-lg font-semibold text-gray-600 mb-4">
+            {data.isReview ? t("reviewTodaysWord") : t("todaysWord")}
+          </h2>
 
           {/* Card */}
           <div className="bg-gradient-to-br from-blue-400 to-purple-500 rounded-3xl p-8 shadow-2xl transform hover:scale-[1.02] transition-transform">
