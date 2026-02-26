@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "tsx scripts/pglite-setup.ts && next dev",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
@@ -17,6 +17,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.72.1",
     "@auth/prisma-adapter": "^2.11.1",
+    "@electric-sql/pglite": "^0.3.2",
     "@prisma/adapter-pg": "^7.2.0",
     "@prisma/client": "^7.2.0",
     "@vercel/blob": "^2.0.0",
@@ -26,6 +27,7 @@
     "next-auth": "5.0.0-beta.30",
     "next-intl": "^4.7.0",
     "pg": "^8.16.3",
+    "pglite-prisma-adapter": "^0.7.2",
     "prisma": "^7.2.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",

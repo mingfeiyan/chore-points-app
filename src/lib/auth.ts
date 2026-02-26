@@ -93,10 +93,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.familyId = user.familyId;
       }
 
-      // Handle session updates
+      // Handle session updates — only overwrite fields that are explicitly provided
       if (trigger === "update" && session) {
-        token.familyId = session.familyId;
-        token.role = session.role;
+        if (session.familyId !== undefined) token.familyId = session.familyId;
+        if (session.role !== undefined) token.role = session.role;
       }
 
       return token;

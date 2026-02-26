@@ -43,7 +43,7 @@ export default function NavBar() {
   const LanguageToggle = () => (
     <button
       onClick={toggleLanguage}
-      className="text-sm px-3 py-2 min-h-[44px] min-w-[44px] rounded border border-gray-600 hover:border-gray-400 transition flex items-center justify-center"
+      className="text-sm px-3 py-2 min-h-[44px] min-w-[44px] rounded border border-gray-600 hover:border-gray-400 transition flex items-center justify-center shrink-0 whitespace-nowrap"
       title={t("language")}
     >
       {locale === "en" ? "中文" : "EN"}
@@ -53,12 +53,12 @@ export default function NavBar() {
   // Show loading state
   if (status === "loading") {
     return (
-      <nav className="bg-gray-800 text-white px-4 py-3">
+      <nav className="bg-gray-800 text-white px-4 py-3 max-[419px]:px-2">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link href="/" className="text-xl font-bold">
             {t("appName")}
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 max-[419px]:gap-2">
             <LanguageToggle />
             <div className="text-sm text-gray-400">{t("loading") || "Loading..."}</div>
           </div>
@@ -70,7 +70,7 @@ export default function NavBar() {
   // Don't show user info if not logged in
   if (!session) {
     return (
-      <nav className="bg-gray-800 text-white px-4 py-3">
+      <nav className="bg-gray-800 text-white px-4 py-3 max-[419px]:px-2">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link href="/" className="text-xl font-bold">
             {t("appName")}
@@ -98,7 +98,7 @@ export default function NavBar() {
   const isParent = session.user.role === "PARENT";
 
   return (
-    <nav className="bg-gray-800 text-white px-4 py-3">
+    <nav className="bg-gray-800 text-white px-4 py-3 max-[419px]:px-2">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <div className="flex items-center gap-6">
           <Link href="/dashboard" className="text-xl font-bold">
@@ -312,15 +312,15 @@ export default function NavBar() {
         </div>
 
         {/* User info and logout */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 max-[419px]:gap-2">
           <LanguageToggle />
-          <div className="text-sm">
-            <span className="text-gray-400 hidden sm:inline">{t("loggedInAs")} </span>
-            <span className="font-medium">
+          <div className="text-sm flex items-center gap-1.5 min-w-0 max-[450px]:flex-col max-[450px]:items-end max-[450px]:gap-0.5">
+            <span className="text-gray-400 hidden sm:inline shrink-0">{t("loggedInAs")} </span>
+            <span className="font-medium truncate min-w-0">
               {session.user.name || session.user.email}
             </span>
             <span
-              className={`ml-2 text-xs px-2 py-0.5 rounded ${
+              className={`shrink-0 text-xs px-2 py-0.5 rounded whitespace-nowrap ${
                 isParent
                   ? "bg-purple-600 text-purple-100"
                   : "bg-green-600 text-green-100"
@@ -332,7 +332,7 @@ export default function NavBar() {
 
           <button
             onClick={() => signOut({ callbackUrl: "/" })}
-            className="text-sm bg-red-600 hover:bg-red-700 px-4 py-2.5 min-h-[44px] rounded-lg transition flex items-center"
+            className="text-sm bg-red-600 hover:bg-red-700 px-4 py-2.5 min-h-[44px] rounded-lg transition flex items-center shrink-0 whitespace-nowrap max-[419px]:px-2.5"
           >
             {t("logout")}
           </button>
