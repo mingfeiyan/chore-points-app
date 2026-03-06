@@ -170,62 +170,99 @@ function SpinningCoin() {
 
 function PinEntry({ onSuccess }: { onSuccess: (token: string) => void }) {
   const [pin, setPin] = useState("");
-  const [error, setError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [checking, setChecking] = useState(false);
+  const [lockedUntil, setLockedUntil] = useState(0);
+  const [countdown, setCountdown] = useState(0);
+
+  // Countdown timer for lockout
+  useEffect(() => {
+    if (lockedUntil <= Date.now()) { setCountdown(0); return; }
+    const tick = () => {
+      const remaining = Math.ceil((lockedUntil - Date.now()) / 1000);
+      if (remaining <= 0) { setCountdown(0); setLockedUntil(0); setErrorMsg(null); }
+      else setCountdown(remaining);
+    };
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [lockedUntil]);
 
   const handleSubmit = async () => {
-    if (!pin) return;
+    if (!pin || pin.length < 6 || countdown > 0) return;
     setChecking(true);
-    setError(false);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/kiosk/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pin }),
       });
+      const data = await res.json();
       if (res.ok) {
-        const { token } = await res.json();
-        localStorage.setItem("kiosk_token", token);
-        onSuccess(token);
+        localStorage.setItem("kiosk_token", data.token);
+        onSuccess(data.token);
+      } else if (res.status === 429) {
+        setLockedUntil(Date.now() + (data.lockedFor || 300) * 1000);
+        setErrorMsg("Too many attempts. Try again later.");
+        setPin("");
       } else {
-        setError(true);
+        const left = data.attemptsLeft;
+        setErrorMsg(left !== undefined && left <= 3
+          ? `Wrong PIN. ${left} attempt${left !== 1 ? "s" : ""} left.`
+          : "Wrong PIN. Try again.");
         setPin("");
       }
     } catch {
-      setError(true);
+      setErrorMsg("Connection error.");
     } finally {
       setChecking(false);
     }
   };
 
+  const locked = countdown > 0;
+  const minutes = Math.floor(countdown / 60);
+  const seconds = countdown % 60;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-indigo-100 to-purple-100">
       <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-sm w-full mx-4 text-center">
-        <div className="text-5xl mb-4">🔒</div>
+        <div className="text-5xl mb-4">{locked ? "⏳" : "🔒"}</div>
         <h1 className="text-2xl font-bold text-gray-800 mb-2">Kiosk PIN</h1>
-        <p className="text-gray-500 text-sm mb-6">Enter the family PIN to access the kiosk</p>
-        <input
-          type="password"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          maxLength={8}
-          value={pin}
-          onChange={(e) => setPin(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-          placeholder="••••"
-          className={`w-full text-center text-3xl tracking-[0.5em] font-mono py-4 border-2 rounded-xl outline-none transition-colors ${
-            error ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-indigo-400"
-          }`}
-          autoFocus
-        />
-        {error && <p className="text-red-500 text-sm mt-2">Wrong PIN. Try again.</p>}
-        <button
-          onClick={handleSubmit}
-          disabled={checking || !pin}
-          className="w-full mt-5 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 text-white font-bold rounded-xl text-lg transition-colors"
-        >
-          {checking ? "..." : "Enter"}
-        </button>
+        <p className="text-gray-500 text-sm mb-6">Enter the 6-digit family PIN</p>
+        {locked ? (
+          <div className="py-6">
+            <p className="text-red-500 font-bold text-lg">Locked out</p>
+            <p className="text-gray-500 text-2xl font-mono mt-2">
+              {minutes}:{String(seconds).padStart(2, "0")}
+            </p>
+          </div>
+        ) : (
+          <>
+            <input
+              type="password"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={6}
+              value={pin}
+              onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+              placeholder="••••••"
+              className={`w-full text-center text-3xl tracking-[0.5em] font-mono py-4 border-2 rounded-xl outline-none transition-colors ${
+                errorMsg ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-indigo-400"
+              }`}
+              autoFocus
+            />
+            {errorMsg && <p className="text-red-500 text-sm mt-2">{errorMsg}</p>}
+            <button
+              onClick={handleSubmit}
+              disabled={checking || pin.length < 6}
+              className="w-full mt-5 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 text-white font-bold rounded-xl text-lg transition-colors"
+            >
+              {checking ? "..." : "Enter"}
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
