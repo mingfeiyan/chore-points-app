@@ -84,6 +84,24 @@ Vitest with jsdom, globals enabled. Tests in `src/__tests__/` with subdirs for `
 - **pre-push**: runs `npm run build` (prisma generate + next build) — pushes will fail if build fails
 - **pre-commit**: currently a no-op
 
+## Deployment
+
+- **Production URL**: https://chore-points-app-seven.vercel.app
+- **Hosting**: Vercel (auto-deploys from `origin/main` on GitHub push)
+- **Database**: Neon PostgreSQL (project: `chore-points-app`, region: us-east-2)
+- **Redeploy after env var changes** (no code change needed):
+  ```bash
+  npx vercel redeploy chore-points-app-seven.vercel.app
+  ```
+- **Set env vars**:
+  ```bash
+  echo "value" | npx vercel env add VAR_NAME production
+  ```
+- **Run migrations against production DB**:
+  ```bash
+  DATABASE_URL="<neon-url>" npx prisma migrate deploy
+  ```
+
 ## Key Conventions
 
 - Tailwind CSS v4 for all styling (no separate tailwind.config — uses PostCSS plugin)

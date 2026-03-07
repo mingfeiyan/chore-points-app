@@ -124,9 +124,10 @@ export default function WeeklyCalendarView() {
     try {
       const res = await fetch("/api/calendar/settings");
       const data = await res.json();
-      setSettings(data.settings);
+      setSettings(data.settings ?? { isConnected: false, selectedCalendarName: null });
     } catch (err) {
       console.error("Failed to load settings:", err);
+      setSettings({ isConnected: false, selectedCalendarName: null });
     }
   }, []);
 
