@@ -96,6 +96,8 @@ export async function GET(
     defaultPoints: number;
     completedToday?: boolean;
     completedThisWeek?: boolean;
+    weekdayOnly?: boolean;
+    activeToday?: boolean;
   };
 
   const morning: ChoreItem[] = [];
@@ -104,12 +106,12 @@ export async function GET(
 
   for (const chore of chores) {
     if (!chore.schedule) continue;
-    // Skip weekday-only chores on weekends
-    if (!isChoreActiveToday(chore.schedule)) continue;
 
     const emoji = chore.icon || extractEmoji(chore.title);
     const baseSchedule = getBaseSchedule(chore.schedule);
-    const base = { id: chore.id, title: chore.title, emoji, defaultPoints: chore.defaultPoints };
+    const weekdayOnly = chore.schedule.endsWith("_weekday");
+    const activeToday = isChoreActiveToday(chore.schedule);
+    const base = { id: chore.id, title: chore.title, emoji, defaultPoints: chore.defaultPoints, weekdayOnly, activeToday };
     if (baseSchedule === "morning") {
       morning.push({ ...base, completedToday: completedTodayChoreIds.has(chore.id) });
     } else if (baseSchedule === "evening") {
@@ -124,9 +126,11 @@ export async function GET(
   const scheduleGroups = { morning, evening, weekly };
 
   for (const [schedule, items] of Object.entries(scheduleGroups)) {
-    const total = items.length;
+    // Only count chores active today toward the bonus
+    const activeItems = items.filter((c) => c.activeToday !== false);
+    const total = activeItems.length;
     const isWeekly = schedule === "weekly";
-    const completed = items.filter((c) =>
+    const completed = activeItems.filter((c) =>
       isWeekly ? c.completedThisWeek : c.completedToday
     ).length;
 

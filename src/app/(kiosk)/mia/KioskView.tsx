@@ -11,6 +11,8 @@ type ChoreItem = {
   defaultPoints: number;
   completedToday?: boolean;
   completedThisWeek?: boolean;
+  weekdayOnly?: boolean;
+  activeToday?: boolean;
 };
 
 type BonusStatus = {
@@ -113,38 +115,47 @@ function getChoreLabel(title: string): string {
 function ChoreTile({ chore, done }: { chore: ChoreItem; done: boolean }) {
   const emoji = getChoreEmoji(chore);
   const label = getChoreLabel(chore.title);
+  const inactive = chore.activeToday === false;
 
   return (
     <div
       className={`relative flex flex-col items-center justify-center rounded-2xl shadow-md transition-all duration-500 select-none
-        ${done
-          ? "bg-emerald-50 border-2 border-emerald-300"
-          : "bg-white border-2 border-gray-100"
+        ${inactive
+          ? "bg-gray-50 border-2 border-dashed border-gray-200 opacity-40"
+          : done
+            ? "bg-emerald-50 border-2 border-emerald-300"
+            : "bg-white border-2 border-gray-100"
         }`}
       style={{ width: 110, height: 110 }}
     >
-      {/* Status badge */}
-      <div
-        className={`absolute top-1.5 right-1.5 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold
-          ${done ? "bg-emerald-400 text-white" : "bg-red-400 text-white"}`}
-      >
-        {done ? "✓" : "!"}
-      </div>
+      {/* Status badge — hide for inactive chores */}
+      {!inactive && (
+        <div
+          className={`absolute top-1.5 right-1.5 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold
+            ${done ? "bg-emerald-400 text-white" : "bg-red-400 text-white"}`}
+        >
+          {done ? "✓" : "!"}
+        </div>
+      )}
 
       {/* Emoji */}
       <span style={{ fontSize: 36, lineHeight: 1 }}>{emoji}</span>
 
       {/* Text label */}
-      <span className={`mt-1 text-xs font-bold text-center leading-tight px-1 ${done ? "text-emerald-700" : "text-gray-600"}`}
+      <span className={`mt-1 text-xs font-bold text-center leading-tight px-1 ${inactive ? "text-gray-400" : done ? "text-emerald-700" : "text-gray-600"}`}
         style={{ maxWidth: 100, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}
       >
         {label}
       </span>
 
-      {/* Points */}
-      <span className={`text-xs font-black ${done ? "text-emerald-600" : "text-gray-400"}`}>
-        {chore.defaultPoints}分
-      </span>
+      {/* Points or weekend label */}
+      {inactive ? (
+        <span className="text-xs font-bold text-gray-300">周一~五</span>
+      ) : (
+        <span className={`text-xs font-black ${done ? "text-emerald-600" : "text-gray-400"}`}>
+          {chore.defaultPoints}分
+        </span>
+      )}
     </div>
   );
 }
