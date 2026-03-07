@@ -13,6 +13,12 @@ type ChoreItem = {
   completedThisWeek?: boolean;
 };
 
+type BonusStatus = {
+  total: number;
+  completed: number;
+  bonusAwarded: boolean;
+};
+
 type KioskData = {
   kid: { id: string; name: string | null };
   totalPoints: number;
@@ -20,6 +26,11 @@ type KioskData = {
     morning: ChoreItem[];
     evening: ChoreItem[];
     weekly: ChoreItem[];
+  };
+  bonuses?: {
+    morning?: BonusStatus;
+    evening?: BonusStatus;
+    weekly?: BonusStatus;
   };
   latestEntry: {
     id: string;
@@ -122,20 +133,60 @@ function ChoreTile({ chore, done }: { chore: ChoreItem; done: boolean }) {
 
 // ── Section ────────────────────────────────────────────────────────────────
 
+function BonusTile({ awarded }: { awarded: boolean }) {
+  return (
+    <div
+      className={`relative flex flex-col items-center justify-center rounded-2xl shadow-md transition-all duration-500 select-none
+        ${awarded
+          ? "bg-yellow-50 border-2 border-yellow-400"
+          : "bg-gray-50 border-2 border-dashed border-gray-200"
+        }`}
+      style={{ width: 110, height: 110 }}
+    >
+      {awarded && (
+        <div className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold bg-yellow-400 text-white">
+          ✓
+        </div>
+      )}
+      <span style={{ fontSize: awarded ? 44 : 36, lineHeight: 1, opacity: awarded ? 1 : 0.3 }}>
+        🌟
+      </span>
+      <span className={`mt-1.5 text-xs font-bold ${awarded ? "text-yellow-600" : "text-gray-300"}`}>
+        +5 全勤
+      </span>
+    </div>
+  );
+}
+
 function ChoreSection({
   label,
   chores,
   isWeekly,
+  bonus,
 }: {
   label: string;
   chores: ChoreItem[];
   isWeekly?: boolean;
+  bonus?: BonusStatus;
 }) {
   if (chores.length === 0) return null;
 
+  const completedCount = bonus?.completed ?? 0;
+  const totalCount = bonus?.total ?? chores.length;
+  const allDone = completedCount === totalCount;
+
   return (
     <div className="mb-4">
-      <h2 className="text-lg font-bold text-gray-700 mb-2 px-1">{label}</h2>
+      <div className="flex items-center gap-2 mb-2 px-1">
+        <h2 className="text-lg font-bold text-gray-700">{label}</h2>
+        <span className={`text-sm font-bold px-2 py-0.5 rounded-full ${
+          allDone
+            ? "bg-emerald-100 text-emerald-700"
+            : "bg-gray-100 text-gray-500"
+        }`}>
+          {completedCount}/{totalCount}
+        </span>
+      </div>
       <div className="flex flex-wrap gap-3">
         {chores.map((chore) => (
           <ChoreTile
@@ -144,6 +195,9 @@ function ChoreSection({
             done={isWeekly ? !!chore.completedThisWeek : !!chore.completedToday}
           />
         ))}
+        {bonus && (
+          <BonusTile awarded={bonus.bonusAwarded} />
+        )}
       </div>
     </div>
   );
@@ -520,15 +574,18 @@ export default function KioskView({ kidId }: { kidId: string }) {
             <ChoreSection
               label="🌅 早上"
               chores={data.chores.morning}
+              bonus={data.bonuses?.morning}
             />
             <ChoreSection
               label="🌙 晚上"
               chores={data.chores.evening}
+              bonus={data.bonuses?.evening}
             />
             <ChoreSection
               label="📅 每周"
               chores={data.chores.weekly}
               isWeekly
+              bonus={data.bonuses?.weekly}
             />
           </div>
         </div>

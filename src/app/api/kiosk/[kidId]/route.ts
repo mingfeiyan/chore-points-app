@@ -1,56 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { verifyKioskToken } from "../verify/route";
+import { getTodayStartPT, getWeekStartPT, buildBonusNote } from "@/lib/date-utils";
 
 // Extract first emoji from a string
 function extractEmoji(text: string): string | null {
   const emojiRegex = /(?:\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/gu;
   const matches = text.match(emojiRegex);
   return matches?.[0] ?? null;
-}
-
-// Get start of today in PT timezone (America/Los_Angeles) as UTC Date
-function getTodayStartPT(): Date {
-  const now = new Date();
-  // Format today's date string in PT
-  const ptDateStr = now.toLocaleDateString("en-CA", {
-    timeZone: "America/Los_Angeles",
-  }); // "YYYY-MM-DD"
-  // Parse as midnight PT — convert to UTC
-  const midnightPT = new Date(`${ptDateStr}T00:00:00-08:00`);
-  // Use actual PT offset (handles DST)
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    timeZone: "America/Los_Angeles",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-  });
-  const parts = formatter.formatToParts(now);
-  const p = Object.fromEntries(parts.map((x) => [x.type, x.value]));
-  const localMidnight = new Date(
-    `${p.year}-${p.month}-${p.day}T00:00:00`
-  );
-  // localMidnight is a "local time" but stored as UTC — adjust with actual offset
-  const offsetMs = now.getTime() - new Date(now.toLocaleString("en-US", { timeZone: "America/Los_Angeles" })).getTime();
-  return new Date(localMidnight.getTime() + offsetMs);
-}
-
-// Get start of this week (Monday) in PT timezone as UTC Date
-function getWeekStartPT(): Date {
-  const now = new Date();
-  const ptNow = new Date(now.toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
-  const day = ptNow.getDay(); // 0=Sun, 1=Mon, ...
-  const diffToMonday = day === 0 ? -6 : 1 - day;
-  const mondayPT = new Date(ptNow);
-  mondayPT.setDate(ptNow.getDate() + diffToMonday);
-  mondayPT.setHours(0, 0, 0, 0);
-  // Adjust back to UTC
-  const offsetMs = now.getTime() - ptNow.getTime();
-  return new Date(mondayPT.getTime() + offsetMs);
 }
 
 export async function GET(
@@ -157,10 +114,41 @@ export async function GET(
     }
   }
 
+  // Category completion bonus status
+  const bonuses: Record<string, { total: number; completed: number; bonusAwarded: boolean }> = {};
+  const scheduleGroups = { morning, evening, weekly };
+
+  for (const [schedule, items] of Object.entries(scheduleGroups)) {
+    const total = items.length;
+    const isWeekly = schedule === "weekly";
+    const completed = items.filter((c) =>
+      isWeekly ? c.completedThisWeek : c.completedToday
+    ).length;
+
+    // Check if bonus was already awarded for this period
+    const periodStart = schedule === "weekly" ? weekStart : todayStart;
+    const bonusNote = buildBonusNote(schedule);
+    const existingBonus = await prisma.pointEntry.findFirst({
+      where: {
+        kidId,
+        choreId: null,
+        date: { gte: periodStart },
+        note: { contains: "全勤奖" },
+        points: 5,
+      },
+    });
+
+    // Only count as bonus for this specific schedule
+    const bonusAwarded = existingBonus?.note?.includes(bonusNote) ?? false;
+
+    bonuses[schedule] = { total, completed, bonusAwarded };
+  }
+
   return NextResponse.json({
     kid: { id: kid.id, name: kid.name },
     totalPoints,
     chores: { morning, evening, weekly },
+    bonuses,
     latestEntry: latestEntry
       ? {
           id: latestEntry.id,
