@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { verifyKioskToken } from "../verify/route";
-import { getTodayStartPT, getWeekStartPT, buildBonusNote } from "@/lib/date-utils";
+import { getTodayStartPT, getWeekStartPT, buildBonusNote, getBaseSchedule, isChoreActiveToday } from "@/lib/date-utils";
 
 // Extract first emoji from a string
 function extractEmoji(text: string): string | null {
@@ -103,13 +103,18 @@ export async function GET(
   const weekly: ChoreItem[] = [];
 
   for (const chore of chores) {
+    if (!chore.schedule) continue;
+    // Skip weekday-only chores on weekends
+    if (!isChoreActiveToday(chore.schedule)) continue;
+
     const emoji = chore.icon || extractEmoji(chore.title);
+    const baseSchedule = getBaseSchedule(chore.schedule);
     const base = { id: chore.id, title: chore.title, emoji, defaultPoints: chore.defaultPoints };
-    if (chore.schedule === "morning") {
+    if (baseSchedule === "morning") {
       morning.push({ ...base, completedToday: completedTodayChoreIds.has(chore.id) });
-    } else if (chore.schedule === "evening") {
+    } else if (baseSchedule === "evening") {
       evening.push({ ...base, completedToday: completedTodayChoreIds.has(chore.id) });
-    } else if (chore.schedule === "weekly") {
+    } else if (baseSchedule === "weekly") {
       weekly.push({ ...base, completedThisWeek: completedThisWeekChoreIds.has(chore.id) });
     }
   }

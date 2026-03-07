@@ -65,7 +65,39 @@ export const SCHEDULE_EMOJI: Record<string, string> = {
 
 /** Build the bonus note string for a schedule */
 export function buildBonusNote(schedule: string): string {
-  const emoji = SCHEDULE_EMOJI[schedule] || "🌟";
-  const label = SCHEDULE_LABELS[schedule] || schedule;
+  const base = getBaseSchedule(schedule);
+  const emoji = SCHEDULE_EMOJI[base] || "🌟";
+  const label = SCHEDULE_LABELS[base] || base;
   return `${emoji} ${label}全勤奖！🌟`;
+}
+
+/**
+ * Get the base schedule group (strips modifiers like _weekday).
+ * "morning_weekday" → "morning", "evening" → "evening"
+ */
+export function getBaseSchedule(schedule: string): string {
+  return schedule.replace(/_weekday$/, "");
+}
+
+/**
+ * Check if today is a weekday in PT timezone.
+ */
+export function isWeekdayPT(): boolean {
+  const now = new Date();
+  const ptDay = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Los_Angeles",
+    weekday: "short",
+  }).format(now);
+  return !["Sat", "Sun"].includes(ptDay);
+}
+
+/**
+ * Check if a chore should be shown today based on its schedule.
+ * Chores with "_weekday" suffix only show on Mon-Fri.
+ */
+export function isChoreActiveToday(schedule: string): boolean {
+  if (schedule.endsWith("_weekday")) {
+    return isWeekdayPT();
+  }
+  return true;
 }

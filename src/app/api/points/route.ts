@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { requireFamily } from "@/lib/permissions";
 import { calculateLevel, getLevelInfo } from "@/lib/badges";
 import { evaluateAndAwardBadges } from "@/lib/badge-evaluator";
-import { getPeriodStartPT, buildBonusNote } from "@/lib/date-utils";
+import { getPeriodStartPT, buildBonusNote, getBaseSchedule, isChoreActiveToday } from "@/lib/date-utils";
 
 // GET /api/points - Get kid's total points and ledger history
 export async function GET(req: Request) {
@@ -238,19 +238,29 @@ export async function POST(req: Request) {
 
       if (completedChore?.schedule) {
         const schedule = completedChore.schedule;
-        const periodStart = getPeriodStartPT(schedule);
+        const baseSchedule = getBaseSchedule(schedule);
+        const periodStart = getPeriodStartPT(baseSchedule);
         const bonusNote = buildBonusNote(schedule);
         const BONUS_POINTS = 5;
 
-        // Get all active chores in this schedule for the family
+        // Get all active chores in this base schedule for the family
+        // Include both "morning" and "morning_weekday" variants
         const allScheduleChores = await prisma.chore.findMany({
           where: {
             familyId: session.user.familyId!,
             isActive: true,
-            schedule,
+            OR: [
+              { schedule: baseSchedule },
+              { schedule: `${baseSchedule}_weekday` },
+            ],
           },
-          select: { id: true },
+          select: { id: true, schedule: true },
         });
+
+        // Filter out weekday-only chores if today is a weekend
+        const activeChores = allScheduleChores.filter(
+          (c) => c.schedule && isChoreActiveToday(c.schedule)
+        );
 
         // Get completed chore IDs for this kid in this period
         const completedEntries = await prisma.pointEntry.findMany({
@@ -267,8 +277,8 @@ export async function POST(req: Request) {
           completedEntries.map((e) => e.choreId).filter(Boolean)
         );
 
-        // Check if ALL schedule chores are now completed
-        const allDone = allScheduleChores.every((c) =>
+        // Check if ALL active schedule chores are now completed
+        const allDone = activeChores.every((c) =>
           completedChoreIds.has(c.id)
         );
 
