@@ -142,7 +142,7 @@ function ChoreTile({ chore, done }: { chore: ChoreItem; done: boolean }) {
       <span style={{ fontSize: 54, lineHeight: 1 }}>{emoji}</span>
 
       {/* Text label */}
-      <span className={`mt-1.5 text-sm font-bold text-center leading-tight px-1.5 ${inactive ? "text-gray-400" : done ? "text-emerald-700" : "text-gray-600"}`}
+      <span className={`mt-1.5 text-base font-bold text-center leading-tight px-1.5 ${inactive ? "text-gray-400" : done ? "text-emerald-700" : "text-gray-600"}`}
         style={{ maxWidth: 150, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}
       >
         {label}
@@ -150,9 +150,9 @@ function ChoreTile({ chore, done }: { chore: ChoreItem; done: boolean }) {
 
       {/* Points or weekend label */}
       {inactive ? (
-        <span className="text-sm font-bold text-gray-300">周一~五</span>
+        <span className="text-base font-bold text-gray-300">周一~五</span>
       ) : (
-        <span className={`text-sm font-black ${done ? "text-emerald-600" : "text-gray-400"}`}>
+        <span className={`text-base font-black ${done ? "text-emerald-600" : "text-gray-400"}`}>
           {chore.defaultPoints}分
         </span>
       )}
@@ -180,7 +180,7 @@ function BonusTile({ awarded }: { awarded: boolean }) {
       <span style={{ fontSize: awarded ? 66 : 54, lineHeight: 1, opacity: awarded ? 1 : 0.3 }}>
         🌟
       </span>
-      <span className={`mt-2 text-sm font-bold ${awarded ? "text-yellow-600" : "text-gray-300"}`}>
+      <span className={`mt-2 text-base font-bold ${awarded ? "text-yellow-600" : "text-gray-300"}`}>
         +5 全勤
       </span>
     </div>
