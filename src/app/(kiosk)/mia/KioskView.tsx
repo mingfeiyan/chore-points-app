@@ -126,12 +126,12 @@ function ChoreTile({ chore, done }: { chore: ChoreItem; done: boolean }) {
             ? "bg-emerald-50 border-2 border-emerald-300"
             : "bg-white border-2 border-gray-100"
         }`}
-      style={{ width: 110, height: 110 }}
+      style={{ width: 165, height: 165 }}
     >
       {/* Status badge — hide for inactive chores */}
       {!inactive && (
         <div
-          className={`absolute top-1.5 right-1.5 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold
+          className={`absolute top-2 right-2 w-9 h-9 rounded-full flex items-center justify-center text-base font-bold
             ${done ? "bg-emerald-400 text-white" : "bg-red-400 text-white"}`}
         >
           {done ? "✓" : "!"}
@@ -139,20 +139,20 @@ function ChoreTile({ chore, done }: { chore: ChoreItem; done: boolean }) {
       )}
 
       {/* Emoji */}
-      <span style={{ fontSize: 36, lineHeight: 1 }}>{emoji}</span>
+      <span style={{ fontSize: 54, lineHeight: 1 }}>{emoji}</span>
 
       {/* Text label */}
-      <span className={`mt-1 text-xs font-bold text-center leading-tight px-1 ${inactive ? "text-gray-400" : done ? "text-emerald-700" : "text-gray-600"}`}
-        style={{ maxWidth: 100, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}
+      <span className={`mt-1.5 text-sm font-bold text-center leading-tight px-1.5 ${inactive ? "text-gray-400" : done ? "text-emerald-700" : "text-gray-600"}`}
+        style={{ maxWidth: 150, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}
       >
         {label}
       </span>
 
       {/* Points or weekend label */}
       {inactive ? (
-        <span className="text-xs font-bold text-gray-300">周一~五</span>
+        <span className="text-sm font-bold text-gray-300">周一~五</span>
       ) : (
-        <span className={`text-xs font-black ${done ? "text-emerald-600" : "text-gray-400"}`}>
+        <span className={`text-sm font-black ${done ? "text-emerald-600" : "text-gray-400"}`}>
           {chore.defaultPoints}分
         </span>
       )}
@@ -170,17 +170,17 @@ function BonusTile({ awarded }: { awarded: boolean }) {
           ? "bg-yellow-50 border-2 border-yellow-400"
           : "bg-gray-50 border-2 border-dashed border-gray-200"
         }`}
-      style={{ width: 110, height: 110 }}
+      style={{ width: 165, height: 165 }}
     >
       {awarded && (
-        <div className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold bg-yellow-400 text-white">
+        <div className="absolute top-2 right-2 w-9 h-9 rounded-full flex items-center justify-center text-base font-bold bg-yellow-400 text-white">
           ✓
         </div>
       )}
-      <span style={{ fontSize: awarded ? 44 : 36, lineHeight: 1, opacity: awarded ? 1 : 0.3 }}>
+      <span style={{ fontSize: awarded ? 66 : 54, lineHeight: 1, opacity: awarded ? 1 : 0.3 }}>
         🌟
       </span>
-      <span className={`mt-1.5 text-xs font-bold ${awarded ? "text-yellow-600" : "text-gray-300"}`}>
+      <span className={`mt-2 text-sm font-bold ${awarded ? "text-yellow-600" : "text-gray-300"}`}>
         +5 全勤
       </span>
     </div>
