@@ -611,31 +611,25 @@ export default function KioskView({ kidId }: { kidId: string }) {
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`flex-1 py-3 rounded-xl font-bold transition-all duration-200 ${
+                  className={`flex-1 py-3.5 rounded-xl font-bold transition-all duration-200 ${
                     isActive
                       ? "bg-indigo-600 text-white shadow-md"
                       : "bg-white text-gray-500 border-2 border-gray-200"
                   }`}
                 >
-                  <div className="flex items-center justify-center gap-1">
-                    <span style={{ fontSize: 22 }}>{tab.emoji}</span>
-                    <span className="text-lg">{tab.label}</span>
-                    <span className={`text-base font-bold px-2 py-0.5 rounded-full ${
-                      isActive ? "bg-white/20" : "bg-gray-100"
-                    }`}>
-                      {completed}/{total}
-                    </span>
-                  </div>
-                  {/* Bonus indicator */}
-                  {allDone || bonusAwarded ? (
-                    <div className={`text-xs font-bold mt-0.5 ${isActive ? "text-yellow-300" : "text-yellow-500"}`}>
-                      🌟 全勤 +5
-                    </div>
-                  ) : (
-                    <div className={`text-xs mt-0.5 ${isActive ? "text-white/50" : "text-gray-300"}`}>
-                      全勤 +5
-                    </div>
-                  )}
+                  <span style={{ fontSize: 22 }}>{tab.emoji}</span>
+                  <span className="ml-1 text-lg">{tab.label}</span>
+                  <span className={`ml-1.5 text-base font-bold px-2 py-0.5 rounded-full ${
+                    isActive ? "bg-white/20" : "bg-gray-100"
+                  }`}>
+                    {completed}/{total}
+                  </span>
+                  <span className={`ml-1.5 text-base ${allDone || bonusAwarded
+                    ? (isActive ? "text-yellow-300 font-bold" : "text-yellow-500 font-bold")
+                    : (isActive ? "text-white/40" : "text-gray-300")
+                  }`}>
+                    {allDone || bonusAwarded ? "🌟+5" : "全勤+5"}
+                  </span>
                 </button>
               );
             })}
