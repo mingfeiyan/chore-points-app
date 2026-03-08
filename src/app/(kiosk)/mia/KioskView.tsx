@@ -46,13 +46,12 @@ type KioskData = {
 // ── Emoji fallback map ─────────────────────────────────────────────────────
 
 const CHORE_EMOJI_MAP: Record<string, string> = {
-  早上起床后尿尿: "🚽",
-  早上自己穿衣服: "👔",
+  上厕所: "🚽",
+  自己穿衣服: "👔",
   穿鞋: "👟",
   安全带: "🚗",
   回家先洗手: "🧼",
-  睡觉前撒尿: "🚽",
-  "9点前睡觉就": "🕘",
+  "9点前睡觉": "🕘",
   自己睡: "😴",
   中文课: "📖",
   武术课: "🥋",
@@ -398,21 +397,33 @@ export default function KioskView({ kidId }: { kidId: string }) {
 
       if (prev !== null && newEntryId && newEntryId !== prevId && newTotal > prev) {
         // New point entry detected — trigger celebration
+        // Use the same getChoreEmoji() as tiles to guarantee matching emoji
         const choreTitle = newData.latestEntry?.choreTitle ?? null;
+        const note = newData.latestEntry?.note ?? null;
         let emoji = "⭐";
 
         if (choreTitle) {
-          const emojiRegex = /(?:\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/gu;
-          const matches = choreTitle.match(emojiRegex);
-          if (matches?.[0]) emoji = matches[0];
-          else {
-            for (const [key, e] of Object.entries(CHORE_EMOJI_MAP)) {
-              if (choreTitle.startsWith(key) || choreTitle.includes(key)) {
-                emoji = e;
-                break;
+          // Find the matching chore in loaded data to use the same emoji logic as tiles
+          const allChores = [...newData.chores.morning, ...newData.chores.evening, ...newData.chores.weekly];
+          const matchedChore = allChores.find((c) => c.title === choreTitle);
+          if (matchedChore) {
+            emoji = getChoreEmoji(matchedChore);
+          } else {
+            // Chore not in current schedule — extract from title text
+            const emojiRegex = /(?:\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/gu;
+            const matches = choreTitle.match(emojiRegex);
+            if (matches?.[0]) emoji = matches[0];
+            else {
+              for (const [key, e] of Object.entries(CHORE_EMOJI_MAP)) {
+                if (choreTitle.startsWith(key) || choreTitle.includes(key)) { emoji = e; break; }
               }
             }
           }
+        } else if (note) {
+          // No chore linked (ad-hoc award) — try extracting emoji from note
+          const emojiRegex = /(?:\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/gu;
+          const matches = note.match(emojiRegex);
+          if (matches?.[0]) emoji = matches[0];
         }
 
         setCelebEmoji(emoji);
