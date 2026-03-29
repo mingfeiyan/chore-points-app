@@ -70,6 +70,7 @@ model User {
   weeklyVotes       WeeklyVote[] @relation("VoteCastBy")
   weeklyPlans       WeeklyPlan[] @relation("WeeklyPlanCreatedBy")
   createdMealPlans  MealPlan[]   @relation("MealPlanCreatedBy")
+  kidStats          KidStats?    @relation("KidStats")
 
   // NextAuth fields
   accounts Account[]
@@ -107,6 +108,8 @@ model Family {
   mealPlans      MealPlan[]
   mathSettings   MathSettings?
   customMathQuestions CustomMathQuestion[]
+  schoolOffDays  SchoolOff[]
+  kidStats       KidStats[]
 
   // Philips Hue integration
   hueAccessToken  String?
@@ -127,6 +130,7 @@ model Chore {
   icon          String?
   defaultPoints Int
   isActive      Boolean @default(true)
+  schedule      String? // "morning" | "evening" | "weekly" | null
 
   createdById String
   createdBy   User   @relation("ChoreCreatedBy", fields: [createdById], references: [id])
@@ -808,6 +812,39 @@ model PlannedDayMeal {
   updatedAt DateTime @updatedAt
 
   @@index([dayId])
+}
+
+model SchoolOff {
+  id       String @id @default(cuid())
+  familyId String
+  family   Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  date  DateTime @db.Date  // Single date (no school this day)
+  label String?            // Optional label ("Spring Break", "Teacher Planning Day")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([familyId, date])
+  @@index([familyId])
+  @@index([familyId, date])
+}
+
+model KidStats {
+  id       String @id @default(cuid())
+  kidId    String @unique
+  kid      User   @relation("KidStats", fields: [kidId], references: [id], onDelete: Cascade)
+  familyId String
+  family   Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  totalEarned Int @default(0) // Lifetime points earned (only increases)
+  totalSpent  Int @default(0) // Lifetime points spent/deducted (stored as positive)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([kidId])
+  @@index([familyId])
 }
 
 model PlannedDayMealDish {

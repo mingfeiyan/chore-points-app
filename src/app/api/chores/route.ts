@@ -38,9 +38,9 @@ export async function POST(req: Request) {
     const session = await requireParentInFamily();
     const { title, defaultPoints, icon } = await req.json();
 
-    if (!title || defaultPoints === undefined) {
+    if (!title || defaultPoints === undefined || !icon) {
       return NextResponse.json(
-        { error: "Title and defaultPoints are required" },
+        { error: "Title, icon, and defaultPoints are required" },
         { status: 400 }
       );
     }
@@ -55,7 +55,7 @@ export async function POST(req: Request) {
     const chore = await prisma.chore.create({
       data: {
         title,
-        icon: icon || null,
+        icon,
         defaultPoints,
         familyId: session.user.familyId!,
         createdById: session.user.id,

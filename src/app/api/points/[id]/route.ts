@@ -82,6 +82,43 @@ export async function PUT(
       },
     });
 
+    // If points changed, adjust KidStats
+    if (points !== undefined && points !== existingEntry.points) {
+      const oldPts = existingEntry.points;
+      const newPts = points;
+      const statsUpdate: any = {};
+
+      // Reverse old
+      if (oldPts > 0) statsUpdate.totalEarned = { decrement: oldPts };
+      else if (oldPts < 0) statsUpdate.totalSpent = { decrement: Math.abs(oldPts) };
+
+      // We need two separate updates since Prisma can't increment and decrement different fields atomically in one call
+      if (Object.keys(statsUpdate).length > 0) {
+        await prisma.kidStats.update({
+          where: { kidId: existingEntry.kidId },
+          data: statsUpdate,
+        }).catch(() => {}); // Ignore if stats row doesn't exist yet
+      }
+
+      // Apply new
+      const statsApply: any = {};
+      if (newPts > 0) statsApply.totalEarned = { increment: newPts };
+      else if (newPts < 0) statsApply.totalSpent = { increment: Math.abs(newPts) };
+
+      if (Object.keys(statsApply).length > 0) {
+        await prisma.kidStats.upsert({
+          where: { kidId: existingEntry.kidId },
+          create: {
+            kidId: existingEntry.kidId,
+            familyId: existingEntry.familyId,
+            totalEarned: newPts > 0 ? newPts : 0,
+            totalSpent: newPts < 0 ? Math.abs(newPts) : 0,
+          },
+          update: statsApply,
+        });
+      }
+    }
+
     return NextResponse.json({ pointEntry });
   } catch (error: any) {
     return NextResponse.json(
@@ -138,6 +175,19 @@ export async function DELETE(
     await prisma.pointEntry.delete({
       where: { id },
     });
+
+    // Adjust KidStats to reverse the deleted entry
+    if (existingEntry.points > 0) {
+      await prisma.kidStats.update({
+        where: { kidId: existingEntry.kidId },
+        data: { totalEarned: { decrement: existingEntry.points } },
+      }).catch(() => {});
+    } else if (existingEntry.points < 0) {
+      await prisma.kidStats.update({
+        where: { kidId: existingEntry.kidId },
+        data: { totalSpent: { decrement: Math.abs(existingEntry.points) } },
+      }).catch(() => {});
+    }
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

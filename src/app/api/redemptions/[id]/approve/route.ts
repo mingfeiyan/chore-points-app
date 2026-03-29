@@ -96,6 +96,20 @@ export async function PUT(
         },
       });
 
+      // Update KidStats for the redemption spend
+      await tx.kidStats.upsert({
+        where: { kidId: redemption.kidId },
+        create: {
+          kidId: redemption.kidId,
+          familyId: session.user.familyId!,
+          totalEarned: 0,
+          totalSpent: redemption.reward.costPoints,
+        },
+        update: {
+          totalSpent: { increment: redemption.reward.costPoints },
+        },
+      });
+
       return updatedRedemption;
     });
 

@@ -65,6 +65,11 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
     e.preventDefault();
     setError("");
 
+    if (!icon) {
+      setError(t("iconRequired"));
+      return;
+    }
+
     const points = parseInt(defaultPoints);
     if (isNaN(points) || points < 0) {
       setError(t("pointsNonNegative"));
@@ -166,15 +171,6 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
               >
                 {icon || "➕"}
               </button>
-              {icon && (
-                <button
-                  type="button"
-                  onClick={() => setIcon("")}
-                  className="text-sm text-gray-500 hover:text-red-500"
-                >
-                  {t("clear")}
-                </button>
-              )}
               <span className="text-sm text-gray-500 ml-2">
                 {icon ? t("clickToChange") : t("clickToPick")}
               </span>

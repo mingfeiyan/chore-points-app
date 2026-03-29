@@ -49,9 +49,13 @@ API routes use permission helpers for authorization:
 
 ### Database (`prisma/schema.prisma`)
 
-PostgreSQL via Neon with `@prisma/adapter-pg` connection pooling. Prisma client is a global singleton (`src/lib/db.ts`). All shared resources are scoped by `familyId`. Two user roles: `PARENT` and `KID`.
+PostgreSQL everywhere. Production uses Neon (`DATABASE_URL="postgresql://..."`); local dev uses PGlite (`DATABASE_URL="./pglite/dev"`), an embedded PostgreSQL that needs no server. Prisma client is a global singleton (`src/lib/db.ts`) that selects the adapter based on `DATABASE_URL`. All shared resources are scoped by `familyId`. Two user roles: `PARENT` and `KID`.
 
 After any schema change: run `npx prisma migrate dev` then `npx prisma generate`.
+
+### Database Rules
+
+- **DB adapter logic stays in `src/lib/db.ts`** — do not import `@prisma/adapter-pg`, `pg`, or `@electric-sql/pglite` anywhere else
 
 ### i18n (`src/components/LocaleProvider.tsx`)
 
@@ -83,6 +87,24 @@ Vitest with jsdom, globals enabled. Tests in `src/__tests__/` with subdirs for `
 
 - **pre-push**: runs `npm run build` (prisma generate + next build) — pushes will fail if build fails
 - **pre-commit**: currently a no-op
+
+## Deployment
+
+- **Production URL**: https://chore-points-app-seven.vercel.app
+- **Hosting**: Vercel (auto-deploys from `origin/main` on GitHub push)
+- **Database**: Neon PostgreSQL (project: `chore-points-app`, region: us-east-2)
+- **Redeploy after env var changes** (no code change needed):
+  ```bash
+  npx vercel redeploy chore-points-app-seven.vercel.app
+  ```
+- **Set env vars**:
+  ```bash
+  echo "value" | npx vercel env add VAR_NAME production
+  ```
+- **Run migrations against production DB**:
+  ```bash
+  DATABASE_URL="<neon-url>" npx prisma migrate deploy
+  ```
 
 ## Key Conventions
 

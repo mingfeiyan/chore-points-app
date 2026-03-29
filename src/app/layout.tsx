@@ -20,7 +20,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "GemSteps - Build Great Habits",
-  description: "Track progress, earn gems, and build lasting habits",
+  description: "Track progress, earn gems, and build lasting habits!",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
