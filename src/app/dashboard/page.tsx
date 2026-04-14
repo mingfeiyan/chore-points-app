@@ -5,7 +5,6 @@ import ParentDashboardHeader from "@/components/parent/ParentDashboardHeader";
 import WeeklyCalendarView from "@/components/calendar/WeeklyCalendarView";
 import FamilyTodoList from "@/components/dashboard/FamilyTodoList";
 import PhotoCarousel from "@/components/dashboard/PhotoCarousel";
-import LightsWidget from "@/components/lights/LightsWidget";
 
 export default async function DashboardPage() {
   const session = await getSession();
@@ -35,7 +34,6 @@ export default async function DashboardPage() {
               <FamilyTodoList />
               <PhotoCarousel />
             </div>
-            <LightsWidget />
           </div>
         </div>
       </div>

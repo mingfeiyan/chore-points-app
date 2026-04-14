@@ -11,8 +11,7 @@
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "postinstall": "prisma generate",
-    "prepare": "husky",
-    "lights": "node scripts/celebration-server.js"
+    "prepare": "husky"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.72.1",

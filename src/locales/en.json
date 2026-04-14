@@ -760,32 +760,5 @@
     "changePhoto": "Change",
     "nameRequired": "Name is required",
     "clickToUploadPhoto": "Click to upload photo"
-  },
-  "hue": {
-    "title": "Smart Lights",
-    "connect": "Connect Philips Hue",
-    "connectDesc": "Control your Philips Hue lights from the dashboard",
-    "disconnect": "Disconnect",
-    "disconnecting": "Disconnecting...",
-    "connected": "Connected",
-    "notConnected": "Not Connected",
-    "connectError": "Failed to connect",
-    "connectDenied": "Connection was denied",
-    "rooms": "Rooms",
-    "scenes": "Scenes",
-    "noRooms": "No rooms found. Set up rooms in the Hue app first.",
-    "noScenes": "No scenes available",
-    "allOff": "All Off",
-    "on": "On",
-    "off": "Off",
-    "brightness": "Brightness",
-    "loading": "Loading lights...",
-    "error": "Failed to load lights",
-    "retry": "Retry",
-    "refresh": "Refresh",
-    "seeAll": "See all",
-    "unavailable": "Hue unavailable",
-    "reconnect": "Reconnect",
-    "allRooms": "All Rooms"
   }
 }

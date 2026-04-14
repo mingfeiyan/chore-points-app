@@ -2,7 +2,6 @@
 
 import { useEffect, useCallback, useState, useRef } from "react";
 import confetti from "canvas-confetti";
-import { celebrationEffects } from "@/lib/hue-local";
 
 type PointsCelebrationProps = {
   fromPoints: number;
@@ -34,13 +33,6 @@ export default function PointsCelebration({
     });
   }, []);
 
-  const triggerLightEffect = useCallback(() => {
-    // Flash living room lights blue 3 times
-    celebrationEffects.pointsCelebration().catch(() => {
-      // Silently ignore - lights may not be reachable
-    });
-  }, []);
-
   const fireConfetti = useCallback(() => {
     confetti({
       particleCount: 100,
@@ -59,9 +51,6 @@ export default function PointsCelebration({
 
     // Fire initial confetti burst
     fireConfetti();
-
-    // Flash living room lights blue 3 times
-    triggerLightEffect();
 
     // Calculate animation parameters
     const pointDiff = toPoints - fromPoints;
@@ -92,7 +81,7 @@ export default function PointsCelebration({
         setTimeout(onComplete, 800);
       }
     }, stepDuration);
-  }, [fromPoints, toPoints, fireConfetti, playSound, triggerLightEffect, onComplete]);
+  }, [fromPoints, toPoints, fireConfetti, playSound, onComplete]);
 
   // Try to autoplay on mount
   useEffect(() => {

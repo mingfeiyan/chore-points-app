@@ -77,7 +77,6 @@ Vitest with jsdom, globals enabled. Tests in `src/__tests__/` with subdirs for `
 - **Vercel Blob** — photo/image uploads (`src/app/api/upload/`)
 - **Resend** — transactional email
 - **Google Calendar** — family event sync (`src/app/api/calendar/`)
-- **Philips Hue** — smart light control via OAuth (`src/app/api/hue/`)
 
 ### Git Hooks (Husky)
 

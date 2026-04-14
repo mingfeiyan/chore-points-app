@@ -24,7 +24,6 @@ export default async function SettingsPage() {
       id: true,
       name: true,
       inviteCode: true,
-      hueAccessToken: true,
       users: {
         select: {
           id: true,
@@ -36,7 +35,6 @@ export default async function SettingsPage() {
     },
   });
 
-  const isHueConnected = !!family?.hueAccessToken;
   const kids = family?.users.filter((u) => u.role === "KID") || [];
 
   return (
@@ -45,7 +43,6 @@ export default async function SettingsPage() {
         familyName={family?.name || ""}
         inviteCode={family?.inviteCode || ""}
         kids={kids}
-        isHueConnected={isHueConnected}
       />
     </div>
   );
