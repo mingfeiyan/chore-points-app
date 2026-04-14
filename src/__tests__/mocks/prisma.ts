@@ -53,13 +53,6 @@ export const mockPrisma = {
     update: vi.fn(),
     delete: vi.fn(),
   },
-  milestone: {
-    findUnique: vi.fn(),
-    findMany: vi.fn(),
-    create: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
-  },
   photo: {
     findUnique: vi.fn(),
     findMany: vi.fn(),

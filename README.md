@@ -37,7 +37,6 @@ A family engagement platform for tracking chores, earning points, and building l
 ### Family Features
 
 - **Photo Gallery** - Store and browse family memories with captions
-- **Milestone Tracking** - Record special achievements and moments
 - **Google Calendar Integration** - Sync and view family events
 - **Family Todo List** - Shared tasks with assignments and due dates
 
@@ -113,7 +112,6 @@ src/
 │   ├── chores/         # Chore management
 │   ├── learn/          # Sight words & math
 │   ├── meals/          # Meal planning & voting
-│   ├── milestones/     # Milestone tracking
 │   ├── photos/         # Photo gallery
 │   ├── points/         # Points ledger & forms
 │   └── rewards/        # Rewards & redemption

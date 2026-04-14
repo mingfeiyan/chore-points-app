@@ -129,20 +129,3 @@ export function createInvite(overrides: Record<string, unknown> = {}) {
     ...overrides,
   }
 }
-
-// Milestone fixtures
-export function createMilestone(overrides: Record<string, unknown> = {}) {
-  return {
-    id: generateId('milestone'),
-    title: `Test Milestone ${idCounter}`,
-    description: null,
-    date: new Date(),
-    imageUrl: null,
-    familyId: 'family-1',
-    kidId: 'kid-1',
-    createdById: 'parent-1',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    ...overrides,
-  }
-}
