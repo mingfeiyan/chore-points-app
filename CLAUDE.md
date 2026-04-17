@@ -49,9 +49,13 @@ API routes use permission helpers for authorization:
 
 ### Database (`prisma/schema.prisma`)
 
-PostgreSQL via Neon with `@prisma/adapter-pg` connection pooling. Prisma client is a global singleton (`src/lib/db.ts`). All shared resources are scoped by `familyId`. Two user roles: `PARENT` and `KID`.
+PostgreSQL everywhere. Production uses Neon (`DATABASE_URL="postgresql://..."`); local dev uses PGlite (`DATABASE_URL="./pglite/dev"`), an embedded PostgreSQL that needs no server. Prisma client is a global singleton (`src/lib/db.ts`) that selects the adapter based on `DATABASE_URL`. All shared resources are scoped by `familyId`. Two user roles: `PARENT` and `KID`.
 
 After any schema change: run `npx prisma migrate dev` then `npx prisma generate`.
+
+### Database Rules
+
+- **DB adapter logic stays in `src/lib/db.ts`** — do not import `@prisma/adapter-pg`, `pg`, or `@electric-sql/pglite` anywhere else
 
 ### i18n (`src/components/LocaleProvider.tsx`)
 
