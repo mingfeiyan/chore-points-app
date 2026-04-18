@@ -20,8 +20,41 @@ export default function SightWordsList() {
   const [showForm, setShowForm] = useState(false);
   const [editingWord, setEditingWord] = useState<SightWord | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [importing, setImporting] = useState(false);
   const t = useTranslations("sightWords");
   const tCommon = useTranslations("common");
+
+  const handleImportPack = async () => {
+    setImporting(true);
+    try {
+      const response = await fetch("/api/sight-words/import-pack", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ packId: "dolch-k" }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        alert(data.error || "Failed to import pack");
+        return;
+      }
+      if (data.imported === 0) {
+        alert(t("importNothingNew"));
+      } else {
+        alert(
+          t("importSuccess", {
+            count: data.imported,
+            skipped: data.skipped,
+          })
+        );
+        fetchSightWords();
+      }
+    } catch (error) {
+      console.error("Failed to import pack:", error);
+      alert("Failed to import pack");
+    } finally {
+      setImporting(false);
+    }
+  };
 
   useEffect(() => {
     fetchSightWords();
@@ -143,12 +176,21 @@ export default function SightWordsList() {
     <div>
       <div className="mb-6 flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900">{t("pageTitle")}</h2>
-        <button
-          onClick={() => setShowForm(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
-        >
-          {t("addWord")}
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleImportPack}
+            disabled={importing}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {importing ? t("importing") : t("importKPack")}
+          </button>
+          <button
+            onClick={() => setShowForm(true)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+          >
+            {t("addWord")}
+          </button>
+        </div>
       </div>
 
       {sightWords.length === 0 ? (

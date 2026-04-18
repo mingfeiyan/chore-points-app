@@ -612,7 +612,11 @@
     "dragToReorder": "拖动调整单词顺序",
     "confirmDelete": "确定要删除这个单词吗？",
     "active": "进行中",
-    "inactive": "已暂停"
+    "inactive": "已暂停",
+    "importKPack": "导入幼儿园词包",
+    "importing": "导入中...",
+    "importSuccess": "已导入 {count} 个单词（跳过 {skipped} 个重复）",
+    "importNothingNew": "幼儿园词包里的单词都已添加过了"
   },
   "meals": {
     "pageTitle": "餐食",

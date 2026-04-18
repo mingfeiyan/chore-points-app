@@ -1,6 +1,39 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireFamily } from "@/lib/permissions";
+import { generateSightWordImage } from "@/lib/gemini-image";
+
+const UPCOMING_IMAGE_PREFETCH = 2;
+
+async function prefetchUpcomingImages(
+  familyId: string,
+  currentSortOrder: number,
+  updatedById: string
+) {
+  const upcoming = await prisma.sightWord.findMany({
+    where: {
+      familyId,
+      isActive: true,
+      imageUrl: null,
+      sortOrder: { gt: currentSortOrder },
+    },
+    orderBy: { sortOrder: "asc" },
+    take: UPCOMING_IMAGE_PREFETCH,
+  });
+
+  for (const sw of upcoming) {
+    generateSightWordImage(sw.word, familyId)
+      .then((url) =>
+        prisma.sightWord.update({
+          where: { id: sw.id },
+          data: { imageUrl: url, updatedById },
+        })
+      )
+      .catch((err) =>
+        console.error(`Prefetch image gen failed for "${sw.word}":`, err)
+      );
+  }
+}
 
 // POST /api/sight-words/quiz - Submit a quiz answer and award point if correct
 export async function POST(req: Request) {
@@ -128,6 +161,12 @@ export async function POST(req: Request) {
         },
       }),
     ]);
+
+    prefetchUpcomingImages(
+      session.user.familyId!,
+      sightWord.sortOrder,
+      session.user.id
+    ).catch((err) => console.error("Upcoming image prefetch failed:", err));
 
     return NextResponse.json({
       correct: true,

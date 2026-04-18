@@ -612,7 +612,11 @@
     "dragToReorder": "Drag to reorder the words",
     "confirmDelete": "Are you sure you want to delete this word?",
     "active": "Active",
-    "inactive": "Paused"
+    "inactive": "Paused",
+    "importKPack": "Import K starter pack",
+    "importing": "Importing...",
+    "importSuccess": "Imported {count} words (skipped {skipped} duplicates)",
+    "importNothingNew": "All words from the K pack are already added"
   },
   "meals": {
     "pageTitle": "Meals",
