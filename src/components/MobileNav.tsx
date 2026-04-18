@@ -29,7 +29,6 @@ export default function MobileNav() {
 
   // Primary links shown in the bottom bar (4 items max)
   const parentPrimaryLinks = [
-    { href: "/meals", label: t("meals"), icon: "🍽️" },
     { href: "/ledger", label: t("pointsNav"), icon: "💎" },
     { href: "/chores", label: t("chores"), icon: "✅" },
     { href: "/rewards", label: t("rewards"), icon: "🎁" },

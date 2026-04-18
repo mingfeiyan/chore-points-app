@@ -148,14 +148,6 @@ export default function NavBar() {
                 // Normal parent navigation
                 <>
                   <Link
-                    href="/meals"
-                    className={`hover:text-gray-300 transition ${
-                      pathname.startsWith("/meals") ? "text-blue-400" : ""
-                    }`}
-                  >
-                    {t("meals")}
-                  </Link>
-                  <Link
                     href="/chores"
                     className={`hover:text-gray-300 transition ${
                       pathname === "/chores" ? "text-blue-400" : ""

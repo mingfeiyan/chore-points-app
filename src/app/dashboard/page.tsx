@@ -3,7 +3,6 @@ import { getSession } from "@/lib/permissions";
 import FamilySetup from "@/components/family/FamilySetup";
 import ParentDashboardHeader from "@/components/parent/ParentDashboardHeader";
 import WeeklyCalendarView from "@/components/calendar/WeeklyCalendarView";
-import FamilyTodoList from "@/components/dashboard/FamilyTodoList";
 import PhotoCarousel from "@/components/dashboard/PhotoCarousel";
 
 export default async function DashboardPage() {
@@ -30,8 +29,7 @@ export default async function DashboardPage() {
           <ParentDashboardHeader />
           <div className="mt-6 space-y-6">
             <WeeklyCalendarView />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <FamilyTodoList />
+            <div className="lg:w-1/2">
               <PhotoCarousel />
             </div>
           </div>
