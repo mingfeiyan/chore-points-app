@@ -24,7 +24,6 @@ type QuizItem = {
   display: string;
   hiddenIndex: number | null;
   answer: string;
-  status: "pending" | "correct" | "wrong";
 };
 
 type Props = {
@@ -48,7 +47,6 @@ function buildQuizItem(word: SightWord): QuizItem {
       display: "_",
       hiddenIndex: null,
       answer: word.word.toLowerCase(),
-      status: "pending",
     };
   }
   const idx = 1 + Math.floor(Math.random() * (word.word.length - 1));
@@ -61,7 +59,6 @@ function buildQuizItem(word: SightWord): QuizItem {
     display,
     hiddenIndex: idx,
     answer: word.word[idx].toLowerCase(),
-    status: "pending",
   };
 }
 
@@ -126,21 +123,18 @@ export default function LearnView({ kidId, onComplete }: Props) {
     fetchSession();
   }, [fetchSession]);
 
-  // Auto-pronounce on study card change
-  useEffect(() => {
-    if (phase !== "study" || !data?.words[studyIndex]) return;
-    const word = data.words[studyIndex].word;
-    const timeout = setTimeout(() => speak(word), 200);
-    return () => clearTimeout(timeout);
-  }, [phase, studyIndex, data]);
+  const activeWord =
+    phase === "study"
+      ? data?.words[studyIndex]?.word
+      : phase === "quiz"
+        ? quizItems[quizIndex]?.word.word
+        : null;
 
-  // Auto-pronounce on quiz card change
   useEffect(() => {
-    if (phase !== "quiz" || !quizItems[quizIndex]) return;
-    const word = quizItems[quizIndex].word.word;
-    const timeout = setTimeout(() => speak(word), 200);
+    if (!activeWord) return;
+    const timeout = setTimeout(() => speak(activeWord), 200);
     return () => clearTimeout(timeout);
-  }, [phase, quizIndex, quizItems]);
+  }, [activeWord]);
 
   const handleStartStudy = () => {
     setPhase("study");
@@ -152,7 +146,6 @@ export default function LearnView({ kidId, onComplete }: Props) {
     if (studyIndex < data.words.length - 1) {
       setStudyIndex(studyIndex + 1);
     } else {
-      // Move to quiz phase with shuffled items
       setQuizItems(shuffle(data.words.map(buildQuizItem)));
       setQuizIndex(0);
       setUserInput("");
@@ -201,12 +194,6 @@ export default function LearnView({ kidId, onComplete }: Props) {
         setPointsEarned((p) => p + 1);
       }
       confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
-
-      setQuizItems((items) =>
-        items.map((it, i) =>
-          i === quizIndex ? { ...it, status: "correct" } : it
-        )
-      );
     } catch (err) {
       console.error("Failed to submit quiz:", err);
       setFeedback("wrong");
@@ -281,7 +268,6 @@ export default function LearnView({ kidId, onComplete }: Props) {
 
   return (
     <div className="max-w-lg mx-auto">
-      {/* Overall progress */}
       <div className="mb-8">
         <div className="flex justify-between text-sm text-gray-600 mb-2">
           <span>{isReview ? t("reviewProgress") : t("progress")}</span>
@@ -441,9 +427,7 @@ export default function LearnView({ kidId, onComplete }: Props) {
                     setUserInput(e.target.value);
                     if (feedback === "wrong") setFeedback(null);
                   }}
-                  placeholder={
-                    currentQuizItem.hiddenIndex === null ? "?" : "?"
-                  }
+                  placeholder="?"
                   maxLength={
                     currentQuizItem.hiddenIndex === null
                       ? currentQuizItem.word.word.length

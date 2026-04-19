@@ -1,12 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireFamily } from "@/lib/permissions";
+import { getLocalDateString } from "@/lib/math-utils";
 
 const SESSION_SIZE = 3;
-
-function localDateString(date: Date, tz: string): string {
-  return date.toLocaleDateString("en-CA", { timeZone: tz });
-}
 
 export async function GET(req: Request) {
   try {
@@ -49,12 +46,18 @@ export async function GET(req: Request) {
       where: { kidId: targetKidId },
     });
     const progressMap = new Map(progress.map((p) => [p.sightWordId, p]));
-    const today = localDateString(new Date(), timezone);
+    const today = getLocalDateString(new Date(), timezone);
 
-    const completedCount = allWords.filter((w) => {
-      const wp = progressMap.get(w.id);
-      return !!wp?.quizPassedAt;
-    }).length;
+    let completedCount = 0;
+    let completedTodayCount = 0;
+    for (const word of allWords) {
+      const wp = progressMap.get(word.id);
+      if (!wp?.quizPassedAt) continue;
+      completedCount++;
+      if (getLocalDateString(new Date(wp.quizPassedAt), timezone) === today) {
+        completedTodayCount++;
+      }
+    }
 
     const pickEligible = (allowReviewCycle: boolean) => {
       const picked: typeof allWords = [];
@@ -62,7 +65,7 @@ export async function GET(req: Request) {
         if (picked.length >= SESSION_SIZE) break;
         const wp = progressMap.get(word.id);
         if (wp?.quizPassedAt) {
-          const passedDate = localDateString(new Date(wp.quizPassedAt), timezone);
+          const passedDate = getLocalDateString(new Date(wp.quizPassedAt), timezone);
           if (passedDate === today) continue;
           if (!wp.pointAwarded && !allowReviewCycle) continue;
         }
@@ -72,22 +75,10 @@ export async function GET(req: Request) {
     };
 
     let sessionWords = pickEligible(false);
-    let isReview = sessionWords.some((w) => {
-      const wp = progressMap.get(w.id);
-      return !!wp?.quizPassedAt;
-    });
+    let isReview = sessionWords.some((w) => !!progressMap.get(w.id)?.quizPassedAt);
 
     if (sessionWords.length === 0) {
-      // Either done today or full review cycle exhausted — check which
-      const anyTodayCompleted = allWords.some((w) => {
-        const wp = progressMap.get(w.id);
-        return (
-          !!wp?.quizPassedAt &&
-          localDateString(new Date(wp.quizPassedAt), timezone) === today
-        );
-      });
-
-      if (anyTodayCompleted && completedCount === allWords.length) {
+      if (completedTodayCount > 0 && completedCount === allWords.length) {
         return NextResponse.json({
           words: [],
           message: "alreadyDoneToday",
@@ -96,7 +87,6 @@ export async function GET(req: Request) {
         });
       }
 
-      // Reset review cycle and pick again
       await prisma.sightWordProgress.updateMany({
         where: {
           kidId: targetKidId,
@@ -104,11 +94,9 @@ export async function GET(req: Request) {
         },
         data: { pointAwarded: true },
       });
-
-      const refreshed = await prisma.sightWordProgress.findMany({
-        where: { kidId: targetKidId },
-      });
-      for (const p of refreshed) progressMap.set(p.sightWordId, p);
+      for (const [id, wp] of progressMap) {
+        progressMap.set(id, { ...wp, pointAwarded: true });
+      }
 
       sessionWords = pickEligible(true);
       isReview = true;
