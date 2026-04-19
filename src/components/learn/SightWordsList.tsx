@@ -34,6 +34,8 @@ export default function SightWordsList() {
 
     setBackfillProgress({ current: 0, total: missing.length });
     let updated = [...sightWords];
+    let succeeded = 0;
+    const failures: { word: string; reason: string }[] = [];
 
     for (let i = 0; i < missing.length; i++) {
       const word = missing[i];
@@ -45,16 +47,30 @@ export default function SightWordsList() {
           const data = await res.json();
           updated = updated.map((w) => (w.id === word.id ? data.sightWord : w));
           setSightWords(updated);
+          succeeded++;
         } else {
-          console.error(`Failed to generate image for "${word.word}"`);
+          const body = await res.text();
+          failures.push({ word: word.word, reason: `${res.status}: ${body.slice(0, 200)}` });
         }
       } catch (err) {
-        console.error(`Error generating image for "${word.word}":`, err);
+        failures.push({
+          word: word.word,
+          reason: err instanceof Error ? err.message : String(err),
+        });
       }
       setBackfillProgress({ current: i + 1, total: missing.length });
     }
 
     setBackfillProgress(null);
+
+    if (failures.length === 0) {
+      alert(`Done — generated ${succeeded} images.`);
+    } else {
+      console.error("Backfill failures:", failures);
+      alert(
+        `Generated ${succeeded} images. ${failures.length} failed. First error:\n\n${failures[0].word}: ${failures[0].reason}\n\n(See browser console for the full list.)`
+      );
+    }
   };
 
   const handleImportPack = async () => {
