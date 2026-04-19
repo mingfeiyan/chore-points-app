@@ -506,6 +506,30 @@
     "wordsMastered": "words mastered",
     "noWordsYet": "No words to learn yet",
     "back": "Back",
+    "speak": "Pronounce",
+    "intro": {
+      "title": "Let's learn {count} new words!",
+      "subtitle": "First look and listen, then we'll test you.",
+      "start": "Start learning"
+    },
+    "study": {
+      "heading": "Word {current} of {total}",
+      "next": "Next word",
+      "readyForQuiz": "Ready for the quiz"
+    },
+    "quiz": {
+      "heading": "Quiz {current} of {total}",
+      "typeWord": "Type the word",
+      "typeMissingLetter": "Type the missing letter",
+      "tryAgain": "Not quite — try again",
+      "next": "Next",
+      "finish": "Finish"
+    },
+    "done": {
+      "title": "Great job!",
+      "earned": "You earned {points} points!",
+      "again": "Learn more words"
+    },
     "sightWord": "Sight Words",
     "math": "Math",
     "mathLocked": "Complete sight word first",

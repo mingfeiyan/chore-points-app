@@ -506,6 +506,30 @@
     "wordsMastered": "个单词已学会",
     "noWordsYet": "还没有要学习的单词",
     "back": "返回",
+    "speak": "朗读",
+    "intro": {
+      "title": "一起学习 {count} 个新单词！",
+      "subtitle": "先看一看、听一听，然后我们测验一下。",
+      "start": "开始学习"
+    },
+    "study": {
+      "heading": "第 {current} 个 / 共 {total} 个",
+      "next": "下一个单词",
+      "readyForQuiz": "准备测验"
+    },
+    "quiz": {
+      "heading": "测验 {current} / {total}",
+      "typeWord": "输入这个单词",
+      "typeMissingLetter": "输入缺失的字母",
+      "tryAgain": "不对哦，再试一次",
+      "next": "下一个",
+      "finish": "完成"
+    },
+    "done": {
+      "title": "做得真棒！",
+      "earned": "你获得了 {points} 个积分！",
+      "again": "再学一些单词"
+    },
     "sightWord": "单词",
     "math": "数学",
     "mathLocked": "先完成单词练习",
