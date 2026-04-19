@@ -616,7 +616,9 @@
     "importKPack": "导入幼儿园词包",
     "importing": "导入中...",
     "importSuccess": "已导入 {count} 个单词（跳过 {skipped} 个重复）",
-    "importNothingNew": "幼儿园词包里的单词都已添加过了"
+    "importNothingNew": "幼儿园词包里的单词都已添加过了",
+    "backfillImages": "生成缺失图片 ({count})",
+    "backfillingImages": "生成中 {current}/{total}..."
   },
   "meals": {
     "pageTitle": "餐食",

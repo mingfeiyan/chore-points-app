@@ -616,7 +616,9 @@
     "importKPack": "Import K starter pack",
     "importing": "Importing...",
     "importSuccess": "Imported {count} words (skipped {skipped} duplicates)",
-    "importNothingNew": "All words from the K pack are already added"
+    "importNothingNew": "All words from the K pack are already added",
+    "backfillImages": "Generate missing images ({count})",
+    "backfillingImages": "Generating {current}/{total}..."
   },
   "meals": {
     "pageTitle": "Meals",

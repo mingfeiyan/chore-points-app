@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireParentInFamily } from "@/lib/permissions";
 import { STARTER_PACKS } from "@/lib/sight-word-starter-packs";
@@ -52,18 +52,22 @@ export async function POST(req: Request) {
       take: BOOTSTRAP_IMAGE_COUNT,
     });
 
-    for (const sw of bootstrapWords) {
-      generateSightWordImage(sw.word, familyId)
-        .then((url) =>
-          prisma.sightWord.update({
+    after(async () => {
+      for (const sw of bootstrapWords) {
+        try {
+          const url = await generateSightWordImage(sw.word, familyId);
+          await prisma.sightWord.update({
             where: { id: sw.id },
             data: { imageUrl: url, updatedById: session.user.id },
-          })
-        )
-        .catch((err) =>
-          console.error(`Bootstrap image gen failed for "${sw.word}":`, err)
-        );
-    }
+          });
+        } catch (err) {
+          console.error(
+            `[sight-words] bootstrap image gen failed for "${sw.word}":`,
+            err
+          );
+        }
+      }
+    });
 
     return NextResponse.json({
       imported: toCreate.length,

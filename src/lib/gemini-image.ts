@@ -1,7 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import { put } from "@vercel/blob";
 
-const IMAGE_MODEL = "gemini-2.5-flash-image-preview";
+const IMAGE_MODEL = "gemini-2.5-flash-image";
 
 function buildPrompt(word: string): string {
   return [

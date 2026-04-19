@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireFamily } from "@/lib/permissions";
 import { generateSightWordImage } from "@/lib/gemini-image";
@@ -22,16 +22,18 @@ async function prefetchUpcomingImages(
   });
 
   for (const sw of upcoming) {
-    generateSightWordImage(sw.word, familyId)
-      .then((url) =>
-        prisma.sightWord.update({
-          where: { id: sw.id },
-          data: { imageUrl: url, updatedById },
-        })
-      )
-      .catch((err) =>
-        console.error(`Prefetch image gen failed for "${sw.word}":`, err)
+    try {
+      const url = await generateSightWordImage(sw.word, familyId);
+      await prisma.sightWord.update({
+        where: { id: sw.id },
+        data: { imageUrl: url, updatedById },
+      });
+    } catch (err) {
+      console.error(
+        `[sight-words] prefetch image gen failed for "${sw.word}":`,
+        err
       );
+    }
   }
 }
 
@@ -162,11 +164,13 @@ export async function POST(req: Request) {
       }),
     ]);
 
-    prefetchUpcomingImages(
-      session.user.familyId!,
-      sightWord.sortOrder,
-      session.user.id
-    ).catch((err) => console.error("Upcoming image prefetch failed:", err));
+    after(() =>
+      prefetchUpcomingImages(
+        session.user.familyId!,
+        sightWord.sortOrder,
+        session.user.id
+      )
+    );
 
     return NextResponse.json({
       correct: true,

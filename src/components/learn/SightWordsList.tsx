@@ -21,8 +21,41 @@ export default function SightWordsList() {
   const [editingWord, setEditingWord] = useState<SightWord | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [importing, setImporting] = useState(false);
+  const [backfillProgress, setBackfillProgress] = useState<{
+    current: number;
+    total: number;
+  } | null>(null);
   const t = useTranslations("sightWords");
   const tCommon = useTranslations("common");
+
+  const handleBackfillImages = async () => {
+    const missing = sightWords.filter((w) => !w.imageUrl && w.isActive);
+    if (missing.length === 0) return;
+
+    setBackfillProgress({ current: 0, total: missing.length });
+    let updated = [...sightWords];
+
+    for (let i = 0; i < missing.length; i++) {
+      const word = missing[i];
+      try {
+        const res = await fetch(`/api/sight-words/${word.id}/generate-image`, {
+          method: "POST",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          updated = updated.map((w) => (w.id === word.id ? data.sightWord : w));
+          setSightWords(updated);
+        } else {
+          console.error(`Failed to generate image for "${word.word}"`);
+        }
+      } catch (err) {
+        console.error(`Error generating image for "${word.word}":`, err);
+      }
+      setBackfillProgress({ current: i + 1, total: missing.length });
+    }
+
+    setBackfillProgress(null);
+  };
 
   const handleImportPack = async () => {
     setImporting(true);
@@ -174,9 +207,26 @@ export default function SightWordsList() {
 
   return (
     <div>
-      <div className="mb-6 flex justify-between items-center">
+      <div className="mb-6 flex justify-between items-center flex-wrap gap-2">
         <h2 className="text-2xl font-bold text-gray-900">{t("pageTitle")}</h2>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          {sightWords.some((w) => !w.imageUrl && w.isActive) && (
+            <button
+              onClick={handleBackfillImages}
+              disabled={backfillProgress !== null}
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {backfillProgress
+                ? t("backfillingImages", {
+                    current: backfillProgress.current,
+                    total: backfillProgress.total,
+                  })
+                : t("backfillImages", {
+                    count: sightWords.filter((w) => !w.imageUrl && w.isActive)
+                      .length,
+                  })}
+            </button>
+          )}
           <button
             onClick={handleImportPack}
             disabled={importing}
