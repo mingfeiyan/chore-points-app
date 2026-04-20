@@ -32,6 +32,7 @@ interface KidWithPoints extends Kid {
   totalPoints: number;
   todayDelta: number;
   todayEntries: PointEntry[];
+  allEntries: PointEntry[];
 }
 
 interface ParentHomeProps {
@@ -74,6 +75,69 @@ function isToday(dateStr: string): boolean {
   );
 }
 
+// ------- Sparkline -------
+
+function getLast7DaysPoints(entries: PointEntry[]): number[] {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const result: number[] = [];
+
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
+    const dateStr = date.toISOString().split("T")[0];
+
+    const dayTotal = entries
+      .filter((e) => {
+        const entryDate = new Date(e.date).toISOString().split("T")[0];
+        return entryDate === dateStr && e.points > 0;
+      })
+      .reduce((sum, e) => sum + e.points, 0);
+
+    result.push(dayTotal);
+  }
+
+  return result;
+}
+
+function Sparkline({ data }: { data: number[] }) {
+  const width = 80;
+  const height = 24;
+  const padding = 2;
+
+  const max = Math.max(...data, 1); // avoid division by zero
+  const stepX = (width - padding * 2) / (data.length - 1);
+
+  const points = data
+    .map((val, i) => {
+      const x = padding + i * stepX;
+      // Invert Y: SVG y=0 is top, so higher values should be lower y
+      const y = padding + (height - padding * 2) * (1 - val / max);
+      return `${x},${y}`;
+    })
+    .join(" ");
+
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="7-day points sparkline"
+    >
+      <polyline
+        points={points}
+        stroke="#6b8e4e"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+    </svg>
+  );
+}
+
 // ------- Component -------
 
 export default function ParentHome({ userName }: ParentHomeProps) {
@@ -106,6 +170,7 @@ export default function ParentHome({ userName }: ParentHomeProps) {
             totalPoints: pointsData.totalPoints || 0,
             todayDelta,
             todayEntries,
+            allEntries: entries,
           };
         })
       );
@@ -257,6 +322,9 @@ export default function ParentHome({ userName }: ParentHomeProps) {
                   <span>{kid.totalPoints} pts</span>
                 </div>
               </div>
+
+              {/* 7-day sparkline */}
+              <Sparkline data={getLast7DaysPoints(kid.allEntries)} />
 
               {/* Today delta */}
               {kid.todayDelta > 0 && (

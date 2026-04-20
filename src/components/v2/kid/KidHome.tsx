@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import KidHeaderBG from "@/components/v2/KidHeaderBG";
 import KidTabBar from "@/components/v2/KidTabBar";
@@ -94,6 +94,98 @@ const tileColorMap: Record<string, string> = {
   "tile-pink": "#fbcfe8",
   "tile-mint": "#a7f3d0",
 };
+
+// ------- Swipeable Chore Card -------
+
+function SwipeableChoreCard({
+  entry,
+  bg,
+}: {
+  entry: PointEntry;
+  bg: string;
+}) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const startXRef = useRef(0);
+  const currentXRef = useRef(0);
+  const isDraggingRef = useRef(false);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    startXRef.current = e.touches[0].clientX;
+    currentXRef.current = 0;
+    isDraggingRef.current = true;
+    if (cardRef.current) {
+      cardRef.current.style.transition = "none";
+    }
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isDraggingRef.current) return;
+    const dx = e.touches[0].clientX - startXRef.current;
+    // Only allow rightward drag
+    const clampedDx = Math.max(0, Math.min(dx, 80));
+    currentXRef.current = clampedDx;
+    if (cardRef.current) {
+      cardRef.current.style.transform = `translateX(${clampedDx}px)`;
+      cardRef.current.style.opacity = `${1 - clampedDx * 0.003}`;
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    isDraggingRef.current = false;
+    if (cardRef.current) {
+      cardRef.current.style.transition = "transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease";
+      cardRef.current.style.transform = "translateX(0px)";
+      cardRef.current.style.opacity = "1";
+    }
+  }, []);
+
+  return (
+    <div
+      ref={cardRef}
+      className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white p-3 touch-pan-y"
+      style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.04)", willChange: "transform" }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Tile icon */}
+      <div
+        className="flex items-center justify-center rounded-xl"
+        style={{ width: 40, height: 40, background: bg }}
+      >
+        <span className="text-lg">✨</span>
+      </div>
+      {/* Chore title */}
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-bold text-ca-ink truncate">
+          {entry.chore!.title}
+        </p>
+      </div>
+      {/* Points */}
+      <div className="flex items-center gap-1">
+        <CoinSmall size={16} />
+        <span className="text-sm font-bold text-ca-gold-deep">
+          +{entry.points}
+        </span>
+      </div>
+      {/* Check */}
+      <div
+        className="flex items-center justify-center rounded-full"
+        style={{ width: 24, height: 24, background: "#22c55e" }}
+      >
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path
+            d="M3 7L6 10L11 4"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </div>
+    </div>
+  );
+}
 
 // ------- Component -------
 
@@ -240,55 +332,11 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
               const color = tileColors[idx % tileColors.length];
               const bg = tileColorMap[color];
               return (
-                <div
+                <SwipeableChoreCard
                   key={entry.id}
-                  className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white p-3"
-                  style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}
-                >
-                  {/* Tile icon */}
-                  <div
-                    className="flex items-center justify-center rounded-xl"
-                    style={{
-                      width: 40,
-                      height: 40,
-                      background: bg,
-                    }}
-                  >
-                    <span className="text-lg">✨</span>
-                  </div>
-                  {/* Chore title */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-ca-ink truncate">
-                      {entry.chore!.title}
-                    </p>
-                  </div>
-                  {/* Points */}
-                  <div className="flex items-center gap-1">
-                    <CoinSmall size={16} />
-                    <span className="text-sm font-bold text-ca-gold-deep">
-                      +{entry.points}
-                    </span>
-                  </div>
-                  {/* Check */}
-                  <div
-                    className="flex items-center justify-center rounded-full"
-                    style={{
-                      width: 24,
-                      height: 24,
-                      background: "#22c55e",
-                    }}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                      <path
-                        d="M3 7L6 10L11 4"
-                        stroke="white"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </div>
-                </div>
+                  entry={entry}
+                  bg={bg}
+                />
               );
             })}
           </div>
