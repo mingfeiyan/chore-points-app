@@ -3,11 +3,14 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useKidMode } from "@/components/providers/KidModeProvider";
+import { useNewDesign } from "@/hooks/useNewDesign";
 import PhotoGallery from "@/components/photos/PhotoGallery";
 import GalleryPageHeader from "@/components/parent/GalleryPageHeader";
+import KidGallery from "@/components/v2/kid/KidGallery";
 
 export default function ViewAsGalleryClient() {
   const { viewingAsKid, isKidMode } = useKidMode();
+  const { isNewDesign } = useNewDesign();
   const router = useRouter();
 
   useEffect(() => {
@@ -18,6 +21,10 @@ export default function ViewAsGalleryClient() {
 
   if (!viewingAsKid) {
     return null;
+  }
+
+  if (isNewDesign) {
+    return <KidGallery kidId={viewingAsKid.id} />;
   }
 
   return (

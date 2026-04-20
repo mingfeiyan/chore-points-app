@@ -14,19 +14,20 @@ type PhotoEntry = {
   chore: { title: string } | null;
 };
 
-export default function KidGallery() {
+export default function KidGallery({ kidId: kidIdProp }: { kidId?: string } = {}) {
   const { data: session } = useSession();
+  const resolvedKidId = kidIdProp || session?.user?.id;
   const [photos, setPhotos] = useState<PhotoEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!session?.user?.id) return;
+    if (!resolvedKidId) return;
     fetchPhotos();
-  }, [session?.user?.id]);
+  }, [resolvedKidId]);
 
   const fetchPhotos = async () => {
     try {
-      const res = await fetch(`/api/photos?kidId=${session?.user?.id}`);
+      const res = await fetch(`/api/photos?kidId=${resolvedKidId}`);
       const data = await res.json();
       if (res.ok) {
         setPhotos(data.photos || []);

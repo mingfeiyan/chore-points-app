@@ -3,10 +3,13 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useKidMode } from "@/components/providers/KidModeProvider";
+import { useNewDesign } from "@/hooks/useNewDesign";
 import KidPointsView from "@/components/points/KidPointsView";
+import KidHome from "@/components/v2/kid/KidHome";
 
 export default function ViewAsPointsClient() {
   const { viewingAsKid, isKidMode } = useKidMode();
+  const { isNewDesign } = useNewDesign();
   const router = useRouter();
 
   useEffect(() => {
@@ -17,6 +20,10 @@ export default function ViewAsPointsClient() {
 
   if (!viewingAsKid) {
     return null;
+  }
+
+  if (isNewDesign) {
+    return <KidHome kidId={viewingAsKid.id} kidName={viewingAsKid.name || viewingAsKid.email} />;
   }
 
   return (

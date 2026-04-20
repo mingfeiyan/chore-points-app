@@ -3,10 +3,13 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useKidMode } from "@/components/providers/KidModeProvider";
+import { useNewDesign } from "@/hooks/useNewDesign";
 import LearningCenter from "@/components/learn/LearningCenter";
+import KidLearnEntry from "@/components/v2/kid/KidLearnEntry";
 
 export default function ViewAsLearnClient() {
   const { viewingAsKid, isKidMode } = useKidMode();
+  const { isNewDesign } = useNewDesign();
   const router = useRouter();
 
   useEffect(() => {
@@ -17,6 +20,10 @@ export default function ViewAsLearnClient() {
 
   if (!viewingAsKid) {
     return null;
+  }
+
+  if (isNewDesign) {
+    return <KidLearnEntry kidId={viewingAsKid.id} />;
   }
 
   return (
