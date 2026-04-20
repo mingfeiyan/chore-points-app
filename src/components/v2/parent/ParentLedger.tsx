@@ -265,7 +265,7 @@ export default function ParentLedger({ kids }: ParentLedgerProps) {
       {/* PointEntryForm modal (add/edit) */}
       {showForm && selectedKid && (
         <PointEntryForm
-          kid={{ ...selectedKid, email: "" }}
+          kidId={selectedKid.id}
           entry={editingEntry}
           onClose={handleFormClose}
           onSuccess={handleFormSuccess}
@@ -275,7 +275,7 @@ export default function ParentLedger({ kids }: ParentLedgerProps) {
       {/* Badge level-up toast */}
       {badgeLevelUp && (
         <BadgeLevelUpToast
-          {...badgeLevelUp}
+          levelUpInfo={badgeLevelUp}
           onClose={() => setBadgeLevelUp(null)}
         />
       )}

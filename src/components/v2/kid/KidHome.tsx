@@ -277,7 +277,6 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
     );
   }
 
-  const todayStr = new Date().toISOString().split("T")[0];
   const todayEntries = data.entries.filter((e) => {
     const entryDate = new Date(e.date).toISOString().split("T")[0];
     return entryDate === todayStr && e.points > 0;
