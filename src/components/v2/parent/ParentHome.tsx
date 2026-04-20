@@ -266,15 +266,6 @@ export default function ParentHome({ userName }: ParentHomeProps) {
     <div className="min-h-screen bg-pg-cream pb-[110px] font-[family-name:var(--font-inter)]">
       {/* Header */}
       <div className="relative px-7 pt-8">
-        {/* Botanical leaf SVG */}
-        <svg
-          className="pointer-events-none absolute right-4 top-4 opacity-30"
-          width="82" height="98" viewBox="0 0 60 72" fill="none"
-        >
-          <path d="M30 2 C10 18 4 42 18 64 C22 68 28 70 30 70 C32 70 38 68 42 64 C56 42 50 18 30 2 Z" fill="#6b8e4e" opacity="0.5" />
-          <path d="M30 4 L30 68" stroke="#4a6a32" strokeWidth="1" opacity="0.3" fill="none" />
-        </svg>
-
         <div className="flex items-start justify-between">
           <div>
             {/* Date + weather */}
