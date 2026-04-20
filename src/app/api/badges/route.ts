@@ -4,6 +4,10 @@ import { requireFamily } from "@/lib/permissions";
 import { Role } from "@prisma/client";
 import { getLevelInfo, getProgressToNextLevel } from "@/lib/badges";
 import { getAchievementBadgeById, ACHIEVEMENT_BADGES } from "@/lib/achievement-badges";
+import {
+  isCustomAwardBadgeId,
+  parseCustomAwardBadgeMetadata,
+} from "@/lib/custom-award-badge";
 
 // GET /api/badges - Get badges for the family
 // Parents can see all badges, kids can only see their own
@@ -89,12 +93,8 @@ export async function GET(req: Request) {
     });
 
     const enrichedAchievementBadges = achievementBadges.map((badge) => {
-      if (badge.badgeId.startsWith("custom-award-")) {
-        const meta = (badge.metadata ?? {}) as {
-          taskDescription?: string;
-          points?: number;
-          imageUrl?: string | null;
-        };
+      if (isCustomAwardBadgeId(badge.badgeId)) {
+        const meta = parseCustomAwardBadgeMetadata(badge.metadata);
         const name = meta.taskDescription?.slice(0, 40) || "Custom award";
         return {
           ...badge,

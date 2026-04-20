@@ -1,5 +1,7 @@
 "use client";
 
+import OptimizedImage from "@/components/ui/OptimizedImage";
+
 type BadgeIconProps = {
   imageUrl?: string | null;
   emoji?: string | null;
@@ -33,10 +35,11 @@ export default function BadgeIcon({
 }: BadgeIconProps) {
   if (imageUrl) {
     return (
-      <img
+      <OptimizedImage
         src={imageUrl}
         alt={alt}
-        className={`${imageSizeClasses[size]} object-cover rounded-full ${className}`}
+        variant="small"
+        className={`${imageSizeClasses[size]} rounded-full ${className}`}
       />
     );
   }

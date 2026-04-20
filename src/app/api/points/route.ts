@@ -3,9 +3,10 @@ import { prisma } from "@/lib/db";
 import { requireFamily } from "@/lib/permissions";
 import { calculateLevel, getLevelInfo } from "@/lib/badges";
 import { evaluateAndAwardBadges } from "@/lib/badge-evaluator";
-import { generateBadgeImage } from "@/lib/gemini-image";
-
-const CUSTOM_AWARD_BADGE_PREFIX = "custom-award-";
+import {
+  customAwardBadgeIdFor,
+  generateAndStoreBadgeImage,
+} from "@/lib/custom-award-badge";
 
 // GET /api/points - Get kid's total points and ledger history
 export async function GET(req: Request) {
@@ -245,32 +246,21 @@ export async function POST(req: Request) {
         data: {
           familyId: session.user.familyId!,
           kidId,
-          badgeId: `${CUSTOM_AWARD_BADGE_PREFIX}${pointEntry.id}`,
-          metadata: {
-            taskDescription,
-            points,
-            imageUrl: null,
-          },
+          badgeId: customAwardBadgeIdFor(pointEntry.id),
+          metadata: { taskDescription, points, imageUrl: null },
         },
       });
       customAwardBadgeId = customBadge.id;
 
       after(async () => {
         try {
-          const imageUrl = await generateBadgeImage(
+          await generateAndStoreBadgeImage(
+            prisma,
+            customBadge.id,
+            session.user.familyId!,
             taskDescription,
-            session.user.familyId!
+            points
           );
-          await prisma.achievementBadge.update({
-            where: { id: customBadge.id },
-            data: {
-              metadata: {
-                taskDescription,
-                points,
-                imageUrl,
-              },
-            },
-          });
         } catch (err) {
           console.error(
             `[custom-badge] image gen failed for "${taskDescription}":`,

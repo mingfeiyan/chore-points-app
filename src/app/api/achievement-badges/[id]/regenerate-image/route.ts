@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireParentInFamily } from "@/lib/permissions";
-import { generateBadgeImage } from "@/lib/gemini-image";
+import {
+  generateAndStoreBadgeImage,
+  isCustomAwardBadgeId,
+  parseCustomAwardBadgeMetadata,
+} from "@/lib/custom-award-badge";
 
 export const maxDuration = 60;
 
@@ -18,43 +22,31 @@ export async function POST(
       return NextResponse.json({ error: "Badge not found" }, { status: 404 });
     }
 
-    if (!badge.badgeId.startsWith("custom-award-")) {
+    if (!isCustomAwardBadgeId(badge.badgeId)) {
       return NextResponse.json(
         { error: "Only custom-award badges can be regenerated" },
         { status: 400 }
       );
     }
 
-    const meta = (badge.metadata ?? {}) as {
-      taskDescription?: string;
-      points?: number;
-      imageUrl?: string | null;
-    };
+    const meta = parseCustomAwardBadgeMetadata(badge.metadata);
     const taskDescription = meta.taskDescription?.trim();
-    if (!taskDescription) {
+    if (!taskDescription || typeof meta.points !== "number") {
       return NextResponse.json(
-        { error: "Badge has no task description" },
+        { error: "Badge metadata is incomplete" },
         { status: 400 }
       );
     }
 
-    const imageUrl = await generateBadgeImage(
+    const imageUrl = await generateAndStoreBadgeImage(
+      prisma,
+      id,
+      session.user.familyId!,
       taskDescription,
-      session.user.familyId!
+      meta.points
     );
 
-    const updated = await prisma.achievementBadge.update({
-      where: { id },
-      data: {
-        metadata: {
-          taskDescription,
-          points: meta.points ?? null,
-          imageUrl,
-        },
-      },
-    });
-
-    return NextResponse.json({ badge: updated });
+    return NextResponse.json({ imageUrl });
   } catch (error: unknown) {
     const message =
       error instanceof Error ? error.message : "Something went wrong";
