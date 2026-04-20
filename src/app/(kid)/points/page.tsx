@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/lib/permissions";
 import KidPointsView from "@/components/points/KidPointsView";
 import KidPointsHeader from "@/components/points/KidPointsHeader";
+import KidHomeWrapper from "@/components/v2/kid/KidHomeWrapper";
 
 export default async function KidPointsPage() {
   const session = await getSession();
@@ -19,14 +20,19 @@ export default async function KidPointsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <KidPointsHeader />
-
-        <div className="mt-8">
-          <KidPointsView kidId={session.user.id} />
+    <KidHomeWrapper
+      kidId={session.user.id}
+      kidName={session.user.name || "Kid"}
+      fallback={
+        <div className="min-h-screen bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <KidPointsHeader />
+            <div className="mt-8">
+              <KidPointsView kidId={session.user.id} />
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      }
+    />
   );
 }
