@@ -6,104 +6,181 @@ import Link from "next/link";
 import KidHeaderBG from "@/components/v2/KidHeaderBG";
 import KidTabBar from "@/components/v2/KidTabBar";
 import CoinSmall from "@/components/v2/CoinSmall";
-import Gemmy from "@/components/v2/Gemmy";
 
-type SessionInfo = {
-  wordCount?: number;
-  subject?: string;
+type SessionData = {
+  words: Array<{ id: string; word: string; imageUrl: string | null }>;
+  isReview?: boolean;
+  progress: { current: number; total: number };
+  message?: "noWords" | "alreadyDoneToday";
 };
 
-const subjectTiles = [
-  { name: "Sight Words", icon: "\uD83D\uDCDA", bg: "bg-ca-tile-teal", href: "/learn/sight-words" },
-  { name: "Addition", icon: "\u2795", bg: "bg-ca-tile-peach", href: "/learn/addition" },
-  { name: "Multiplication", icon: "\u2716\uFE0F", bg: "bg-ca-tile-butter", href: "/learn/multiplication" },
-  { name: "Speed Round", icon: "\u26A1", bg: "bg-ca-tile-pink", href: "/learn/speed-round" },
-];
+interface KidLearnEntryProps {
+  kidId?: string;
+}
 
-export default function KidLearnEntry() {
+export default function KidLearnEntry({ kidId: kidIdProp }: KidLearnEntryProps = {}) {
   const { data: session } = useSession();
-  const [sessionInfo, setSessionInfo] = useState<SessionInfo | null>(null);
+  const resolvedKidId = kidIdProp || session?.user?.id;
+  const [data, setData] = useState<SessionData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<"sight-words" | "math">("sight-words");
 
   useEffect(() => {
-    if (!session?.user?.id) return;
-    fetchSessionInfo();
-  }, [session?.user?.id]);
+    if (!resolvedKidId) return;
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    fetch(`/api/sight-words/session?kidId=${resolvedKidId}&timezone=${encodeURIComponent(tz)}`)
+      .then((res) => res.json())
+      .then((d) => setData(d))
+      .catch((err) => console.error("Failed to fetch session:", err))
+      .finally(() => setLoading(false));
+  }, [resolvedKidId]);
 
-  const fetchSessionInfo = async () => {
-    try {
-      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const res = await fetch(
-        `/api/sight-words/session?kidId=${session?.user?.id}&timezone=${encodeURIComponent(tz)}`
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setSessionInfo(data);
-      }
-    } catch (err) {
-      console.error("Failed to fetch session info:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const wordCount = sessionInfo?.wordCount || 10;
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-ca-cream flex items-center justify-center">
-        <div className="text-ca-muted">Loading...</div>
-      </div>
-    );
-  }
+  const progress = data?.progress || { current: 0, total: 0 };
+  const wordCount = data?.words?.length || 0;
+  const isReview = data?.isReview || false;
+  const allDone = data?.message === "alreadyDoneToday";
+  const noWords = data?.message === "noWords";
 
   return (
-    <div className="min-h-screen bg-ca-cream pb-20 font-[family-name:var(--font-nunito)]">
-      <KidHeaderBG compact>
-        <div className="text-center">
-          <h1 className="text-2xl font-black font-[family-name:var(--font-baloo-2)]">Learn</h1>
+    <div className="min-h-screen bg-ca-cream pb-[110px] font-[family-name:var(--font-nunito)]">
+      {/* Header */}
+      <KidHeaderBG>
+        <p className="text-[11px] font-bold uppercase tracking-wider opacity-80">
+          Earn gems by learning
+        </p>
+        <h1 className="text-2xl font-black font-[family-name:var(--font-baloo-2)] mt-0.5">
+          Learning Center
+        </h1>
+
+        {/* Subject tabs */}
+        <div className="flex gap-2 mt-4">
+          <button
+            onClick={() => setActiveTab("sight-words")}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold transition-colors"
+            style={{
+              background: activeTab === "sight-words" ? "#fff" : "rgba(255,255,255,0.2)",
+              color: activeTab === "sight-words" ? "var(--ca-cobalt-deep)" : "#fff",
+            }}
+          >
+            📚 Sight Words
+          </button>
+          <button
+            onClick={() => setActiveTab("math")}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold transition-colors"
+            style={{
+              background: activeTab === "math" ? "#fff" : "rgba(255,255,255,0.2)",
+              color: activeTab === "math" ? "var(--ca-cobalt-deep)" : "#fff",
+            }}
+          >
+            🔢 Math
+          </button>
         </div>
       </KidHeaderBG>
 
-      <div className="px-4 mt-4 space-y-4">
-        {/* Today's session hero card */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm flex items-center gap-4">
-          <div className="flex-shrink-0">
-            <Gemmy size={72} mood="happy" bounce />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h2 className="text-base font-bold text-ca-ink">Today&apos;s session</h2>
-            <p className="text-sm text-ca-muted">
-              Sight Words &middot; {"\u00D7"}{wordCount} words
-            </p>
-            <div className="flex items-center gap-3 mt-1">
-              <span className="text-xs text-ca-muted">~2 min</span>
-              <span className="flex items-center gap-0.5 text-xs text-ca-muted">
-                <CoinSmall size={14} /> +5
-              </span>
-            </div>
-            <Link
-              href="/learn/sight-words"
-              className="mt-2 inline-block bg-ca-cobalt text-white text-sm font-bold px-5 py-1.5 rounded-xl"
-            >
-              Start
-            </Link>
-          </div>
-        </div>
+      <div className="px-4 mt-5 space-y-4">
+        {loading ? (
+          <div className="py-12 text-center text-ca-muted">Loading...</div>
+        ) : activeTab === "sight-words" ? (
+          <>
+            {/* Progress bar */}
+            {progress.total > 0 && (
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <h2 className="text-base font-extrabold text-ca-ink">
+                    {isReview ? "Review Progress" : "Learning Progress"}
+                  </h2>
+                  <span className="text-sm font-bold text-ca-muted">
+                    {progress.current} / {progress.total}
+                  </span>
+                </div>
+                <div className="h-2.5 rounded-full bg-[rgba(26,24,19,0.06)] overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${progress.total > 0 ? (progress.current / progress.total) * 100 : 0}%`,
+                      background: "linear-gradient(90deg, var(--ca-cobalt), var(--ca-sky))",
+                    }}
+                  />
+                </div>
+              </div>
+            )}
 
-        {/* Subject tiles */}
-        <div className="grid grid-cols-2 gap-3">
-          {subjectTiles.map((tile) => (
-            <Link
-              key={tile.name}
-              href={tile.href}
-              className={`${tile.bg} rounded-2xl p-4 flex flex-col items-center justify-center aspect-square shadow-sm`}
-            >
-              <span className="text-3xl mb-2">{tile.icon}</span>
-              <span className="text-sm font-bold text-ca-ink text-center">{tile.name}</span>
-            </Link>
-          ))}
-        </div>
+            {/* Session card */}
+            {allDone ? (
+              <div className="bg-white rounded-2xl p-5 border border-[rgba(26,24,19,0.06)] text-center">
+                <span className="text-4xl">🎉</span>
+                <h3 className="text-lg font-extrabold text-ca-ink mt-2">All done for today!</h3>
+                <p className="text-sm text-ca-muted mt-1">Great job! Come back tomorrow for more.</p>
+              </div>
+            ) : noWords ? (
+              <div className="bg-white rounded-2xl p-5 border border-[rgba(26,24,19,0.06)] text-center">
+                <span className="text-4xl">📚</span>
+                <h3 className="text-lg font-extrabold text-ca-ink mt-2">No words yet</h3>
+                <p className="text-sm text-ca-muted mt-1">Ask a parent to add sight words.</p>
+              </div>
+            ) : (
+              <>
+                {/* Review / New words card */}
+                {isReview && wordCount > 0 && (
+                  <div className="bg-white rounded-2xl p-4 border border-[rgba(26,24,19,0.06)] flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-ca-tile-peach flex items-center justify-center shrink-0">
+                      <span className="text-2xl">🔄</span>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-base font-extrabold text-ca-ink">Review time!</h3>
+                      <p className="text-xs text-ca-muted mt-0.5">
+                        Practice the {progress.current} words you&apos;ve learned
+                      </p>
+                    </div>
+                    <Link
+                      href="/learn"
+                      className="shrink-0 w-14 h-14 rounded-full flex items-center justify-center text-white font-extrabold text-sm"
+                      style={{ background: "var(--ca-coral)" }}
+                    >
+                      Start
+                    </Link>
+                  </div>
+                )}
+
+                {/* New words hero card */}
+                <div
+                  className="rounded-3xl p-6 text-white text-center relative overflow-hidden"
+                  style={{
+                    background: "linear-gradient(160deg, var(--ca-cobalt) 0%, var(--ca-cobalt-deep) 70%, #0d2480 100%)",
+                  }}
+                >
+                  <span className="text-5xl">📚</span>
+                  <h3 className="text-xl font-black mt-3 font-[family-name:var(--font-baloo-2)]">
+                    Let&apos;s learn {wordCount} {isReview ? "review" : "new"} words!
+                  </h3>
+                  <p className="text-sm opacity-80 mt-1">
+                    Look and listen first, then we&apos;ll test you.
+                  </p>
+
+                  <Link
+                    href="/learn"
+                    className="inline-flex items-center gap-2 mt-4 px-6 py-3 rounded-full text-sm font-extrabold"
+                    style={{ background: "var(--ca-gold)", color: "var(--ca-gold-deep)" }}
+                  >
+                    <CoinSmall size={16} />
+                    Start learning →
+                  </Link>
+
+                  <p className="text-xs opacity-60 mt-3">
+                    +1 gem per word learned
+                  </p>
+                </div>
+              </>
+            )}
+          </>
+        ) : (
+          /* Math tab */
+          <div className="bg-white rounded-2xl p-5 border border-[rgba(26,24,19,0.06)] text-center">
+            <span className="text-4xl">🔢</span>
+            <h3 className="text-lg font-extrabold text-ca-ink mt-2">Math Practice</h3>
+            <p className="text-sm text-ca-muted mt-1">Coming soon!</p>
+          </div>
+        )}
       </div>
 
       <KidTabBar />
