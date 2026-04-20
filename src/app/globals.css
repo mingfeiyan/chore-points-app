@@ -3,6 +3,42 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Coin Arcade */
+  --ca-cream: #FFFEF9;
+  --ca-paper: #FFF8EC;
+  --ca-ink: #1b1a17;
+  --ca-muted: #8a8577;
+  --ca-divider: rgba(26,24,19,0.08);
+  --ca-gold: #FFCB3B;
+  --ca-gold-deep: #B27B00;
+  --ca-gold-glow: #FFE88A;
+  --ca-cobalt: #2f62f5;
+  --ca-cobalt-deep: #1a3fb3;
+  --ca-sky: #6fa8ff;
+  --ca-coral: #f66951;
+  --ca-mint: #38c07f;
+  --ca-pink: #ff9dbf;
+  --ca-teal: #6cc4cf;
+  --ca-peach: #ffb977;
+  --ca-lavender: #b49ef0;
+  --ca-tile-teal: #dcf1f3;
+  --ca-tile-peach: #fff4e6;
+  --ca-tile-pink: #fce4ec;
+  --ca-tile-mint: #e8f5e9;
+  --ca-tile-lavender: #ece4f8;
+  --ca-tile-butter: #fff3b0;
+
+  /* Paper Garden */
+  --pg-cream: #F9F4E8;
+  --pg-ink: #2f2a1f;
+  --pg-muted: #857d68;
+  --pg-line: rgba(68,55,32,0.14);
+  --pg-accent: #6b8e4e;
+  --pg-accent-deep: #4a6a32;
+  --pg-coral: #c5543d;
+  --pg-leaf: #9bbf7a;
+  --pg-bloom: #d88b8b;
 }
 
 @theme inline {
@@ -10,6 +46,46 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Coin Arcade */
+  --color-ca-cream: var(--ca-cream);
+  --color-ca-paper: var(--ca-paper);
+  --color-ca-ink: var(--ca-ink);
+  --color-ca-muted: var(--ca-muted);
+  --color-ca-gold: var(--ca-gold);
+  --color-ca-gold-deep: var(--ca-gold-deep);
+  --color-ca-gold-glow: var(--ca-gold-glow);
+  --color-ca-cobalt: var(--ca-cobalt);
+  --color-ca-cobalt-deep: var(--ca-cobalt-deep);
+  --color-ca-sky: var(--ca-sky);
+  --color-ca-coral: var(--ca-coral);
+  --color-ca-mint: var(--ca-mint);
+  --color-ca-pink: var(--ca-pink);
+  --color-ca-teal: var(--ca-teal);
+  --color-ca-peach: var(--ca-peach);
+  --color-ca-lavender: var(--ca-lavender);
+  --color-ca-tile-teal: var(--ca-tile-teal);
+  --color-ca-tile-peach: var(--ca-tile-peach);
+  --color-ca-tile-pink: var(--ca-tile-pink);
+  --color-ca-tile-mint: var(--ca-tile-mint);
+  --color-ca-tile-lavender: var(--ca-tile-lavender);
+  --color-ca-tile-butter: var(--ca-tile-butter);
+
+  /* Paper Garden */
+  --color-pg-cream: var(--pg-cream);
+  --color-pg-ink: var(--pg-ink);
+  --color-pg-muted: var(--pg-muted);
+  --color-pg-accent: var(--pg-accent);
+  --color-pg-accent-deep: var(--pg-accent-deep);
+  --color-pg-coral: var(--pg-coral);
+  --color-pg-leaf: var(--pg-leaf);
+  --color-pg-bloom: var(--pg-bloom);
+
+  /* Font families */
+  --font-baloo: var(--font-baloo-2);
+  --font-nunito: var(--font-nunito);
+  --font-fraunces: var(--font-fraunces);
+  --font-inter: var(--font-inter);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -43,4 +119,35 @@ body {
 
 .animate-shake {
   animation: shake 0.5s ease-in-out;
+}
+
+@keyframes confettiFall {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity: 0; }
+}
+
+@keyframes flamePulse {
+  0%, 100% { transform: scale(1) rotate(-2deg); }
+  50% { transform: scale(1.12) rotate(2deg); }
+}
+
+@keyframes gemmyBounce {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-6px) rotate(2deg); }
+}
+
+@keyframes targetPulse {
+  0%, 100% { border-color: var(--ca-gold-deep); }
+  50% { border-color: var(--ca-gold); }
+}
+
+@keyframes haloPulse {
+  0%, 100% { transform: scale(1); opacity: 0.55; }
+  50% { transform: scale(1.15); opacity: 0.9; }
+}
+
+@keyframes gemSpin {
+  0% { transform: rotateY(0); }
+  50% { transform: rotateY(180deg); }
+  100% { transform: rotateY(360deg); }
 }
