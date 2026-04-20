@@ -297,25 +297,25 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
             </button>
           )}
         </div>
-        <div className="bg-white rounded-2xl p-3 border border-[rgba(26,24,19,0.08)]">
+        <div className="bg-white rounded-2xl p-4 border border-[rgba(26,24,19,0.08)] max-w-md mx-auto">
           {/* Month nav */}
-          <div className="flex items-center justify-between mb-2">
-            <button onClick={prevMonth} className="w-8 h-8 rounded-full hover:bg-ca-cream flex items-center justify-center">
-              <ChevronLeft size={18} className="text-ca-muted" />
+          <div className="flex items-center justify-between mb-3">
+            <button onClick={prevMonth} className="w-9 h-9 rounded-full hover:bg-ca-cream flex items-center justify-center">
+              <ChevronLeft size={20} className="text-ca-ink" />
             </button>
-            <span className="text-sm font-bold text-ca-ink">{monthName}</span>
-            <button onClick={nextMonth} className="w-8 h-8 rounded-full hover:bg-ca-cream flex items-center justify-center">
-              <ChevronRight size={18} className="text-ca-muted" />
+            <span className="text-base font-extrabold text-ca-ink font-[family-name:var(--font-baloo-2)]">{monthName}</span>
+            <button onClick={nextMonth} className="w-9 h-9 rounded-full hover:bg-ca-cream flex items-center justify-center">
+              <ChevronRight size={20} className="text-ca-ink" />
             </button>
           </div>
           {/* Day headers */}
-          <div className="grid grid-cols-7 mb-1">
+          <div className="grid grid-cols-7 mb-2">
             {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
-              <div key={i} className="text-center text-[10px] font-bold text-ca-muted py-0.5">{d}</div>
+              <div key={i} className="text-center text-xs font-bold text-ca-muted py-1">{d}</div>
             ))}
           </div>
           {/* Cells */}
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7 gap-1.5">
             {monthCells.map((cell, i) => {
               const pts = dayTotals[cell.dateStr] || 0;
               const isFire = pts >= 10;
@@ -330,18 +330,25 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
               return (
                 <div
                   key={i}
-                  className="aspect-square rounded-[10px] flex flex-col items-center justify-center"
+                  className="rounded-xl flex flex-col items-center justify-center py-2"
                   style={{
                     backgroundColor: bg,
-                    border: isToday ? "2px solid var(--ca-cobalt)" : "none",
-                    opacity: cell.inMonth ? 1 : 0.3,
+                    border: isToday ? "2.5px solid var(--ca-cobalt)" : "1px solid transparent",
+                    opacity: cell.inMonth ? 1 : 0.25,
+                    minHeight: 48,
                   }}
                 >
                   {cell.inMonth && (
                     <>
-                      <span className="text-[12px] font-extrabold text-ca-ink leading-none">{cell.day}</span>
-                      {isFire && <span className="text-[9px] leading-none">🔥</span>}
-                      {isGem && <span className="text-[9px] leading-none">💎</span>}
+                      <span className="text-sm font-extrabold text-ca-ink leading-none">{cell.day}</span>
+                      <span className="text-base leading-none mt-0.5">
+                        {isFire ? "🔥" : isGem ? "💎" : ""}
+                      </span>
+                      {(isFire || isGem) && (
+                        <span className="text-[10px] font-bold text-ca-muted leading-none mt-0.5">
+                          {pts}
+                        </span>
+                      )}
                     </>
                   )}
                 </div>
@@ -349,9 +356,13 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
             })}
           </div>
           {/* Legend */}
-          <div className="flex items-center justify-center gap-4 mt-2 text-[10px] text-ca-muted">
-            <span>🔥 10+ pts</span>
-            <span>💎 1+ pts</span>
+          <div className="flex items-center justify-center gap-6 mt-3 text-xs font-bold text-ca-muted">
+            <span>🔥 10+ gems</span>
+            <span>💎 1+ gems</span>
+            <span className="flex items-center gap-1">
+              <span className="w-2.5 h-2.5 rounded-full border-2 border-ca-cobalt inline-block" />
+              Today
+            </span>
           </div>
         </div>
       </section>
