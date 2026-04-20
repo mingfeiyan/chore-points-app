@@ -77,13 +77,13 @@ function toLocalDateString(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-function getEventColor(summary: string, kids: Kid[]): number {
+// Match event to a family member by checking if any known name appears in the summary
+function getEventColorIdx(summary: string, familyNames: string[]): number {
   const lower = summary.toLowerCase();
-  for (let i = 0; i < kids.length; i++) {
-    const name = (kids[i].name || kids[i].email).toLowerCase();
-    if (lower.includes(name.split(" ")[0])) return i;
+  for (let i = 0; i < familyNames.length; i++) {
+    if (lower.includes(familyNames[i].toLowerCase())) return i % 4;
   }
-  return kids.length; // default
+  return 3; // default: sky blue
 }
 
 // ------- Component -------
@@ -185,7 +185,24 @@ export default function ParentCalendar() {
     loadCalendarEvents();
   }, [loadCalendarEvents]);
 
-  // Build kid color map
+  // Build family member list: kids first, then detect parents from calendar events
+  const familyNames: string[] = kids.map((k) => (k.name || k.email).split(" ")[0]);
+
+  // Add names found in calendar events that aren't already kids
+  const knownLower = new Set(familyNames.map((n) => n.toLowerCase()));
+  for (const ev of calendarEvents) {
+    const words = ev.summary.split(/\s+/);
+    for (const word of words) {
+      const lower = word.toLowerCase().replace(/[^a-z]/g, "");
+      if (lower.length >= 3 && !knownLower.has(lower) && word[0] === word[0].toUpperCase()) {
+        // Only add if it appears as a name-like pattern (starts uppercase)
+        familyNames.push(word.replace(/[^a-zA-Z]/g, ""));
+        knownLower.add(lower);
+      }
+    }
+  }
+
+  // Build kid color map for point entries
   const kidColorMap: Record<string, number> = {};
   kids.forEach((kid, i) => {
     kidColorMap[kid.id] = i % 4;
@@ -331,7 +348,7 @@ export default function ParentCalendar() {
 
                     {/* Google Calendar events */}
                     {cell.events.slice(0, 2).map((ev) => {
-                      const colorIdx = getEventColor(ev.summary, kids) % 4;
+                      const colorIdx = getEventColorIdx(ev.summary, familyNames);
                       const colors = KID_COLORS[colorIdx] || KID_COLORS[0];
                       return (
                         <div
@@ -381,18 +398,18 @@ export default function ParentCalendar() {
         )}
       </div>
 
-      {/* Kid color legend */}
-      {kids.length > 0 && (
+      {/* Family member color legend */}
+      {familyNames.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-4 px-7">
-          {kids.map((kid, i) => {
+          {familyNames.map((name, i) => {
             const colors = KID_COLORS[i % 4];
             return (
-              <div key={kid.id} className="flex items-center gap-1.5">
+              <div key={name} className="flex items-center gap-1.5">
                 <div
                   className="h-2.5 w-2.5 rounded-full"
                   style={{ backgroundColor: colors.dot }}
                 />
-                <span className="text-xs text-[#857d68]">{kid.name || kid.email}</span>
+                <span className="text-xs text-[#857d68]">{name}</span>
               </div>
             );
           })}
@@ -426,7 +443,7 @@ export default function ParentCalendar() {
             </div>
             <div className="max-h-[60vh] overflow-y-auto p-4 space-y-2">
               {selectedDay.events.map((ev) => {
-                const colorIdx = getEventColor(ev.summary, kids) % 4;
+                const colorIdx = getEventColorIdx(ev.summary, familyNames);
                 const colors = KID_COLORS[colorIdx] || KID_COLORS[0];
                 const time = ev.start.dateTime
                   ? new Date(ev.start.dateTime).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
