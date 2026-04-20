@@ -302,9 +302,6 @@ export default function ParentHome({ userName }: ParentHomeProps) {
                   </div>
                 </div>
 
-                {/* 7-day sparkline */}
-                <Sparkline data={getLast7DaysPoints(kid.allEntries)} />
-
                 {/* Today delta */}
                 {kid.todayDelta > 0 && (
                   <span className="text-sm font-medium text-pg-accent-deep">
