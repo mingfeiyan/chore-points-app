@@ -7,14 +7,14 @@ export async function POST(req: Request) {
     const session = await requireParentInFamily();
     const { kidId, note, points, photoUrl } = await req.json();
 
-    if (!kidId || !note || typeof points !== "number") {
+    if (typeof kidId !== "string" || typeof note !== "string") {
       return NextResponse.json(
-        { error: "kidId, note, and points are required" },
+        { error: "kidId and note must be strings" },
         { status: 400 }
       );
     }
 
-    const trimmedNote = String(note).trim();
+    const trimmedNote = note.trim();
     if (trimmedNote.length === 0 || trimmedNote.length > 100) {
       return NextResponse.json(
         { error: "Item name must be 1–100 characters" },
@@ -29,6 +29,18 @@ export async function POST(req: Request) {
       );
     }
 
+    const url =
+      typeof photoUrl === "string" &&
+      /^https:\/\/[a-z0-9-]+\.public\.blob\.vercel-storage\.com\//i.test(photoUrl)
+        ? photoUrl
+        : null;
+    if (photoUrl && !url) {
+      return NextResponse.json(
+        { error: "photoUrl must be a Vercel Blob URL" },
+        { status: 400 }
+      );
+    }
+
     const kid = await prisma.user.findUnique({ where: { id: kidId } });
     if (!kid || kid.familyId !== session.user.familyId || kid.role !== "KID") {
       return NextResponse.json({ error: "Invalid kid" }, { status: 400 });
@@ -36,7 +48,6 @@ export async function POST(req: Request) {
 
     const familyId = session.user.familyId!;
     const parentId = session.user.id;
-    const url = typeof photoUrl === "string" && photoUrl.trim() ? photoUrl : null;
 
     const pointEntry = await prisma.$transaction(async (tx) => {
       const entry = await tx.pointEntry.create({

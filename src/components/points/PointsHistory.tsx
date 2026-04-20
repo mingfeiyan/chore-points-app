@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 
 type PointEntry = {
   id: string;
@@ -95,24 +96,31 @@ export default function PointsHistory({ kidId }: PointsHistoryProps) {
                 </span>
               </td>
               <td className="px-6 py-4 text-sm text-gray-500">
-                <div className="flex items-center gap-3">
-                  {entry.photoUrl && (
-                    <img
+                {entry.photoUrl ? (
+                  <div className="flex items-center gap-3">
+                    <OptimizedImage
                       src={entry.photoUrl}
-                      alt={entry.note || "Reward"}
-                      className="w-12 h-12 object-cover rounded-lg shadow-sm shrink-0"
+                      alt={entry.note || t("photoAlt")}
+                      variant="small"
+                      className="w-12 h-12 rounded-lg shadow-sm shrink-0"
                     />
-                  )}
-                  <span>
-                    {entry.redemption ? (
-                      <span className="text-purple-600">
-                        {t("redeemed")} {entry.redemption.reward.title}
-                      </span>
-                    ) : (
-                      entry.note || "-"
-                    )}
+                    <span>
+                      {entry.redemption ? (
+                        <span className="text-purple-600">
+                          {t("redeemed")} {entry.redemption.reward.title}
+                        </span>
+                      ) : (
+                        entry.note || "-"
+                      )}
+                    </span>
+                  </div>
+                ) : entry.redemption ? (
+                  <span className="text-purple-600">
+                    {t("redeemed")} {entry.redemption.reward.title}
                   </span>
-                </div>
+                ) : (
+                  entry.note || "-"
+                )}
               </td>
             </tr>
           ))}

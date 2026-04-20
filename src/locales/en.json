@@ -145,7 +145,8 @@
     "note": "Note",
     "noEntries": "No point entries yet. Complete chores to start earning points!",
     "redeemed": "Redeemed:",
-    "custom": "Custom"
+    "custom": "Custom",
+    "photoAlt": "Reward photo"
   },
   "logReward": {
     "button": "Log reward",
