@@ -18,71 +18,24 @@ export default function KidHeaderBG({ children, compact }: KidHeaderBGProps) {
         position: "relative",
       }}
     >
-      {/* Large circle - top right */}
+      {/* Subtle sparkles only */}
       <svg
-        width="90"
-        height="90"
-        viewBox="0 0 90 90"
-        style={{
-          position: "absolute",
-          top: 0,
-          right: 0,
-          opacity: 0.15,
-          transform: "rotate(15deg)",
-        }}
+        width="10" height="10" viewBox="0 0 10 10"
+        className="absolute top-[60px] left-10 opacity-40"
       >
-        <circle cx="45" cy="45" r="45" fill="#FFE88A" />
+        <path d="M5 0L5.9 3.1L9 3.1L6.5 5L7.4 8.1L5 6.2L2.6 8.1L3.5 5L1 3.1L4.1 3.1Z" fill="white" />
       </svg>
-
-      {/* Medium circle - bottom left */}
       <svg
-        width="60"
-        height="60"
-        viewBox="0 0 60 60"
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          opacity: 0.12,
-        }}
+        width="8" height="8" viewBox="0 0 10 10"
+        className="absolute top-[85px] right-8 opacity-35"
       >
-        <circle cx="30" cy="30" r="30" fill="#FFE88A" />
+        <path d="M5 0L5.9 3.1L9 3.1L6.5 5L7.4 8.1L5 6.2L2.6 8.1L3.5 5L1 3.1L4.1 3.1Z" fill="white" />
       </svg>
-
-      {/* Small sparkle */}
       <svg
-        width="10"
-        height="10"
-        viewBox="0 0 10 10"
-        style={{
-          position: "absolute",
-          top: 60,
-          left: 40,
-          opacity: 0.5,
-        }}
+        width="6" height="6" viewBox="0 0 10 10"
+        className="absolute top-16 right-[40%] opacity-30"
       >
-        <path
-          d="M5 0L5.9 3.1L9 3.1L6.5 5L7.4 8.1L5 6.2L2.6 8.1L3.5 5L1 3.1L4.1 3.1Z"
-          fill="white"
-        />
-      </svg>
-
-      {/* Tiny sparkle */}
-      <svg
-        width="8"
-        height="8"
-        viewBox="0 0 10 10"
-        style={{
-          position: "absolute",
-          top: 90,
-          right: 30,
-          opacity: 0.55,
-        }}
-      >
-        <path
-          d="M5 0L5.9 3.1L9 3.1L6.5 5L7.4 8.1L5 6.2L2.6 8.1L3.5 5L1 3.1L4.1 3.1Z"
-          fill="white"
-        />
+        <path d="M5 0L5.9 3.1L9 3.1L6.5 5L7.4 8.1L5 6.2L2.6 8.1L3.5 5L1 3.1L4.1 3.1Z" fill="white" />
       </svg>
 
       {/* Content */}

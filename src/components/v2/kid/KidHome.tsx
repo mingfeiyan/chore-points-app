@@ -237,28 +237,13 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
       {/* Header */}
       <KidHeaderBG>
         {/* Greeting row */}
-        <div className="flex items-center justify-between mb-2">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wide opacity-80">
-              Hey {kidName} 👋
-            </p>
-            <p className="text-xl font-extrabold">
-              Let&apos;s earn some gems!
-            </p>
-          </div>
-          <div
-            className="flex items-center justify-center rounded-full"
-            style={{
-              width: 36,
-              height: 36,
-              background: "rgba(255,255,255,0.2)",
-              border: "2px solid rgba(255,255,255,0.4)",
-              fontSize: 16,
-              fontWeight: 700,
-            }}
-          >
-            {kidName.charAt(0).toUpperCase()}
-          </div>
+        <div className="mb-2">
+          <p className="text-xs font-bold uppercase tracking-wide opacity-80">
+            Hey {kidName} 👋
+          </p>
+          <p className="text-xl font-extrabold">
+            Let&apos;s earn some gems!
+          </p>
         </div>
 
         {/* Coin Counter */}
