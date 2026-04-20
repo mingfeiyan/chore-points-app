@@ -93,7 +93,6 @@ export default function ParentCalendar() {
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
   const [kids, setKids] = useState<Kid[]>([]);
-  const [entries, setEntries] = useState<PointEntry[]>([]);
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
   const [calendarSettings, setCalendarSettings] = useState<CalendarSettings | null>(null);
   const [loading, setLoading] = useState(true);
@@ -135,20 +134,6 @@ export default function ParentCalendar() {
         const kidsData = await kidsRes.json();
         if (!kidsRes.ok || !Array.isArray(kidsData.kids)) return;
         setKids(kidsData.kids);
-
-        const allEntries: PointEntry[] = [];
-        await Promise.all(
-          kidsData.kids.map(async (kid: Kid) => {
-            const res = await fetch(`/api/points?kidId=${kid.id}`);
-            const data = await res.json();
-            if (data.entries) {
-              allEntries.push(
-                ...data.entries.map((e: PointEntry) => ({ ...e, kidId: kid.id }))
-              );
-            }
-          })
-        );
-        setEntries(allEntries);
       } catch (err) {
         console.error("Failed to load data:", err);
       } finally {
@@ -215,15 +200,7 @@ export default function ParentCalendar() {
   // Current month
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(viewYear, viewMonth, d);
-    const dayEntries = entries
-      .filter((e) => {
-        const entryDate = new Date(e.date || e.createdAt);
-        return isSameDay(entryDate, date);
-      })
-      .map((e) => {
-        const kid = kids.find((k) => k.id === e.kidId);
-        return { ...e, kidName: kid?.name || kid?.email || "Unknown", kidId: e.kidId || "" };
-      });
+    const dayEntries: Array<PointEntry & { kidName: string; kidId: string }> = [];
 
     const dateStr = toLocalDateString(date);
     const dayEvents = calendarEvents.filter((ev) => {
@@ -313,7 +290,7 @@ export default function ParentCalendar() {
             {/* Day cells */}
             <div className="grid grid-cols-7">
               {displayCells.map((cell, i) => {
-                const hasContent = cell.entries.length > 0 || cell.events.length > 0;
+                const hasContent = cell.events.length > 0;
                 return (
                   <div
                     key={i}
@@ -356,29 +333,10 @@ export default function ParentCalendar() {
                       );
                     })}
 
-                    {/* Point entries */}
-                    {cell.entries.slice(0, Math.max(0, 2 - cell.events.length)).map((entry) => {
-                      const colorIdx = kidColorMap[entry.kidId] ?? 0;
-                      const colors = KID_COLORS[colorIdx] || KID_COLORS[0];
-                      return (
-                        <div
-                          key={entry.id}
-                          className="mb-0.5 truncate rounded-sm border-l-2 px-1 py-px text-[9px] leading-tight font-medium"
-                          style={{
-                            backgroundColor: colors.bg,
-                            borderLeftColor: colors.border,
-                            color: colors.text,
-                          }}
-                        >
-                          {entry.chore?.title || entry.note || `+${entry.points}`}
-                        </div>
-                      );
-                    })}
-
                     {/* Overflow count */}
-                    {(cell.entries.length + cell.events.length) > 2 && (
+                    {cell.events.length > 2 && (
                       <p className="text-[9px] text-[#857d68] text-center mt-0.5">
-                        +{cell.entries.length + cell.events.length - 2} more
+                        +{cell.events.length - 2} more
                       </p>
                     )}
                   </div>
@@ -450,25 +408,7 @@ export default function ParentCalendar() {
                   </div>
                 );
               })}
-              {selectedDay.entries.map((entry) => {
-                const colorIdx = kidColorMap[entry.kidId] ?? 0;
-                const colors = KID_COLORS[colorIdx] || KID_COLORS[0];
-                return (
-                  <div
-                    key={entry.id}
-                    className="rounded-lg px-3 py-2"
-                    style={{ backgroundColor: colors.bg, borderLeft: `3px solid ${colors.border}` }}
-                  >
-                    <p className="text-sm font-medium" style={{ color: colors.text }}>
-                      {entry.chore?.title || entry.note || "Points"}
-                    </p>
-                    <p className="text-xs mt-0.5" style={{ color: colors.text, opacity: 0.7 }}>
-                      {entry.kidName} &middot; +{entry.points} pts
-                    </p>
-                  </div>
-                );
-              })}
-              {selectedDay.events.length === 0 && selectedDay.entries.length === 0 && (
+              {selectedDay.events.length === 0 && (
                 <p className="text-sm text-[#857d68] text-center py-4">No events this day</p>
               )}
             </div>
