@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useNewDesign } from "@/hooks/useNewDesign";
 
 type Kid = {
   id: string;
@@ -17,6 +18,31 @@ type Props = {
 export default function LogRewardModal({ onClose, onSuccess }: Props) {
   const t = useTranslations("logReward");
   const tCommon = useTranslations("common");
+  const { isNewDesign } = useNewDesign();
+
+  const theme = isNewDesign ? {
+    title: "text-[#2f2a1f]",
+    label: "text-[#2f2a1f]",
+    muted: "text-[#857d68]",
+    close: "text-[#857d68] hover:text-[#2f2a1f]",
+    input: "border-[rgba(68,55,32,0.14)] focus:ring-[#6b8e4e] focus:border-[#6b8e4e]",
+    errorBg: "bg-[rgba(197,84,61,0.08)] border border-[rgba(197,84,61,0.2)] text-[#c5543d]",
+    cancelBtn: "border-[rgba(68,55,32,0.14)] text-[#2f2a1f] hover:bg-[#F9F4E8]",
+    submitBtn: "bg-[#4a6a32] text-white hover:bg-[#3d5a2a]",
+    photoBorder: "border-[rgba(68,55,32,0.14)] hover:border-[#4a6a32] hover:bg-[rgba(107,142,78,0.06)]",
+    photoText: "text-[#857d68]",
+  } : {
+    title: "text-gray-900",
+    label: "text-gray-700",
+    muted: "text-gray-500",
+    close: "text-gray-400 hover:text-gray-600",
+    input: "border-gray-300 focus:ring-blue-500 focus:border-blue-500",
+    errorBg: "bg-red-50 border border-red-200 text-red-700",
+    cancelBtn: "border-gray-300 text-gray-700 hover:bg-gray-50",
+    submitBtn: "bg-blue-600 text-white hover:bg-blue-700",
+    photoBorder: "border-gray-300 hover:border-blue-500 hover:bg-blue-50",
+    photoText: "text-gray-500",
+  };
 
   const [kids, setKids] = useState<Kid[]>([]);
   const [kidId, setKidId] = useState("");
@@ -123,10 +149,10 @@ export default function LogRewardModal({ onClose, onSuccess }: Props) {
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-auto">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-900">{t("title")}</h2>
+          <h2 className={`text-xl font-bold ${theme.title}`}>{t("title")}</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className={theme.close}
             aria-label={tCommon("cancel")}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -137,20 +163,20 @@ export default function LogRewardModal({ onClose, onSuccess }: Props) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            <div className={`${theme.errorBg} px-4 py-3 rounded`}>
               {error}
             </div>
           )}
 
           {kids.length > 1 && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium ${theme.label} mb-1">
                 {t("kid")}
               </label>
               <select
                 value={kidId}
                 onChange={(e) => setKidId(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border ${theme.input} rounded-md shadow-sm focus:outline-none"
                 required
               >
                 <option value="">{t("selectKid")}</option>
@@ -164,7 +190,7 @@ export default function LogRewardModal({ onClose, onSuccess }: Props) {
           )}
 
           <div>
-            <label htmlFor="note" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="note" className="block text-sm font-medium ${theme.label} mb-1">
               {t("note")}
             </label>
             <input
@@ -174,14 +200,14 @@ export default function LogRewardModal({ onClose, onSuccess }: Props) {
               onChange={(e) => setNote(e.target.value)}
               placeholder={t("notePlaceholder")}
               maxLength={100}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border ${theme.input} rounded-md shadow-sm focus:outline-none"
               required
               autoFocus
             />
           </div>
 
           <div>
-            <label htmlFor="points" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="points" className="block text-sm font-medium ${theme.label} mb-1">
               {t("points")}
             </label>
             <input
@@ -193,13 +219,13 @@ export default function LogRewardModal({ onClose, onSuccess }: Props) {
               min={1}
               max={999}
               placeholder="10"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border ${theme.input} rounded-md shadow-sm focus:outline-none"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium ${theme.label} mb-1">
               {t("photo")}
             </label>
             {photoUrl ? (
@@ -219,13 +245,13 @@ export default function LogRewardModal({ onClose, onSuccess }: Props) {
                 </button>
               </div>
             ) : (
-              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors">
+              <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed ${theme.photoBorder} rounded-lg cursor-pointer transition-colors`}>
                 {uploading ? (
-                  <span className="text-sm text-gray-500">{t("uploading")}</span>
+                  <span className="text-sm ${theme.photoText}">{t("uploading")}</span>
                 ) : (
                   <>
                     <span className="text-3xl mb-1">📸</span>
-                    <span className="text-sm text-gray-500">{t("photoHint")}</span>
+                    <span className="text-sm ${theme.photoText}">{t("photoHint")}</span>
                   </>
                 )}
                 <input
@@ -245,14 +271,14 @@ export default function LogRewardModal({ onClose, onSuccess }: Props) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium"
+              className={`flex-1 px-4 py-2 border ${theme.cancelBtn} rounded-md font-medium`}
             >
               {tCommon("cancel")}
             </button>
             <button
               type="submit"
               disabled={submitting || uploading}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className={`flex-1 px-4 py-2 ${theme.submitBtn} rounded-md font-medium disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               {submitting ? tCommon("saving") : t("submit")}
             </button>

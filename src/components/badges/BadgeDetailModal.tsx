@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import BadgeIcon from "./BadgeIcon";
 import { BADGE_LEVELS } from "@/lib/badges";
+import { useNewDesign } from "@/hooks/useNewDesign";
 
 type ChoreBadge = {
   id: string;
@@ -87,6 +88,39 @@ export default function BadgeDetailModal(props: BadgeDetailModalProps) {
   const router = useRouter();
   const [regenerating, setRegenerating] = useState(false);
   const isParent = session?.user?.role === "PARENT";
+  const { isNewDesign } = useNewDesign();
+
+  const theme = isNewDesign ? {
+    close: "text-[#857d68] hover:text-[#2f2a1f]",
+    title: "text-[#2f2a1f]",
+    titleUnearned: "text-[#857d68]",
+    desc: "text-[#857d68]",
+    descUnearned: "text-[#857d68]",
+    earnedBg: "text-[#4a6a32] bg-[rgba(107,142,78,0.1)]",
+    unearnedBg: "text-[#857d68] bg-[rgba(68,55,32,0.06)]",
+    dateBg: "text-[#857d68] bg-[rgba(68,55,32,0.06)]",
+    positive: "text-[#4a6a32]",
+    levelText: "text-[#2f2a1f]",
+    progress: "text-[#857d68]",
+    maxLevel: "text-[#6b8e4e] bg-[rgba(107,142,78,0.1)]",
+    completedText: "text-[#857d68]",
+    regenBtn: "bg-[#4a6a32] text-white hover:bg-[#3d5a2a]",
+  } : {
+    close: "text-gray-400 hover:text-gray-600",
+    title: "text-gray-900",
+    titleUnearned: "text-gray-400",
+    desc: "text-gray-600",
+    descUnearned: "text-gray-400",
+    earnedBg: "text-green-600 bg-green-50",
+    unearnedBg: "text-gray-400 bg-gray-100",
+    dateBg: "text-gray-600 bg-gray-50",
+    positive: "text-green-600",
+    levelText: "text-gray-700",
+    progress: "text-gray-500",
+    maxLevel: "text-yellow-600 bg-yellow-50",
+    completedText: "text-gray-500",
+    regenBtn: "bg-purple-600 text-white hover:bg-purple-700",
+  };
 
   const handleRegenerate = async (badgeId: string) => {
     setRegenerating(true);
@@ -146,7 +180,7 @@ export default function BadgeDetailModal(props: BadgeDetailModalProps) {
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+          className={`absolute top-4 right-4 ${theme.close} transition-colors`}
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -170,27 +204,27 @@ export default function BadgeDetailModal(props: BadgeDetailModalProps) {
                 </div>
               )}
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
+            <h2 className={`text-xl font-bold ${theme.title} mb-2`}>
               {props.badge.name}
             </h2>
             {props.badge.description && (
-              <p className="text-sm text-gray-600 mb-4">
+              <p className={`text-sm ${theme.desc} mb-4`}>
                 {props.badge.description}
               </p>
             )}
             {typeof props.badge.points === "number" && (
-              <div className="mb-3 text-sm font-semibold text-green-600">
+              <div className={`mb-3 text-sm font-semibold ${theme.positive}`}>
                 +{props.badge.points} pts
               </div>
             )}
-            <div className="flex items-center gap-2 text-gray-600 bg-gray-50 px-4 py-2 rounded-full mb-3">
+            <div className={`flex items-center gap-2 ${theme.dateBg} px-4 py-2 rounded-full mb-3`}>
               <span className="text-sm">{formatDate(props.badge.earnedAt)}</span>
             </div>
             {isParent && (
               <button
                 onClick={() => handleRegenerate(props.badge.id)}
                 disabled={regenerating}
-                className="mt-2 px-4 py-2 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className={`mt-2 px-4 py-2 text-sm ${theme.regenBtn} rounded-lg disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 {regenerating
                   ? t("regenerating")
@@ -215,13 +249,13 @@ export default function BadgeDetailModal(props: BadgeDetailModalProps) {
             </div>
 
             {/* Badge Name */}
-            <h2 className={`text-xl font-bold mb-2 ${props.earned ? "text-gray-900" : "text-gray-400"}`}>
+            <h2 className={`text-xl font-bold mb-2 ${props.earned ? theme.title : theme.titleUnearned}`}>
               {locale === "zh" ? props.badge.nameZh : props.badge.name}
             </h2>
 
             {/* Description */}
             {(props.badge.description || props.badge.descriptionZh) && (
-              <p className={`text-sm mb-4 ${props.earned ? "text-gray-600" : "text-gray-400"}`}>
+              <p className={`text-sm mb-4 ${props.earned ? theme.desc : theme.descUnearned}`}>
                 {locale === "zh"
                   ? props.badge.descriptionZh || props.badge.description
                   : props.badge.description || props.badge.descriptionZh}
@@ -230,7 +264,7 @@ export default function BadgeDetailModal(props: BadgeDetailModalProps) {
 
             {/* Earned Status */}
             {props.earned && props.earnedBadge ? (
-              <div className="flex items-center gap-2 text-green-600 bg-green-50 px-4 py-2 rounded-full">
+              <div className={`flex items-center gap-2 ${theme.earnedBg} px-4 py-2 rounded-full`}>
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
@@ -239,7 +273,7 @@ export default function BadgeDetailModal(props: BadgeDetailModalProps) {
                 </span>
               </div>
             ) : (
-              <div className="flex items-center gap-2 text-gray-400 bg-gray-100 px-4 py-2 rounded-full">
+              <div className={`flex items-center gap-2 ${theme.unearnedBg} px-4 py-2 rounded-full`}>
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                 </svg>
@@ -270,14 +304,14 @@ export default function BadgeDetailModal(props: BadgeDetailModalProps) {
             </div>
 
             {/* Badge Name */}
-            <h2 className="text-xl font-bold text-gray-900 mb-1">
+            <h2 className={`text-xl font-bold ${theme.title} mb-1`}>
               {props.badge.chore.title}
             </h2>
 
             {/* Level */}
             <div className="flex items-center gap-2 mb-4">
               <span className="text-2xl">{props.badge.levelIcon}</span>
-              <span className="text-lg font-medium text-gray-700">
+              <span className={`text-lg font-medium ${theme.levelText}`}>
                 {props.badge.levelName}
               </span>
             </div>
@@ -285,7 +319,7 @@ export default function BadgeDetailModal(props: BadgeDetailModalProps) {
             {/* Progress to next level */}
             {props.badge.nextLevelAt && (
               <div className="w-full mb-4">
-                <div className="flex justify-between text-xs text-gray-500 mb-1">
+                <div className="flex justify-between text-xs ${theme.progress} mb-1">
                   <span>{t("progress")}</span>
                   <span>
                     {props.badge.count}/{props.badge.nextLevelAt} {locale === "zh" ? "次" : ""}
@@ -300,7 +334,7 @@ export default function BadgeDetailModal(props: BadgeDetailModalProps) {
                 {(() => {
                   const nextLevel = getNextLevel(props.badge.level);
                   return nextLevel ? (
-                    <div className="text-xs text-gray-500 mt-1">
+                    <div className={`text-xs ${theme.progress} mt-1`}>
                       {locale === "zh"
                         ? `还需 ${props.badge.nextLevelAt - props.badge.count} 次升级到 ${nextLevel.name}`
                         : `${props.badge.nextLevelAt - props.badge.count} more to ${nextLevel.name}`}
@@ -312,14 +346,14 @@ export default function BadgeDetailModal(props: BadgeDetailModalProps) {
 
             {/* Max level indicator */}
             {!props.badge.nextLevelAt && (
-              <div className="flex items-center gap-2 text-yellow-600 bg-yellow-50 px-4 py-2 rounded-full mb-4">
+              <div className={`flex items-center gap-2 ${theme.maxLevel} px-4 py-2 rounded-full mb-4`}>
                 <span className="text-lg">⭐</span>
                 <span className="text-sm font-medium">{t("maxLevel")}</span>
               </div>
             )}
 
             {/* Times completed */}
-            <div className="text-sm text-gray-500">
+            <div className={`text-sm ${theme.completedText}`}>
               {locale === "zh"
                 ? `已完成 ${props.badge.count} 次`
                 : `Completed ${props.badge.count} ${props.badge.count === 1 ? "time" : "times"}`}

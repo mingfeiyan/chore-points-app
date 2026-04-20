@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { useNewDesign } from "@/hooks/useNewDesign";
 
 type Chore = {
   id: string;
@@ -84,6 +85,51 @@ export default function PointEntryForm({
   const t = useTranslations("parent");
   const tCommon = useTranslations("common");
   const tPhotos = useTranslations("photos");
+  const { isNewDesign } = useNewDesign();
+
+  const theme = isNewDesign ? {
+    title: "text-[#2f2a1f]",
+    label: "text-[#2f2a1f]",
+    muted: "text-[#857d68]",
+    close: "text-[#857d68] hover:text-[#2f2a1f]",
+    input: "border-[rgba(68,55,32,0.14)] focus:ring-[#6b8e4e] focus:border-[#6b8e4e]",
+    checkbox: "border-[rgba(68,55,32,0.14)] text-[#6b8e4e] focus:ring-[#6b8e4e]",
+    errorBg: "bg-[rgba(197,84,61,0.08)] border border-[rgba(197,84,61,0.2)] text-[#c5543d]",
+    cancelBtn: "border-[rgba(68,55,32,0.14)] text-[#2f2a1f] hover:bg-[#F9F4E8]",
+    choreBtn: "bg-[#4a6a32] hover:bg-[#3d5a2a]",
+    customBtn: "bg-[#6b8e4e] hover:bg-[#4a6a32]",
+    choreBorder: "border-[rgba(68,55,32,0.14)] hover:border-[#4a6a32] hover:bg-[rgba(107,142,78,0.06)]",
+    customBorder: "border-[rgba(68,55,32,0.14)] hover:border-[#6b8e4e] hover:bg-[rgba(107,142,78,0.06)]",
+    choreIcon: "bg-[rgba(107,142,78,0.15)]",
+    choreIconSvg: "text-[#4a6a32]",
+    customIcon: "bg-[rgba(107,142,78,0.15)]",
+    customIconSvg: "text-[#6b8e4e]",
+    infoBg: "bg-[rgba(107,142,78,0.08)] border border-[rgba(107,142,78,0.2)]",
+    infoText: "text-[#4a6a32]",
+    photoBorder: "border-[rgba(68,55,32,0.14)] hover:border-[#4a6a32] hover:bg-[rgba(107,142,78,0.06)]",
+    photoText: "text-[#857d68]",
+  } : {
+    title: "text-gray-900",
+    label: "text-gray-700",
+    muted: "text-gray-500",
+    close: "${theme.muted} hover:text-gray-600",
+    input: "border-gray-300 focus:ring-blue-500 focus:border-blue-500",
+    checkbox: "border-gray-300 text-blue-600 focus:ring-blue-500",
+    errorBg: "bg-red-50 border border-red-200 text-red-700",
+    cancelBtn: "border-gray-300 text-gray-700 hover:bg-gray-50",
+    choreBtn: "bg-blue-600 hover:bg-blue-700",
+    customBtn: "bg-green-600 hover:bg-green-700",
+    choreBorder: "border-gray-300 hover:border-blue-500 hover:bg-blue-50",
+    customBorder: "border-gray-300 hover:border-green-500 hover:bg-green-50",
+    choreIcon: "bg-blue-100",
+    choreIconSvg: "text-blue-600",
+    customIcon: "bg-green-100",
+    customIconSvg: "text-green-600",
+    infoBg: "bg-blue-50 border border-blue-200",
+    infoText: "text-blue-700",
+    photoBorder: "border-gray-300 hover:border-blue-500 hover:bg-blue-50",
+    photoText: "text-gray-500",
+  };
 
   useEffect(() => {
     fetchChores();
@@ -226,10 +272,10 @@ export default function PointEntryForm({
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg p-6 w-full max-w-md">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-gray-900">{t("awardPoints")}</h2>
+            <h2 className={`text-xl font-bold ${theme.title}`}>{t("awardPoints")}</h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
+              className={theme.close}
             >
               <svg
                 className="w-6 h-6"
@@ -247,16 +293,16 @@ export default function PointEntryForm({
             </button>
           </div>
 
-          <p className="text-gray-600 mb-6">{t("howToAwardPoints")}</p>
+          <p className={`${theme.muted} mb-6`}>{t("howToAwardPoints")}</p>
 
           <div className="space-y-3">
             <button
               onClick={() => setMode("chore")}
-              className="w-full flex items-center p-4 border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors text-left"
+              className={`w-full flex items-center p-4 border-2 ${theme.choreBorder} rounded-lg transition-colors text-left`}
             >
-              <div className="flex-shrink-0 bg-blue-100 rounded-full p-3 mr-4">
+              <div className={`flex-shrink-0 ${theme.choreIcon} rounded-full p-3 mr-4`}>
                 <svg
-                  className="w-6 h-6 text-blue-600"
+                  className={`w-6 h-6 ${theme.choreIconSvg}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -270,8 +316,8 @@ export default function PointEntryForm({
                 </svg>
               </div>
               <div>
-                <div className="font-medium text-gray-900">{t("completedChore")}</div>
-                <div className="text-sm text-gray-500">
+                <div className={`font-medium ${theme.title}`}>{t("completedChore")}</div>
+                <div className={`text-sm ${theme.muted}`}>
                   {t("completedChoreDesc")}
                 </div>
               </div>
@@ -279,11 +325,11 @@ export default function PointEntryForm({
 
             <button
               onClick={() => setMode("custom")}
-              className="w-full flex items-center p-4 border-2 border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors text-left"
+              className={`w-full flex items-center p-4 border-2 ${theme.customBorder} rounded-lg transition-colors text-left`}
             >
-              <div className="flex-shrink-0 bg-green-100 rounded-full p-3 mr-4">
+              <div className={`flex-shrink-0 ${theme.customIcon} rounded-full p-3 mr-4`}>
                 <svg
-                  className="w-6 h-6 text-green-600"
+                  className={`w-6 h-6 ${theme.customIconSvg}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -297,8 +343,8 @@ export default function PointEntryForm({
                 </svg>
               </div>
               <div>
-                <div className="font-medium text-gray-900">{t("customAward")}</div>
-                <div className="text-sm text-gray-500">
+                <div className={`font-medium ${theme.title}`}>{t("customAward")}</div>
+                <div className={`text-sm ${theme.muted}`}>
                   {t("customAwardDesc")}
                 </div>
               </div>
@@ -318,7 +364,7 @@ export default function PointEntryForm({
             {!entry && (
               <button
                 onClick={() => setMode("choose")}
-                className="mr-2 text-gray-400 hover:text-gray-600"
+                className={`mr-2 ${theme.close}`}
               >
                 <svg
                   className="w-5 h-5"
@@ -335,7 +381,7 @@ export default function PointEntryForm({
                 </svg>
               </button>
             )}
-            <h2 className="text-xl font-bold text-gray-900">
+            <h2 className={`text-xl font-bold ${theme.title}`}>
               {entry
                 ? t("editPoints")
                 : mode === "chore"
@@ -345,7 +391,7 @@ export default function PointEntryForm({
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className={theme.close}
           >
             <svg
               className="w-6 h-6"
@@ -365,7 +411,7 @@ export default function PointEntryForm({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            <div className={`${theme.errorBg} px-4 py-3 rounded`}>
               {error}
             </div>
           )}
@@ -375,7 +421,7 @@ export default function PointEntryForm({
             <div>
               <label
                 htmlFor="chore"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium ${theme.label} mb-1"
               >
                 {t("selectChore")}
               </label>
@@ -384,7 +430,7 @@ export default function PointEntryForm({
                 value={choreId}
                 onChange={(e) => handleChoreSelect(e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border ${theme.input} rounded-md shadow-sm focus:outline-none"
               >
                 <option value="">{t("chooseChore")}</option>
                 {chores.map((chore) => (
@@ -395,10 +441,10 @@ export default function PointEntryForm({
               </select>
 
               {selectedChore && (
-                <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                <div className={`mt-3 p-3 ${theme.infoBg} rounded-md`}>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-blue-700">{t("pointsToAward")}</span>
-                    <span className="text-lg font-bold text-blue-700">
+                    <span className={`text-sm ${theme.infoText}`}>{t("pointsToAward")}</span>
+                    <span className={`text-lg font-bold ${theme.infoText}`}>
                       +{selectedChore.defaultPoints}
                     </span>
                   </div>
@@ -406,7 +452,7 @@ export default function PointEntryForm({
               )}
 
               {chores.length === 0 && (
-                <p className="mt-2 text-sm text-gray-500">
+                <p className="mt-2 text-sm ${theme.muted}">
                   {t("noChoresDefinedYet")}
                 </p>
               )}
@@ -416,7 +462,7 @@ export default function PointEntryForm({
             <div>
               <label
                 htmlFor="points"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium ${theme.label} mb-1"
               >
                 {tCommon("points")}
               </label>
@@ -427,9 +473,9 @@ export default function PointEntryForm({
                 value={customPoints}
                 onChange={(e) => setCustomPoints(e.target.value)}
                 placeholder={t("pointsPlaceholder")}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border ${theme.input} rounded-md shadow-sm focus:outline-none"
               />
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm ${theme.muted}">
                 {t("pointsHint")}
               </p>
             </div>
@@ -438,7 +484,7 @@ export default function PointEntryForm({
           <div>
             <label
               htmlFor="note"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium ${theme.label} mb-1"
             >
               {t("note")} {mode === "custom" && <span className="text-red-500">*</span>}
             </label>
@@ -453,7 +499,7 @@ export default function PointEntryForm({
                   ? t("noteOptionalPlaceholder")
                   : t("noteRequiredPlaceholder")
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border ${theme.input} rounded-md shadow-sm focus:outline-none"
             />
           </div>
 
@@ -463,9 +509,9 @@ export default function PointEntryForm({
                 type="checkbox"
                 checked={generateBadge}
                 onChange={(e) => setGenerateBadge(e.target.checked)}
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className={`mt-1 h-4 w-4 rounded ${theme.checkbox}`}
               />
-              <span className="text-sm text-gray-700">
+              <span className={`text-sm ${theme.label}`}>
                 <span className="font-medium">🎨 {t("generateBadge")}</span>
                 <span className="block text-xs text-gray-500">
                   {t("generateBadgeHint")}
@@ -477,7 +523,7 @@ export default function PointEntryForm({
           <div>
             <label
               htmlFor="date"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium ${theme.label} mb-1"
             >
               {t("date")}
             </label>
@@ -487,14 +533,14 @@ export default function PointEntryForm({
               required
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border ${theme.input} rounded-md shadow-sm focus:outline-none"
             />
           </div>
 
           {/* Photo Upload */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {tPhotos("photo")} <span className="text-gray-400">({tPhotos("optional")})</span>
+            <label className="block text-sm font-medium ${theme.label} mb-1">
+              {tPhotos("photo")} <span className="${theme.muted}">({tPhotos("optional")})</span>
             </label>
 
             {photoPreview ? (
@@ -513,9 +559,9 @@ export default function PointEntryForm({
                 </button>
               </div>
             ) : (
-              <label className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors">
+              <label className={`flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed ${theme.photoBorder} rounded-lg cursor-pointer transition-colors`}>
                 <svg
-                  className="w-8 h-8 text-gray-400"
+                  className="w-8 h-8 ${theme.muted}"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -527,7 +573,7 @@ export default function PointEntryForm({
                     d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                   />
                 </svg>
-                <span className="mt-1 text-sm text-gray-500">{tPhotos("addPhoto")}</span>
+                <span className="mt-1 text-sm ${theme.muted}">{tPhotos("addPhoto")}</span>
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/gif,image/webp"
@@ -543,7 +589,7 @@ export default function PointEntryForm({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium"
+              className={`flex-1 px-4 py-2 border ${theme.cancelBtn} rounded-md font-medium`}
             >
               {tCommon("cancel")}
             </button>
@@ -552,8 +598,8 @@ export default function PointEntryForm({
               disabled={loading || uploading || (mode === "chore" && !selectedChore)}
               className={`flex-1 px-4 py-2 text-white rounded-md font-medium disabled:opacity-50 disabled:cursor-not-allowed ${
                 mode === "chore"
-                  ? "bg-blue-600 hover:bg-blue-700"
-                  : "bg-green-600 hover:bg-green-700"
+                  ? theme.choreBtn
+                  : theme.customBtn
               }`}
             >
               {uploading

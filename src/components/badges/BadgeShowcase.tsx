@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { BADGE_LEVELS } from "@/lib/badges";
 import BadgeIcon from "./BadgeIcon";
 import BadgeDetailModal from "./BadgeDetailModal";
+import { useNewDesign } from "@/hooks/useNewDesign";
 
 type Badge = {
   id: string;
@@ -75,6 +76,21 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
   const [selectedBadge, setSelectedBadge] = useState<SelectedBadge | null>(null);
   const t = useTranslations("badges");
   const locale = useLocale();
+  const { isNewDesign } = useNewDesign();
+
+  const theme = isNewDesign ? {
+    skeleton: "bg-[rgba(68,55,32,0.06)]",
+    nameEarned: "text-[#2f2a1f]",
+    nameUnearned: "text-[#857d68]",
+    choreName: "text-[#2f2a1f]",
+    customName: "text-[#2f2a1f]",
+  } : {
+    skeleton: "bg-gray-100",
+    nameEarned: "text-gray-700",
+    nameUnearned: "text-gray-400",
+    choreName: "text-gray-700",
+    customName: "text-gray-700",
+  };
 
   useEffect(() => {
     fetchBadges();
@@ -113,8 +129,8 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
       <div className="grid grid-cols-4 gap-4">
         {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
           <div key={i} className="flex flex-col items-center">
-            <div className="w-20 h-20 bg-gray-100 rounded-lg animate-pulse" />
-            <div className="w-12 h-3 bg-gray-100 rounded mt-2 animate-pulse" />
+            <div className={`w-20 h-20 ${theme.skeleton} rounded-lg animate-pulse`} />
+            <div className={`w-12 h-3 ${theme.skeleton} rounded mt-2 animate-pulse`} />
           </div>
         ))}
       </div>
@@ -148,7 +164,7 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
                 />
               </div>
               {/* Name */}
-              <div className={`text-xs text-center mt-2 font-medium leading-tight ${earned ? "text-gray-700" : "text-gray-400"}`}>
+              <div className={`text-xs text-center mt-2 font-medium leading-tight ${earned ? theme.nameEarned : theme.nameUnearned}`}>
                 {locale === "zh" ? badge.nameZh : badge.name}
               </div>
             </button>
@@ -179,7 +195,7 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
                   />
                 )}
               </div>
-              <div className="text-xs text-center mt-2 font-medium text-gray-700 leading-tight line-clamp-2">
+              <div className={`text-xs text-center mt-2 font-medium ${theme.customName} leading-tight line-clamp-2`}>
                 {badge.name}
               </div>
             </button>
@@ -213,7 +229,7 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
                 )}
               </div>
               {/* Name */}
-              <div className="text-xs text-center mt-2 font-medium text-gray-700 leading-tight">
+              <div className={`text-xs text-center mt-2 font-medium ${theme.choreName} leading-tight`}>
                 {badge.chore.title}
               </div>
             </button>

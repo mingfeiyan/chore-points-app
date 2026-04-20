@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import OptimizedImage from "@/components/ui/OptimizedImage";
+import { useNewDesign } from "@/hooks/useNewDesign";
 
 type PhotoEntry = {
   id: string;
@@ -22,6 +23,28 @@ type PhotoEntry = {
 export default function PhotoCarousel() {
   const t = useTranslations("photos");
   const tCommon = useTranslations("common");
+  const { isNewDesign } = useNewDesign();
+
+  const theme = isNewDesign ? {
+    card: "bg-white rounded-[14px] border border-[rgba(68,55,32,0.14)]",
+    title: "text-[#2f2a1f]",
+    link: "text-[#4a6a32] hover:text-[#3d5a2a]",
+    skeleton: "bg-[rgba(68,55,32,0.08)]",
+    emptyBg: "bg-[#F9F4E8]",
+    emptyIcon: "text-[rgba(68,55,32,0.2)]",
+    emptyText: "text-[#857d68]",
+    dateText: "text-[#857d68]",
+  } : {
+    card: "bg-white rounded-lg shadow",
+    title: "text-gray-900",
+    link: "text-blue-600 hover:text-blue-700",
+    skeleton: "bg-gray-200",
+    emptyBg: "bg-gray-100",
+    emptyIcon: "text-gray-300",
+    emptyText: "text-gray-400",
+    dateText: "text-gray-400",
+  };
+
   const [photos, setPhotos] = useState<PhotoEntry[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -70,10 +93,10 @@ export default function PhotoCarousel() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-4">
+      <div className={`${theme.card} p-4`}>
         <div className="animate-pulse">
-          <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
-          <div className="aspect-video bg-gray-200 rounded"></div>
+          <div className={`h-4 ${theme.skeleton} rounded w-1/4 mb-4`}></div>
+          <div className={`aspect-video ${theme.skeleton} rounded`}></div>
         </div>
       </div>
     );
@@ -81,19 +104,19 @@ export default function PhotoCarousel() {
 
   if (photos.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow p-4">
+      <div className={`${theme.card} p-4`}>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-semibold text-gray-900">{t("pageTitle")}</h2>
+          <h2 className={`text-lg font-semibold ${theme.title}`}>{t("pageTitle")}</h2>
           <Link
             href="/gallery"
-            className="text-sm text-blue-600 hover:text-blue-700"
+            className={`text-sm ${theme.link}`}
           >
             {t("pageTitle")}
           </Link>
         </div>
-        <div className="aspect-video bg-gray-100 rounded-lg flex flex-col items-center justify-center">
+        <div className={`aspect-video ${theme.emptyBg} rounded-lg flex flex-col items-center justify-center`}>
           <svg
-            className="w-12 h-12 text-gray-300 mb-2"
+            className={`w-12 h-12 ${theme.emptyIcon} mb-2`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -105,7 +128,7 @@ export default function PhotoCarousel() {
               d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
             />
           </svg>
-          <p className="text-sm text-gray-400">{t("noPhotosYet")}</p>
+          <p className={`text-sm ${theme.emptyText}`}>{t("noPhotosYet")}</p>
         </div>
       </div>
     );
@@ -114,12 +137,12 @@ export default function PhotoCarousel() {
   const currentPhoto = photos[currentIndex];
 
   return (
-    <div className="bg-white rounded-lg shadow p-4">
+    <div className={`${theme.card} p-4`}>
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-lg font-semibold text-gray-900">{t("pageTitle")}</h2>
+        <h2 className={`text-lg font-semibold ${theme.title}`}>{t("pageTitle")}</h2>
         <Link
           href="/gallery"
-          className="text-sm text-blue-600 hover:text-blue-700"
+          className={`text-sm ${theme.link}`}
         >
           View All ({photos.length})
         </Link>
@@ -202,7 +225,7 @@ export default function PhotoCarousel() {
       </div>
 
       {/* Date */}
-      <p className="text-xs text-gray-400 mt-2 text-right">
+      <p className={`text-xs ${theme.dateText} mt-2 text-right`}>
         {new Date(currentPhoto.date).toLocaleDateString()}
       </p>
     </div>

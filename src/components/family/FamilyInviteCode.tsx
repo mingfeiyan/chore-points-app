@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useNewDesign } from "@/hooks/useNewDesign";
 
 export default function FamilyInviteCode({ inviteCode: initialCode }: { inviteCode: string }) {
   const router = useRouter();
@@ -11,6 +12,25 @@ export default function FamilyInviteCode({ inviteCode: initialCode }: { inviteCo
   const [showCode, setShowCode] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const t = useTranslations("family");
+  const { isNewDesign } = useNewDesign();
+
+  const theme = isNewDesign ? {
+    muted: "text-[#857d68]",
+    codeBg: "bg-[#F9F4E8]",
+    showLink: "text-[#4a6a32] hover:text-[#3d5a2a]",
+    copyActive: "bg-[rgba(107,142,78,0.15)] text-[#4a6a32]",
+    copyDefault: "bg-[rgba(107,142,78,0.15)] text-[#4a6a32] hover:bg-[rgba(107,142,78,0.25)]",
+    refreshBtn: "bg-[rgba(68,55,32,0.06)] text-[#857d68] hover:bg-[rgba(68,55,32,0.12)]",
+    hint: "text-[#857d68]",
+  } : {
+    muted: "text-gray-500",
+    codeBg: "bg-gray-100",
+    showLink: "text-blue-600 hover:text-blue-800",
+    copyActive: "bg-green-100 text-green-700",
+    copyDefault: "bg-blue-100 text-blue-700 hover:bg-blue-200",
+    refreshBtn: "bg-gray-100 text-gray-700 hover:bg-gray-200",
+    hint: "text-gray-400",
+  };
 
   const handleCopy = async () => {
     try {
@@ -53,16 +73,16 @@ export default function FamilyInviteCode({ inviteCode: initialCode }: { inviteCo
 
   return (
     <div className="flex flex-col items-end gap-2">
-      <div className="text-sm text-gray-500">{t("familyInviteCode")}</div>
+      <div className={`text-sm ${theme.muted}`}>{t("familyInviteCode")}</div>
       <div className="flex items-center gap-2">
         {showCode ? (
-          <code className="bg-gray-100 px-3 py-1.5 rounded font-mono text-sm tracking-wider">
+          <code className={`${theme.codeBg} px-3 py-1.5 rounded font-mono text-sm tracking-wider`}>
             {inviteCode}
           </code>
         ) : (
           <button
             onClick={() => setShowCode(true)}
-            className="text-blue-600 hover:text-blue-800 text-sm"
+            className={`${theme.showLink} text-sm`}
           >
             {t("showCode")}
           </button>
@@ -71,8 +91,8 @@ export default function FamilyInviteCode({ inviteCode: initialCode }: { inviteCo
           onClick={handleCopy}
           className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
             copied
-              ? "bg-green-100 text-green-700"
-              : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+              ? theme.copyActive
+              : theme.copyDefault
           }`}
         >
           {copied ? t("copied") : t("copy")}
@@ -80,7 +100,7 @@ export default function FamilyInviteCode({ inviteCode: initialCode }: { inviteCo
         <button
           onClick={handleRefresh}
           disabled={refreshing}
-          className="px-3 py-1.5 rounded text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors disabled:opacity-50"
+          className={`px-3 py-1.5 rounded text-sm font-medium ${theme.refreshBtn} transition-colors disabled:opacity-50`}
           title={t("generateNewCode")}
         >
           {refreshing ? (
@@ -96,7 +116,7 @@ export default function FamilyInviteCode({ inviteCode: initialCode }: { inviteCo
         </button>
       </div>
       {showCode && (
-        <p className="text-xs text-gray-400">
+        <p className={`text-xs ${theme.hint}`}>
           {t("shareCodeHint")}
         </p>
       )}

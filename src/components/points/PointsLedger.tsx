@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import PointEntryForm from "./PointEntryForm";
 import BadgeLevelUpToast from "@/components/badges/BadgeLevelUpToast";
 import AchievementBadgeToast from "@/components/badges/AchievementBadgeToast";
+import { useNewDesign } from "@/hooks/useNewDesign";
 
 type Kid = {
   id: string;
@@ -58,6 +59,44 @@ export default function PointsLedger() {
   const tCommon = useTranslations("common");
   const tHistory = useTranslations("history");
   const tPhotos = useTranslations("photos");
+  const { isNewDesign } = useNewDesign();
+
+  const theme = isNewDesign ? {
+    card: "bg-white rounded-[14px] border border-[rgba(68,55,32,0.14)]",
+    title: "text-[#2f2a1f]",
+    points: "text-[#4a6a32]",
+    addBtn: "bg-[#4a6a32] text-white hover:bg-[#3d5a2a]",
+    emptyText: "text-[#857d68]",
+    tableHead: "bg-[#F9F4E8]",
+    tableHeadText: "text-[#857d68]",
+    tableDivide: "divide-[rgba(68,55,32,0.08)]",
+    cellText: "text-[#2f2a1f]",
+    cellMuted: "text-[#857d68]",
+    editBtn: "text-[#4a6a32] hover:text-[#3d5a2a] hover:bg-[rgba(107,142,78,0.1)]",
+    deleteBtn: "text-[#c5543d] hover:text-[#a84632] hover:bg-[rgba(197,84,61,0.08)]",
+    positive: "text-[#4a6a32]",
+    negative: "text-[#c5543d]",
+    redeemed: "text-[#7b6bad]",
+    photoPlaceholder: "text-[#857d68]",
+  } : {
+    card: "bg-white rounded-lg shadow",
+    title: "text-gray-900",
+    points: "text-blue-600",
+    addBtn: "bg-blue-600 text-white hover:bg-blue-700",
+    emptyText: "text-gray-500",
+    tableHead: "bg-gray-50",
+    tableHeadText: "text-gray-500",
+    tableDivide: "divide-gray-200",
+    cellText: "text-gray-900",
+    cellMuted: "text-gray-500",
+    editBtn: "text-blue-600 hover:text-blue-900 hover:bg-blue-50",
+    deleteBtn: "text-red-600 hover:text-red-900 hover:bg-red-50",
+    positive: "text-green-600",
+    negative: "text-red-600",
+    redeemed: "text-purple-600",
+    photoPlaceholder: "text-gray-400",
+  };
+
   const [viewingPhoto, setViewingPhoto] = useState<string | null>(null);
 
   useEffect(() => {
@@ -143,8 +182,8 @@ export default function PointsLedger() {
 
   if (kids.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow p-8 text-center">
-        <p className="text-gray-500">
+      <div className={`${theme.card} p-8 text-center`}>
+        <p className={theme.emptyText}>
           {t("noKidsInFamily")}
         </p>
       </div>
@@ -156,10 +195,10 @@ export default function PointsLedger() {
       <div className="mb-6 flex justify-between items-center">
         {selectedKid && (
           <div className="flex items-center space-x-4">
-            <span className="text-2xl font-bold text-gray-900">
+            <span className={`text-2xl font-bold ${theme.title}`}>
               {selectedKid.name || selectedKid.email}
             </span>
-            <span className="text-2xl font-bold text-blue-600">
+            <span className={`text-2xl font-bold ${theme.points}`}>
               {totalPoints} {tCommon("points")}
             </span>
           </div>
@@ -168,70 +207,70 @@ export default function PointsLedger() {
         <button
           onClick={() => setShowForm(true)}
           disabled={!selectedKid}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          className={`px-4 py-2 ${theme.addBtn} rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           {t("addPoints")}
         </button>
       </div>
 
       {selectedKid && entries.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-lg shadow">
-          <p className="text-gray-500">
+        <div className={`text-center py-12 ${theme.card}`}>
+          <p className={theme.emptyText}>
             {t("noPointEntries")}
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+        <div className={`${theme.card} overflow-x-auto`}>
+          <table className={`min-w-full divide-y ${theme.tableDivide}`}>
+            <thead className={theme.tableHead}>
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium ${theme.tableHeadText} uppercase tracking-wider">
                   {t("date")}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium ${theme.tableHeadText} uppercase tracking-wider">
                   {tHistory("chore")}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium ${theme.tableHeadText} uppercase tracking-wider">
                   {tCommon("points")}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium ${theme.tableHeadText} uppercase tracking-wider">
                   {t("note")}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium ${theme.tableHeadText} uppercase tracking-wider">
                   {tPhotos("photo")}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium ${theme.tableHeadText} uppercase tracking-wider">
                   {t("addedBy")}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium ${theme.tableHeadText} uppercase tracking-wider">
                   {t("actions")}
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className={`bg-white divide-y ${theme.tableDivide}`}>
               {entries.map((entry) => (
                 <tr key={entry.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm ${theme.cellText}">
                     {new Date(entry.date).toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm ${theme.cellText}">
                     {entry.chore?.title || (entry.points > 0 ? tHistory("custom") : "-")}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`text-sm font-semibold ${
                         entry.points >= 0
-                          ? "text-green-600"
-                          : "text-red-600"
+                          ? theme.positive
+                          : theme.negative
                       }`}
                     >
                       {entry.points >= 0 ? "+" : ""}
                       {entry.points}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
+                  <td className={`px-6 py-4 text-sm ${theme.cellMuted}`}>
                     {entry.redemption ? (
-                      <span className="text-purple-600">
+                      <span className={theme.redeemed}>
                         {tHistory("redeemed")} {entry.redemption.reward.title}
                       </span>
                     ) : (
@@ -247,10 +286,10 @@ export default function PointsLedger() {
                         onClick={() => setViewingPhoto(entry.photoUrl)}
                       />
                     ) : (
-                      <span className="text-gray-400">-</span>
+                      <span className={theme.photoPlaceholder}>-</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${theme.cellMuted}`}>
                     {entry.createdBy.name || entry.createdBy.email}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -258,13 +297,13 @@ export default function PointsLedger() {
                       <div className="inline-flex gap-2">
                         <button
                           onClick={() => handleEdit(entry)}
-                          className="text-blue-600 hover:text-blue-900 px-2 py-1 hover:bg-blue-50 rounded"
+                          className={`${theme.editBtn} px-2 py-1 rounded`}
                         >
                           {t("edit")}
                         </button>
                         <button
                           onClick={() => handleDelete(entry.id)}
-                          className="text-red-600 hover:text-red-900 px-2 py-1 hover:bg-red-50 rounded"
+                          className={`${theme.deleteBtn} px-2 py-1 rounded`}
                         >
                           {t("delete")}
                         </button>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { useNewDesign } from "@/hooks/useNewDesign";
 
 interface CalendarEvent {
   id: string;
@@ -119,6 +120,47 @@ export default function CalendarEventForm({
 }: Props) {
   const t = useTranslations("calendar");
   const tCommon = useTranslations("common");
+  const { isNewDesign } = useNewDesign();
+
+  const theme = isNewDesign ? {
+    title: "text-[#2f2a1f]",
+    label: "text-[#2f2a1f]",
+    muted: "text-[#857d68]",
+    close: "text-[#857d68] hover:text-[#2f2a1f]",
+    input: "border-[rgba(68,55,32,0.14)] focus:ring-[#6b8e4e] focus:border-[#6b8e4e]",
+    checkbox: "text-[#6b8e4e] border-[rgba(68,55,32,0.14)] focus:ring-[#6b8e4e]",
+    footerBg: "bg-[#F9F4E8]",
+    cancelBtn: "text-[#2f2a1f] border-[rgba(68,55,32,0.14)] hover:bg-[#F9F4E8]",
+    submitBtn: "bg-[#4a6a32] text-white hover:bg-[#3d5a2a]",
+    errorBg: "bg-[rgba(197,84,61,0.08)] border border-[rgba(197,84,61,0.2)] text-[#c5543d]",
+    memberNone: "bg-[rgba(68,55,32,0.06)] border-[#4a6a32] text-[#4a6a32]",
+    memberNoneInactive: "bg-white border-[rgba(68,55,32,0.14)] text-[#857d68] hover:border-[rgba(68,55,32,0.25)]",
+    memberJasper: "border-[#b49ef0] text-[#7b6bad]",
+    memberJasperBg: "rgba(180,158,240,0.15)",
+    memberMingfei: "border-[#9bbf7a] text-[#4a6a32]",
+    memberMingfeiBg: "rgba(155,191,122,0.15)",
+    memberYue: "border-[#d88b8b] text-[#a05555]",
+    memberYueBg: "rgba(216,139,139,0.15)",
+  } : {
+    title: "text-gray-900",
+    label: "text-gray-700",
+    muted: "text-gray-500",
+    close: "text-gray-400 hover:text-gray-600",
+    input: "border-gray-300 focus:ring-blue-500 focus:border-blue-500",
+    checkbox: "text-blue-600 border-gray-300 focus:ring-blue-500",
+    footerBg: "bg-gray-50",
+    cancelBtn: "text-gray-700 border-gray-300 hover:bg-gray-50",
+    submitBtn: "bg-blue-600 text-white hover:bg-blue-700",
+    errorBg: "bg-red-50 border border-red-200 text-red-700",
+    memberNone: "bg-blue-100 border-blue-500 text-blue-700",
+    memberNoneInactive: "bg-white border-gray-300 text-gray-600 hover:border-gray-400",
+    memberJasper: "bg-purple-100 border-purple-500 text-purple-700",
+    memberJasperBg: "",
+    memberMingfei: "bg-green-100 border-green-500 text-green-700",
+    memberMingfeiBg: "",
+    memberYue: "bg-pink-100 border-pink-500 text-pink-700",
+    memberYueBg: "",
+  };
 
   const [summary, setSummary] = useState("");
   const [selectedMember, setSelectedMember] = useState("");
@@ -302,12 +344,12 @@ export default function CalendarEventForm({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between px-4 py-3 border-b flex-shrink-0">
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className={`text-lg font-semibold ${theme.title}`}>
             {event ? t("editEvent") : t("addEvent")}
           </h3>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 rounded-lg transition"
+            className={`p-2 ${theme.close} rounded-lg transition`}
           >
             <svg
               className="w-5 h-5"
@@ -328,14 +370,14 @@ export default function CalendarEventForm({
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
           <div className="p-4 space-y-4 overflow-y-auto flex-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+            <div className={`${theme.errorBg} px-4 py-3 rounded-lg text-sm`}>
               {error}
             </div>
           )}
 
           {/* Family Member Selector */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className={`block text-sm font-medium ${theme.label} mb-1`}>
               {t("assignTo")}
             </label>
             <div className="flex flex-wrap gap-2">
@@ -344,36 +386,41 @@ export default function CalendarEventForm({
                 onClick={() => setSelectedMember("")}
                 className={`px-3 py-1.5 text-sm rounded-full border transition ${
                   selectedMember === ""
-                    ? "bg-blue-100 border-blue-500 text-blue-700"
-                    : "bg-white border-gray-300 text-gray-600 hover:border-gray-400"
+                    ? theme.memberNone
+                    : theme.memberNoneInactive
                 }`}
+                style={selectedMember === "" && isNewDesign ? { backgroundColor: "rgba(68,55,32,0.06)" } : undefined}
               >
                 {t("noAssignment")}
               </button>
-              {FAMILY_MEMBERS.map((member) => (
+              {FAMILY_MEMBERS.map((member) => {
+                const memberTheme = member === "Jasper"
+                  ? { active: theme.memberJasper, bg: theme.memberJasperBg }
+                  : member === "Mingfei"
+                  ? { active: theme.memberMingfei, bg: theme.memberMingfeiBg }
+                  : { active: theme.memberYue, bg: theme.memberYueBg };
+                return (
                 <button
                   key={member}
                   type="button"
                   onClick={() => setSelectedMember(member)}
                   className={`px-3 py-1.5 text-sm rounded-full border transition ${
                     selectedMember === member
-                      ? member === "Jasper"
-                        ? "bg-purple-100 border-purple-500 text-purple-700"
-                        : member === "Mingfei"
-                        ? "bg-green-100 border-green-500 text-green-700"
-                        : "bg-pink-100 border-pink-500 text-pink-700"
-                      : "bg-white border-gray-300 text-gray-600 hover:border-gray-400"
+                      ? memberTheme.active
+                      : theme.memberNoneInactive
                   }`}
+                  style={selectedMember === member && memberTheme.bg ? { backgroundColor: memberTheme.bg } : undefined}
                 >
                   {member}
                 </button>
-              ))}
+                );
+              })}
             </div>
           </div>
 
           {/* Event Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium ${theme.label} mb-1">
               {t("eventTitle")}
             </label>
             <input
@@ -381,7 +428,7 @@ export default function CalendarEventForm({
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
               placeholder="Untitled"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border ${theme.input} rounded-lg"
             />
           </div>
 
@@ -392,16 +439,16 @@ export default function CalendarEventForm({
               id="allDay"
               checked={allDay}
               onChange={(e) => setAllDay(e.target.checked)}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              className={`w-4 h-4 ${theme.checkbox} rounded`}
             />
-            <label htmlFor="allDay" className="text-sm text-gray-700">
+            <label htmlFor="allDay" className={`text-sm ${theme.label}`}>
               {t("allDayEvent")}
             </label>
           </div>
 
           {/* Timezone indicator */}
           {!allDay && (
-            <div className="flex items-center gap-2 text-sm text-gray-500">
+            <div className={`flex items-center gap-2 text-sm ${theme.muted}`}>
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -412,7 +459,7 @@ export default function CalendarEventForm({
           {/* Start Date/Time */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium ${theme.label} mb-1">
                 {t("startDate")} *
               </label>
               <input
@@ -420,19 +467,19 @@ export default function CalendarEventForm({
                 value={startDate}
                 onChange={(e) => handleStartDateChange(e.target.value)}
                 required
-                className="w-full h-11 px-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
+                className="w-full h-11 px-3 border ${theme.input} rounded-lg bg-white"
               />
             </div>
             {!allDay && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ${theme.label} mb-1">
                   {t("startTime")} *
                 </label>
                 <select
                   value={startTime}
                   onChange={(e) => handleStartTimeChange(e.target.value)}
                   required
-                  className="w-full h-11 px-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  className="w-full h-11 px-3 border ${theme.input} rounded-lg bg-white"
                 >
                   {TIME_OPTIONS.map((time) => (
                     <option key={time} value={time}>
@@ -447,7 +494,7 @@ export default function CalendarEventForm({
           {/* End Date/Time */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium ${theme.label} mb-1">
                 {t("endDate")} *
               </label>
               <input
@@ -455,19 +502,19 @@ export default function CalendarEventForm({
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 required
-                className="w-full h-11 px-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
+                className="w-full h-11 px-3 border ${theme.input} rounded-lg bg-white"
               />
             </div>
             {!allDay && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ${theme.label} mb-1">
                   {t("endTime")} *
                 </label>
                 <select
                   value={endTime}
                   onChange={(e) => handleEndTimeChange(e.target.value)}
                   required
-                  className="w-full h-11 px-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  className="w-full h-11 px-3 border ${theme.input} rounded-lg bg-white"
                 >
                   {TIME_OPTIONS.map((time) => (
                     <option key={time} value={time}>
@@ -481,46 +528,46 @@ export default function CalendarEventForm({
 
           {/* Location */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium ${theme.label} mb-1">
               {t("location")}
             </label>
             <input
               type="text"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border ${theme.input} rounded-lg"
               placeholder={t("locationPlaceholder")}
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium ${theme.label} mb-1">
               {t("description")}
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border ${theme.input} rounded-lg"
               placeholder={t("descriptionPlaceholder")}
             />
           </div>
           </div>
 
           {/* Buttons - Fixed at bottom */}
-          <div className="flex justify-end gap-3 p-4 bg-gray-50 flex-shrink-0 rounded-b-lg">
+          <div className={`flex justify-end gap-3 p-4 ${theme.footerBg} flex-shrink-0 rounded-b-lg`}>
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+              className={`px-4 py-2 border ${theme.cancelBtn} rounded-lg transition`}
             >
               {tCommon("cancel")}
             </button>
             <button
               type="submit"
               disabled={loading || !startDate}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className={`px-4 py-2 ${theme.submitBtn} rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               {loading
                 ? tCommon("saving")
