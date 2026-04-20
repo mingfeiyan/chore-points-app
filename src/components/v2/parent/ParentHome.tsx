@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { User } from "lucide-react";
+import FlameIcon from "@/components/v2/FlameIcon";
 import ParentTabBar from "@/components/v2/ParentTabBar";
 import CoinSmall from "@/components/v2/CoinSmall";
 import WeeklyCalendarView from "@/components/calendar/WeeklyCalendarView";
@@ -292,7 +293,7 @@ export default function ParentHome({ userName }: ParentHomeProps) {
                     {primaryKid.name} earned{" "}
                     <strong className="text-pg-ink">{primaryKid.todayDelta} gems</strong> today
                     {streakCount > 1 && (
-                      <>, keeping a <strong className="text-pg-coral">{streakCount}-day 🔥 streak</strong> alive</>
+                      <>, keeping a <strong className="text-pg-coral inline-flex items-center gap-0.5">{streakCount}-day <FlameIcon size={14} /> streak</strong> alive</>
                     )}
                     .
                   </>
@@ -323,7 +324,7 @@ export default function ParentHome({ userName }: ParentHomeProps) {
           {[
             { label: primaryKid.name || "Kid", value: primaryKid.totalPoints.toLocaleString(), sub: "total gems", tone: "#FFCB3B", showCoin: true },
             { label: "This week", value: `+${weekTotal}`, sub: "gems earned", tone: "#6b8e4e", showCoin: false },
-            { label: "Streak", value: String(streakCount), sub: `days in a row 🔥`, tone: "#c5543d", showCoin: false },
+            { label: "Streak", value: String(streakCount), sub: "days in a row", tone: "#c5543d", showCoin: false, showFlame: true },
             { label: "Badges", value: "—", sub: "earned", tone: "#d88b8b", showCoin: false },
           ].map((s, i) => (
             <div
@@ -334,6 +335,7 @@ export default function ParentHome({ userName }: ParentHomeProps) {
               <div className="text-[11px] font-semibold text-pg-muted uppercase tracking-wide">{s.label}</div>
               <div className="flex items-baseline gap-1.5 mt-1">
                 {s.showCoin && <CoinSmall size={20} />}
+                {"showFlame" in s && s.showFlame && <FlameIcon size={20} />}
                 <span className="font-[family-name:var(--font-fraunces)] text-[30px] font-medium text-pg-ink leading-none tracking-tight">
                   {s.value}
                 </span>
