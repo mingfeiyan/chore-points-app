@@ -227,6 +227,41 @@ export default function ParentHome({ userName }: ParentHomeProps) {
     router.push("/view-as/points");
   };
 
+  // Compute stats for the first kid (primary child)
+  const primaryKid = kids[0];
+  const weekTotal = primaryKid
+    ? primaryKid.allEntries
+        .filter((e) => {
+          const d = new Date(e.date || e.createdAt);
+          const now = new Date();
+          const weekAgo = new Date(now);
+          weekAgo.setDate(now.getDate() - 7);
+          return d >= weekAgo && e.points > 0;
+        })
+        .reduce((s, e) => s + e.points, 0)
+    : 0;
+
+  // Streak calculation
+  const streakCount = (() => {
+    if (!primaryKid) return 0;
+    const dayTotals: Record<string, number> = {};
+    for (const e of primaryKid.allEntries) {
+      if (e.points > 0) {
+        const ds = new Date(e.date).toISOString().split("T")[0];
+        dayTotals[ds] = (dayTotals[ds] || 0) + e.points;
+      }
+    }
+    let streak = 0;
+    const d = new Date();
+    for (let i = 0; i < 60; i++) {
+      const ds = d.toISOString().split("T")[0];
+      if (dayTotals[ds]) streak++;
+      else if (i > 0) break; // allow today to be 0
+      d.setDate(d.getDate() - 1);
+    }
+    return streak;
+  })();
+
   return (
     <div className="min-h-screen bg-pg-cream pb-[110px] font-[family-name:var(--font-inter)]">
       {/* Header */}
@@ -234,137 +269,136 @@ export default function ParentHome({ userName }: ParentHomeProps) {
         {/* Botanical leaf SVG */}
         <svg
           className="pointer-events-none absolute right-4 top-4 opacity-30"
-          width="64"
-          height="64"
-          viewBox="0 0 64 64"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
+          width="82" height="98" viewBox="0 0 60 72" fill="none"
         >
-          <path
-            d="M48 8C48 8 32 16 24 32C16 48 16 56 16 56C16 56 28 52 36 40C44 28 48 8 48 8Z"
-            fill="#6b8e4e"
-            opacity="0.5"
-          />
-          <path
-            d="M16 56C16 56 20 36 32 24"
-            stroke="#6b8e4e"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            opacity="0.7"
-          />
+          <path d="M30 2 C10 18 4 42 18 64 C22 68 28 70 30 70 C32 70 38 68 42 64 C56 42 50 18 30 2 Z" fill="#6b8e4e" opacity="0.5" />
+          <path d="M30 4 L30 68" stroke="#4a6a32" strokeWidth="1" opacity="0.3" fill="none" />
         </svg>
 
-        {/* Date + weather */}
-        <p className="text-[11px] font-bold uppercase tracking-wide text-pg-muted">
-          {formatDate(new Date())}
-          {weather && (
-            <span>
-              {weather.location && ` · ${weather.location}`} · {weather.icon} {weather.temp}°F
-            </span>
-          )}
-        </p>
+        <div className="flex items-start justify-between">
+          <div>
+            {/* Date + weather */}
+            <p className="text-[11px] font-bold uppercase tracking-wide text-pg-muted">
+              {formatDate(new Date())}
+              {weather && (
+                <span>
+                  {weather.location && ` · ${weather.location}`} · {weather.icon} {weather.temp}°F
+                </span>
+              )}
+            </p>
 
-        {/* Greeting */}
-        <h1 className="mt-1 font-[family-name:var(--font-fraunces)] text-4xl font-medium text-pg-ink">
-          {getGreeting()},{" "}
-          <em className="not-italic font-medium italic text-pg-accent-deep">
-            {firstName}
-          </em>
-        </h1>
+            {/* Greeting */}
+            <h1 className="mt-1.5 font-[family-name:var(--font-fraunces)] text-[38px] font-medium text-pg-ink leading-tight tracking-tight">
+              {getGreeting()},{" "}
+              <em className="italic text-pg-accent-deep">{firstName}</em>
+            </h1>
+
+            {/* Subtitle */}
+            {primaryKid && (
+              <p className="mt-1.5 text-sm text-pg-muted max-w-[500px]">
+                {primaryKid.todayDelta > 0 ? (
+                  <>
+                    {primaryKid.name} earned{" "}
+                    <strong className="text-pg-ink">{primaryKid.todayDelta} gems</strong> today
+                    {streakCount > 1 && (
+                      <>, keeping a <strong className="text-pg-coral">{streakCount}-day 🔥 streak</strong> alive</>
+                    )}
+                    .
+                  </>
+                ) : (
+                  <>{primaryKid.name} hasn&apos;t earned gems yet today.</>
+                )}
+              </p>
+            )}
+          </div>
+
+          {/* View as Kid button */}
+          {primaryKid && (
+            <button
+              onClick={() => handleViewAsKid(primaryKid)}
+              className="shrink-0 flex items-center gap-2 rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-white"
+              style={{ background: "#6b8e4e", boxShadow: "0 2px 0 rgba(74,106,50,0.4)" }}
+            >
+              <User size={16} />
+              View as Kid
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Kid cards */}
-      <div className="mt-5 space-y-3 px-7">
-        {loading && (
-          <div className="py-8 text-center text-pg-muted">Loading...</div>
-        )}
-        {!loading &&
-          kids.map((kid) => (
+      {/* Stats row */}
+      {primaryKid && !loading && (
+        <div className="mt-5 px-7 grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            { label: primaryKid.name || "Kid", value: primaryKid.totalPoints.toLocaleString(), sub: "total gems", tone: "#FFCB3B", showCoin: true },
+            { label: "This week", value: `+${weekTotal}`, sub: "gems earned", tone: "#6b8e4e", showCoin: false },
+            { label: "Streak", value: String(streakCount), sub: `days in a row 🔥`, tone: "#c5543d", showCoin: false },
+            { label: "Badges", value: "—", sub: "earned", tone: "#d88b8b", showCoin: false },
+          ].map((s, i) => (
             <div
-              key={kid.id}
-              className="rounded-xl border border-[rgba(68,55,32,0.14)] bg-white overflow-hidden"
+              key={i}
+              className="bg-white rounded-xl p-4 border border-[rgba(68,55,32,0.14)]"
+              style={{ borderLeft: `3px solid ${s.tone}` }}
             >
-              {/* Main card content */}
-              <div className="flex items-center gap-4 p-4">
-                {/* Avatar */}
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-pg-accent text-white font-semibold text-sm shrink-0">
-                  {(kid.name || kid.email)[0].toUpperCase()}
-                </div>
-
-                {/* Name + points */}
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-pg-ink">
-                    {kid.name || kid.email}
-                  </p>
-                  <div className="flex items-center gap-1 text-sm text-pg-muted">
-                    <CoinSmall size={14} />
-                    <span>{kid.totalPoints} pts</span>
-                  </div>
-                </div>
-
-                {/* Today delta */}
-                {kid.todayDelta > 0 && (
-                  <span className="text-sm font-medium text-pg-accent-deep">
-                    +{kid.todayDelta} today
-                  </span>
-                )}
+              <div className="text-[11px] font-semibold text-pg-muted uppercase tracking-wide">{s.label}</div>
+              <div className="flex items-baseline gap-1.5 mt-1">
+                {s.showCoin && <CoinSmall size={20} />}
+                <span className="font-[family-name:var(--font-fraunces)] text-[30px] font-medium text-pg-ink leading-none tracking-tight">
+                  {s.value}
+                </span>
               </div>
-
-              {/* View as kid bar */}
-              <button
-                onClick={() => handleViewAsKid(kid)}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-pg-accent-deep bg-[rgba(107,142,78,0.06)] border-t border-[rgba(68,55,32,0.08)] hover:bg-[rgba(107,142,78,0.12)] transition-colors"
-              >
-                <User size={14} />
-                View as {kid.name || "Kid"}
-              </button>
+              <div className="text-xs text-pg-muted mt-1">{s.sub}</div>
             </div>
           ))}
-      </div>
-
-      {/* Today's activity */}
-      {allTodayEntries.length > 0 && (
-        <div className="mt-5 px-7">
-          <h2 className="font-[family-name:var(--font-fraunces)] text-xl text-pg-ink">
-            Today&apos;s activity
-          </h2>
-
-          <div className="mt-3 rounded-xl border border-[rgba(68,55,32,0.14)] bg-white overflow-hidden">
-            {allTodayEntries.map((entry, i) => (
-              <div
-                key={entry.id}
-                className={`flex items-center gap-3 px-4 py-3 ${
-                  i < allTodayEntries.length - 1
-                    ? "border-b border-[rgba(68,55,32,0.14)]"
-                    : ""
-                }`}
-              >
-                <span className="w-14 shrink-0 text-[11px] text-pg-muted">
-                  {formatTime(entry.createdAt)}
-                </span>
-                <span className="flex-1 text-sm text-pg-ink">
-                  {entry.chore?.title || entry.note || "Points"}
-                </span>
-                <span className="text-sm font-medium text-pg-accent-deep">
-                  +{entry.points}
-                </span>
-              </div>
-            ))}
-          </div>
         </div>
       )}
 
-      {/* Weekly Calendar */}
+      {loading && (
+        <div className="py-12 text-center text-pg-muted">Loading...</div>
+      )}
+
+      {/* Family Calendar */}
       <div className="mt-5 px-7">
-        <h2 className="font-[family-name:var(--font-fraunces)] text-xl text-pg-ink mb-3">
-          Family calendar
-        </h2>
         <WeeklyCalendarView />
       </div>
 
-      {/* Photo Gallery */}
-      <div className="mt-5 px-7 lg:w-1/2 font-[family-name:var(--font-inter)]">
-        <PhotoCarousel />
+      {/* Today's activity + Photo side by side on desktop */}
+      <div className="mt-5 px-7 grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* Today's activity */}
+        {allTodayEntries.length > 0 && (
+          <div>
+            <div className="rounded-[14px] border border-[rgba(68,55,32,0.14)] bg-white p-4">
+              <div className="flex items-baseline justify-between mb-3">
+                <h3 className="font-[family-name:var(--font-fraunces)] text-lg font-medium text-pg-ink">
+                  {primaryKid?.name} today
+                </h3>
+              </div>
+              {allTodayEntries.map((entry, i) => (
+                <div
+                  key={entry.id}
+                  className={`flex items-center gap-3 py-2 ${
+                    i < allTodayEntries.length - 1 ? "border-b border-[rgba(68,55,32,0.08)]" : ""
+                  }`}
+                >
+                  <span className="w-14 shrink-0 text-[11px] text-pg-muted tabular-nums">
+                    {formatTime(entry.createdAt)}
+                  </span>
+                  <span className="flex-1 text-sm font-medium text-pg-ink">
+                    {entry.chore?.title || entry.note || "Points"}
+                  </span>
+                  <div className="flex items-center gap-1 text-sm font-bold text-pg-accent-deep">
+                    <CoinSmall size={13} />+{entry.points}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Photo Gallery */}
+        <div>
+          <PhotoCarousel />
+        </div>
       </div>
 
       <ParentTabBar />
