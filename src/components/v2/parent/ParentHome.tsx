@@ -380,7 +380,7 @@ export default function ParentHome({ userName }: ParentHomeProps) {
                     {entry.chore?.title || entry.note || "Points"}
                   </span>
                   <div className="flex items-center gap-1 text-sm font-bold text-pg-accent-deep">
-                    <CoinSmall size={13} />+{entry.points}
+                    <CoinSmall size={13} />{entry.points > 0 ? "+" : ""}{entry.points}
                   </div>
                 </div>
               ))}
