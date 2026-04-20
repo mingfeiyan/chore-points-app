@@ -359,13 +359,11 @@ export default function ParentHome({ userName }: ParentHomeProps) {
         <h2 className="font-[family-name:var(--font-fraunces)] text-xl text-pg-ink mb-3">
           Family calendar
         </h2>
-        <div className="rounded-xl border border-[rgba(68,55,32,0.14)] bg-white overflow-hidden p-4">
-          <WeeklyCalendarView />
-        </div>
+        <WeeklyCalendarView />
       </div>
 
       {/* Photo Gallery */}
-      <div className="mt-5 px-7 lg:w-1/2">
+      <div className="mt-5 px-7 lg:w-1/2 font-[family-name:var(--font-inter)]">
         <PhotoCarousel />
       </div>
 

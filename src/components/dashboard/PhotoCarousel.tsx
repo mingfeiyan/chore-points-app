@@ -27,7 +27,7 @@ export default function PhotoCarousel() {
 
   const theme = isNewDesign ? {
     card: "bg-white rounded-[14px] border border-[rgba(68,55,32,0.14)]",
-    title: "text-[#2f2a1f]",
+    title: "text-[#2f2a1f] font-[family-name:var(--font-fraunces)]",
     link: "text-[#4a6a32] hover:text-[#3d5a2a]",
     skeleton: "bg-[rgba(68,55,32,0.08)]",
     emptyBg: "bg-[#F9F4E8]",
