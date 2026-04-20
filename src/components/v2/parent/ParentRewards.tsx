@@ -182,7 +182,7 @@ export default function ParentRewards() {
             <OptimizedImage
               src={selectedPhoto.photoUrl}
               alt={selectedPhoto.note || "Reward"}
-              variant="large"
+              variant="full"
               className="w-full max-h-[60vh] object-contain bg-black"
             />
             <div className="p-4">
