@@ -176,6 +176,22 @@
     "redemptionSubmitted": "Redemption request submitted! Waiting for parent approval.",
     "redemptionFailed": "Failed to request redemption"
   },
+  "logReward": {
+    "button": "Log reward",
+    "title": "Log a reward",
+    "kid": "Kid",
+    "selectKid": "Select a kid",
+    "kidRequired": "Pick a kid",
+    "note": "What was it?",
+    "notePlaceholder": "Popcorn",
+    "noteRequired": "Item name is required",
+    "points": "Points to deduct",
+    "pointsRange": "Points must be between 1 and 999",
+    "photo": "Photo (optional)",
+    "photoHint": "Tap to take a photo or choose one",
+    "uploading": "Uploading...",
+    "submit": "Log reward"
+  },
   "home": {
     "getStarted": "Get Started",
     "signIn": "Sign In",

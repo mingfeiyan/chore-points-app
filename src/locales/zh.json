@@ -186,6 +186,22 @@
     "redemptionSubmitted": "兑换申请已提交！等待家长批准。",
     "redemptionFailed": "兑换申请失败"
   },
+  "logReward": {
+    "button": "记录奖励",
+    "title": "记录一次奖励",
+    "kid": "孩子",
+    "selectKid": "选择一个孩子",
+    "kidRequired": "请选择孩子",
+    "note": "是什么？",
+    "notePlaceholder": "爆米花",
+    "noteRequired": "请填写物品名称",
+    "points": "扣除积分",
+    "pointsRange": "积分必须在 1 到 999 之间",
+    "photo": "照片（可选）",
+    "photoHint": "点击拍照或选择一张",
+    "uploading": "上传中...",
+    "submit": "记录"
+  },
   "home": {
     "getStarted": "开始使用",
     "signIn": "登录",

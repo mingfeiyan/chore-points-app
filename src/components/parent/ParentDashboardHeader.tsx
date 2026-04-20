@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
 import { useKidMode } from "@/components/providers/KidModeProvider";
+import LogRewardButton from "@/components/rewards/LogRewardButton";
 
 type Kid = {
   id: string;
@@ -209,6 +210,8 @@ export default function ParentDashboardHeader() {
         </div>
       </div>
 
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+        <LogRewardButton />
       {kids.length > 0 && (
         <div className="relative">
           {/* Single kid: direct navigation, no dropdown */}
@@ -303,6 +306,7 @@ export default function ParentDashboardHeader() {
           )}
         </div>
       )}
+      </div>
     </div>
   );
 }
