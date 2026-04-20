@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/permissions";
-import KidLearnEntryWrapper from "@/components/v2/kid/KidLearnEntryWrapper";
+import KidBadgesWrapper from "@/components/v2/kid/KidBadgesWrapper";
 
-export default async function LearnPage() {
+export default async function KidBadgesPage() {
   const session = await getSession();
 
   if (!session?.user) {
@@ -13,9 +13,9 @@ export default async function LearnPage() {
     redirect("/dashboard");
   }
 
-  if (session.user.role === "PARENT") {
+  if (session.user.role !== "KID") {
     redirect("/dashboard");
   }
 
-  return <KidLearnEntryWrapper />;
+  return <KidBadgesWrapper />;
 }
