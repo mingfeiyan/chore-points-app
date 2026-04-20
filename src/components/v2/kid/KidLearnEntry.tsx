@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
 import { BookOpen, Hash, RotateCcw, Sparkles, BookMarked, PartyPopper } from "lucide-react";
 import KidHeaderBG from "@/components/v2/KidHeaderBG";
 import KidTabBar from "@/components/v2/KidTabBar";
 import CoinSmall from "@/components/v2/CoinSmall";
+import LearnView from "@/components/learn/LearnView";
+import MathModule from "@/components/learn/MathModule";
 
 type SessionData = {
   words: Array<{ id: string; word: string; imageUrl: string | null }>;
@@ -25,6 +26,7 @@ export default function KidLearnEntry({ kidId: kidIdProp }: KidLearnEntryProps =
   const [data, setData] = useState<SessionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"sight-words" | "math">("sight-words");
+  const [started, setStarted] = useState(false);
 
   useEffect(() => {
     if (!resolvedKidId) return;
@@ -41,6 +43,35 @@ export default function KidLearnEntry({ kidId: kidIdProp }: KidLearnEntryProps =
   const isReview = data?.isReview || false;
   const allDone = data?.message === "alreadyDoneToday";
   const noWords = data?.message === "noWords";
+
+  // When started, show the learning session inline
+  if (started) {
+    return (
+      <div className="min-h-screen bg-ca-cream pb-[110px] font-[family-name:var(--font-nunito)]">
+        <KidHeaderBG compact>
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-black font-[family-name:var(--font-baloo-2)]">
+              {activeTab === "sight-words" ? "Sight Words" : "Math"}
+            </h1>
+            <button
+              onClick={() => setStarted(false)}
+              className="px-3 py-1 rounded-full text-xs font-bold bg-white/20"
+            >
+              Back
+            </button>
+          </div>
+        </KidHeaderBG>
+        <div className="px-4 mt-4">
+          {activeTab === "sight-words" ? (
+            <LearnView kidId={resolvedKidId} onComplete={() => setStarted(false)} />
+          ) : (
+            <MathModule kidId={resolvedKidId} onComplete={() => setStarted(false)} />
+          )}
+        </div>
+        <KidTabBar />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-ca-cream pb-[110px] font-[family-name:var(--font-nunito)]">
@@ -137,13 +168,13 @@ export default function KidLearnEntry({ kidId: kidIdProp }: KidLearnEntryProps =
                         Practice the {progress.current} words you&apos;ve learned
                       </p>
                     </div>
-                    <Link
-                      href="/learn"
+                    <button
+                      onClick={() => setStarted(true)}
                       className="shrink-0 w-14 h-14 rounded-full flex items-center justify-center text-white font-extrabold text-sm"
                       style={{ background: "var(--ca-coral)" }}
                     >
                       Start
-                    </Link>
+                    </button>
                   </div>
                 )}
 
@@ -164,14 +195,14 @@ export default function KidLearnEntry({ kidId: kidIdProp }: KidLearnEntryProps =
                     Look and listen first, then we&apos;ll test you.
                   </p>
 
-                  <Link
-                    href="/learn"
+                  <button
+                    onClick={() => setStarted(true)}
                     className="inline-flex items-center gap-2 mt-4 px-6 py-3 rounded-full text-sm font-extrabold"
                     style={{ background: "var(--ca-gold)", color: "var(--ca-gold-deep)" }}
                   >
                     <CoinSmall size={16} />
                     Start learning →
-                  </Link>
+                  </button>
 
                   <p className="text-xs opacity-60 mt-3">
                     +1 gem per word learned
