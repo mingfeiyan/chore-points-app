@@ -366,12 +366,7 @@ export default function ParentHome({ userName }: ParentHomeProps) {
 
       {/* Photo Gallery */}
       <div className="mt-5 px-7 lg:w-1/2">
-        <h2 className="font-[family-name:var(--font-fraunces)] text-xl text-pg-ink mb-3">
-          Recent photos
-        </h2>
-        <div className="rounded-xl border border-[rgba(68,55,32,0.14)] bg-white overflow-hidden p-4">
-          <PhotoCarousel />
-        </div>
+        <PhotoCarousel />
       </div>
 
       <ParentTabBar />
