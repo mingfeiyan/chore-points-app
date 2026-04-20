@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useState, useCallback } from "react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import ParentTabBar from "@/components/v2/ParentTabBar";
-import CoinSmall from "@/components/v2/CoinSmall";
+import CalendarEventForm from "@/components/calendar/CalendarEventForm";
 
 // ------- Types -------
 
@@ -23,46 +23,43 @@ interface PointEntry {
   kidId?: string;
 }
 
-interface DayColumn {
-  date: Date;
-  dayName: string;
-  dayNum: number;
-  isToday: boolean;
-  entries: Array<PointEntry & { kidName: string; kidColor: string }>;
+interface CalendarEvent {
+  id: string;
+  summary: string;
+  description?: string;
+  location?: string;
+  start: { dateTime?: string; date?: string };
+  end: { dateTime?: string; date?: string };
+  htmlLink?: string;
 }
 
-// ------- Constants -------
+interface CalendarSettings {
+  isConnected: boolean;
+  selectedCalendarName: string | null;
+}
 
-const KID_COLORS = [
-  { bg: "bg-purple-100", border: "border-l-purple-400", text: "text-purple-700" },
-  { bg: "bg-emerald-100", border: "border-l-emerald-400", text: "text-emerald-700" },
-  { bg: "bg-rose-100", border: "border-l-rose-400", text: "text-rose-700" },
-  { bg: "bg-sky-100", border: "border-l-sky-400", text: "text-sky-700" },
-];
+interface DayCell {
+  date: Date;
+  dayNum: number;
+  isToday: boolean;
+  isCurrentMonth: boolean;
+  entries: Array<PointEntry & { kidName: string; kidId: string }>;
+  events: CalendarEvent[];
+}
+
+// ------- Paper Garden member colors -------
+
+const KID_COLORS: Record<number, { bg: string; border: string; text: string; dot: string }> = {
+  0: { bg: "rgba(180,158,240,0.15)", border: "#b49ef0", text: "#7b6bad", dot: "#b49ef0" },
+  1: { bg: "rgba(155,191,122,0.15)", border: "#9bbf7a", text: "#4a6a32", dot: "#9bbf7a" },
+  2: { bg: "rgba(216,139,139,0.15)", border: "#d88b8b", text: "#a05555", dot: "#d88b8b" },
+  3: { bg: "rgba(127,168,221,0.15)", border: "#7fa8dd", text: "#4a6a8a", dot: "#7fa8dd" },
+};
 
 // ------- Helpers -------
 
-function getWeekStart(referenceDate: Date): Date {
-  const d = new Date(referenceDate);
-  const day = d.getDay(); // 0=Sun
-  d.setDate(d.getDate() - day);
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
-
-function formatWeekRange(weekStart: Date): string {
-  const weekEnd = new Date(weekStart);
-  weekEnd.setDate(weekStart.getDate() + 6);
-
-  const startMonth = weekStart.toLocaleDateString("en-US", { month: "short" });
-  const endMonth = weekEnd.toLocaleDateString("en-US", { month: "short" });
-  const startDay = weekStart.getDate();
-  const endDay = weekEnd.getDate();
-
-  if (startMonth === endMonth) {
-    return `${startMonth} ${startDay} \u2013 ${endDay}`;
-  }
-  return `${startMonth} ${startDay} \u2013 ${endMonth} ${endDay}`;
+function getMonthStart(year: number, month: number): Date {
+  return new Date(year, month, 1);
 }
 
 function isSameDay(d1: Date, d2: Date): boolean {
@@ -73,19 +70,63 @@ function isSameDay(d1: Date, d2: Date): boolean {
   );
 }
 
+function toLocalDateString(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getEventColor(summary: string, kids: Kid[]): number {
+  const lower = summary.toLowerCase();
+  for (let i = 0; i < kids.length; i++) {
+    const name = (kids[i].name || kids[i].email).toLowerCase();
+    if (lower.includes(name.split(" ")[0])) return i;
+  }
+  return kids.length; // default
+}
+
 // ------- Component -------
 
 export default function ParentCalendar() {
-  const [weekOffset, setWeekOffset] = useState(0);
+  const today = new Date();
+  const [viewYear, setViewYear] = useState(today.getFullYear());
+  const [viewMonth, setViewMonth] = useState(today.getMonth());
   const [kids, setKids] = useState<Kid[]>([]);
   const [entries, setEntries] = useState<PointEntry[]>([]);
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
+  const [calendarSettings, setCalendarSettings] = useState<CalendarSettings | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showEventForm, setShowEventForm] = useState(false);
+  const [selectedDay, setSelectedDay] = useState<DayCell | null>(null);
 
-  const today = new Date();
-  const referenceDate = new Date(today);
-  referenceDate.setDate(today.getDate() + weekOffset * 7);
-  const weekStart = getWeekStart(referenceDate);
+  const monthStart = getMonthStart(viewYear, viewMonth);
+  const monthName = monthStart.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 
+  const goToPrevMonth = () => {
+    if (viewMonth === 0) {
+      setViewYear((y) => y - 1);
+      setViewMonth(11);
+    } else {
+      setViewMonth((m) => m - 1);
+    }
+  };
+
+  const goToNextMonth = () => {
+    if (viewMonth === 11) {
+      setViewYear((y) => y + 1);
+      setViewMonth(0);
+    } else {
+      setViewMonth((m) => m + 1);
+    }
+  };
+
+  const goToToday = () => {
+    setViewYear(today.getFullYear());
+    setViewMonth(today.getMonth());
+  };
+
+  // Load kids + points
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
@@ -95,7 +136,6 @@ export default function ParentCalendar() {
         if (!kidsRes.ok || !Array.isArray(kidsData.kids)) return;
         setKids(kidsData.kids);
 
-        // Fetch points for all kids
         const allEntries: PointEntry[] = [];
         await Promise.all(
           kidsData.kids.map(async (kid: Kid) => {
@@ -103,17 +143,14 @@ export default function ParentCalendar() {
             const data = await res.json();
             if (data.entries) {
               allEntries.push(
-                ...data.entries.map((e: PointEntry) => ({
-                  ...e,
-                  kidId: kid.id,
-                }))
+                ...data.entries.map((e: PointEntry) => ({ ...e, kidId: kid.id }))
               );
             }
           })
         );
         setEntries(allEntries);
       } catch (err) {
-        console.error("Failed to load calendar data:", err);
+        console.error("Failed to load data:", err);
       } finally {
         setLoading(false);
       }
@@ -121,20 +158,55 @@ export default function ParentCalendar() {
     loadData();
   }, []);
 
+  // Load Google Calendar settings + events
+  const loadCalendarEvents = useCallback(async () => {
+    try {
+      const settingsRes = await fetch("/api/calendar/settings");
+      const settingsData = await settingsRes.json();
+      setCalendarSettings(settingsData.settings);
+
+      if (settingsData.settings?.isConnected) {
+        const start = new Date(viewYear, viewMonth, 1);
+        const end = new Date(viewYear, viewMonth + 1, 0, 23, 59, 59);
+        const res = await fetch(
+          `/api/calendar/events?timeMin=${start.toISOString()}&timeMax=${end.toISOString()}`
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setCalendarEvents(data.events || []);
+        }
+      }
+    } catch {
+      // Calendar not connected, that's fine
+    }
+  }, [viewYear, viewMonth]);
+
+  useEffect(() => {
+    loadCalendarEvents();
+  }, [loadCalendarEvents]);
+
   // Build kid color map
-  const kidColorMap: Record<string, (typeof KID_COLORS)[number]> = {};
+  const kidColorMap: Record<string, number> = {};
   kids.forEach((kid, i) => {
-    kidColorMap[kid.id] = KID_COLORS[i % KID_COLORS.length];
+    kidColorMap[kid.id] = i % 4;
   });
 
-  // Build 7 day columns
-  const days: DayColumn[] = [];
-  const dayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+  // Build month grid (6 weeks × 7 days = 42 cells)
+  const firstDayOfMonth = new Date(viewYear, viewMonth, 1).getDay(); // 0=Sun
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
 
-  for (let i = 0; i < 7; i++) {
-    const date = new Date(weekStart);
-    date.setDate(weekStart.getDate() + i);
+  const cells: DayCell[] = [];
 
+  // Previous month fill
+  const prevMonthDays = new Date(viewYear, viewMonth, 0).getDate();
+  for (let i = firstDayOfMonth - 1; i >= 0; i--) {
+    const date = new Date(viewYear, viewMonth - 1, prevMonthDays - i);
+    cells.push({ date, dayNum: date.getDate(), isToday: false, isCurrentMonth: false, entries: [], events: [] });
+  }
+
+  // Current month
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(viewYear, viewMonth, d);
     const dayEntries = entries
       .filter((e) => {
         const entryDate = new Date(e.date || e.createdAt);
@@ -142,128 +214,271 @@ export default function ParentCalendar() {
       })
       .map((e) => {
         const kid = kids.find((k) => k.id === e.kidId);
-        return {
-          ...e,
-          kidName: kid?.name || kid?.email || "Unknown",
-          kidColor: e.kidId || "",
-        };
+        return { ...e, kidName: kid?.name || kid?.email || "Unknown", kidId: e.kidId || "" };
       });
 
-    days.push({
+    const dateStr = toLocalDateString(date);
+    const dayEvents = calendarEvents.filter((ev) => {
+      const startStr = ev.start.date || (ev.start.dateTime ? toLocalDateString(new Date(ev.start.dateTime)) : undefined);
+      if (!startStr) return false;
+      let endStr = ev.end.date || (ev.end.dateTime ? toLocalDateString(new Date(ev.end.dateTime)) : startStr);
+      if (ev.start.date && ev.end.date && endStr) {
+        const endDate = new Date(endStr + "T00:00:00");
+        endDate.setDate(endDate.getDate() - 1);
+        endStr = toLocalDateString(endDate);
+      }
+      return dateStr >= startStr && dateStr <= endStr;
+    });
+
+    cells.push({
       date,
-      dayName: dayNames[i],
-      dayNum: date.getDate(),
+      dayNum: d,
       isToday: isSameDay(date, today),
+      isCurrentMonth: true,
       entries: dayEntries,
+      events: dayEvents,
     });
   }
+
+  // Next month fill
+  while (cells.length < 42) {
+    const date = new Date(viewYear, viewMonth + 1, cells.length - firstDayOfMonth - daysInMonth + 1);
+    cells.push({ date, dayNum: date.getDate(), isToday: false, isCurrentMonth: false, entries: [], events: [] });
+  }
+
+  // If last row is entirely next month, trim to 35
+  const lastRowStart = 35;
+  const allNextMonth = cells.slice(lastRowStart).every((c) => !c.isCurrentMonth);
+  const displayCells = allNextMonth ? cells.slice(0, 35) : cells;
 
   return (
     <div className="min-h-screen bg-pg-cream pb-[110px] font-[family-name:var(--font-inter)]">
       {/* Header */}
-      <div className="px-7 pt-7">
-        <h1 className="font-[family-name:var(--font-fraunces)] text-2xl font-medium text-pg-ink">
-          {formatWeekRange(weekStart)}
-        </h1>
-        <p className="mt-0.5 text-sm text-pg-muted">Family calendar</p>
+      <div className="px-7 pt-7 flex items-start justify-between">
+        <div>
+          <h1 className="font-[family-name:var(--font-fraunces)] text-3xl font-medium text-pg-ink">
+            {monthName}
+          </h1>
+          <p className="mt-0.5 text-sm text-pg-muted">Family calendar</p>
+        </div>
+        <button
+          onClick={() => setShowEventForm(true)}
+          className="flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-semibold text-white"
+          style={{ background: "#4a6a32", boxShadow: "0 2px 0 rgba(74,106,50,0.3)" }}
+        >
+          <Plus size={16} />
+          Add event
+        </button>
       </div>
 
-      {/* Week nav */}
+      {/* Month nav */}
       <div className="mt-3 flex items-center justify-between px-7">
-        <button
-          type="button"
-          onClick={() => setWeekOffset((o) => o - 1)}
-          className="rounded-lg p-2 hover:bg-black/5"
-        >
+        <button onClick={goToPrevMonth} className="rounded-lg p-2 hover:bg-[rgba(68,55,32,0.06)]">
           <ChevronLeft size={20} className="text-pg-ink" />
         </button>
         <button
-          type="button"
-          onClick={() => setWeekOffset(0)}
-          className="rounded-lg px-3 py-1.5 text-xs font-medium text-pg-accent hover:bg-black/5"
+          onClick={goToToday}
+          className="rounded-lg px-3 py-1.5 text-xs font-semibold text-[#4a6a32] hover:bg-[rgba(107,142,78,0.08)]"
         >
           Today
         </button>
-        <button
-          type="button"
-          onClick={() => setWeekOffset((o) => o + 1)}
-          className="rounded-lg p-2 hover:bg-black/5"
-        >
+        <button onClick={goToNextMonth} className="rounded-lg p-2 hover:bg-[rgba(68,55,32,0.06)]">
           <ChevronRight size={20} className="text-pg-ink" />
         </button>
       </div>
 
-      {/* 7-day grid */}
+      {/* Calendar grid */}
       <div className="mt-4 px-4">
         {loading ? (
-          <div className="py-8 text-center text-pg-muted">Loading...</div>
+          <div className="py-12 text-center text-pg-muted">Loading...</div>
         ) : (
-          <div className="grid grid-cols-7 gap-1">
-            {/* Column headers */}
-            {days.map((day) => (
-              <div key={day.dayName} className="text-center">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-pg-muted">
-                  {day.dayName}
-                </p>
-                <p
-                  className={`mt-0.5 text-sm font-medium ${
-                    day.isToday
-                      ? "flex h-6 w-6 mx-auto items-center justify-center rounded-full bg-pg-accent text-white"
-                      : "text-pg-ink"
-                  }`}
-                >
-                  {day.dayNum}
-                </p>
-              </div>
-            ))}
+          <div className="rounded-[14px] border border-[rgba(68,55,32,0.14)] bg-white overflow-hidden">
+            {/* Day headers */}
+            <div className="grid grid-cols-7 border-b border-[rgba(68,55,32,0.14)] bg-[#F9F4E8]">
+              {["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"].map((d) => (
+                <div key={d} className="py-2 text-center text-[10px] font-bold uppercase tracking-wider text-[#857d68]">
+                  {d}
+                </div>
+              ))}
+            </div>
 
-            {/* Column bodies */}
-            {days.map((day) => (
-              <div
-                key={`body-${day.dayNum}`}
-                className="min-h-[120px] mt-2 space-y-1"
-              >
-                {day.entries.slice(0, 4).map((entry) => {
-                  const colors = kidColorMap[entry.kidId || ""] || KID_COLORS[0];
-                  return (
-                    <div
-                      key={entry.id}
-                      className={`rounded-sm border-l-2 ${colors.border} ${colors.bg} px-1 py-0.5`}
-                    >
-                      <p className={`truncate text-[9px] leading-tight ${colors.text}`}>
-                        {entry.chore?.title || entry.note || `+${entry.points}`}
-                      </p>
+            {/* Day cells */}
+            <div className="grid grid-cols-7">
+              {displayCells.map((cell, i) => {
+                const hasContent = cell.entries.length > 0 || cell.events.length > 0;
+                return (
+                  <div
+                    key={i}
+                    onClick={() => hasContent ? setSelectedDay(cell) : undefined}
+                    className={`min-h-[90px] border-b border-r border-[rgba(68,55,32,0.06)] p-1.5 ${
+                      cell.isToday ? "bg-[rgba(107,142,78,0.06)]" : ""
+                    } ${!cell.isCurrentMonth ? "opacity-40" : ""} ${
+                      hasContent ? "cursor-pointer hover:bg-[rgba(68,55,32,0.03)]" : ""
+                    }`}
+                  >
+                    {/* Day number */}
+                    <div className="mb-1">
+                      <span
+                        className={`inline-flex text-xs font-semibold ${
+                          cell.isToday
+                            ? "h-6 w-6 items-center justify-center rounded-full bg-[#4a6a32] text-white"
+                            : "text-[#2f2a1f]"
+                        }`}
+                      >
+                        {cell.dayNum}
+                      </span>
                     </div>
-                  );
-                })}
-                {day.entries.length > 4 && (
-                  <p className="text-center text-[9px] text-pg-muted">
-                    +{day.entries.length - 4} more
-                  </p>
-                )}
-              </div>
-            ))}
+
+                    {/* Google Calendar events */}
+                    {cell.events.slice(0, 2).map((ev) => {
+                      const colorIdx = getEventColor(ev.summary, kids) % 4;
+                      const colors = KID_COLORS[colorIdx] || KID_COLORS[0];
+                      return (
+                        <div
+                          key={ev.id}
+                          className="mb-0.5 truncate rounded-sm border-l-2 px-1 py-px text-[9px] leading-tight font-medium"
+                          style={{
+                            backgroundColor: colors.bg,
+                            borderLeftColor: colors.border,
+                            color: colors.text,
+                          }}
+                        >
+                          {ev.summary}
+                        </div>
+                      );
+                    })}
+
+                    {/* Point entries */}
+                    {cell.entries.slice(0, Math.max(0, 2 - cell.events.length)).map((entry) => {
+                      const colorIdx = kidColorMap[entry.kidId] ?? 0;
+                      const colors = KID_COLORS[colorIdx] || KID_COLORS[0];
+                      return (
+                        <div
+                          key={entry.id}
+                          className="mb-0.5 truncate rounded-sm border-l-2 px-1 py-px text-[9px] leading-tight font-medium"
+                          style={{
+                            backgroundColor: colors.bg,
+                            borderLeftColor: colors.border,
+                            color: colors.text,
+                          }}
+                        >
+                          {entry.chore?.title || entry.note || `+${entry.points}`}
+                        </div>
+                      );
+                    })}
+
+                    {/* Overflow count */}
+                    {(cell.entries.length + cell.events.length) > 2 && (
+                      <p className="text-[9px] text-[#857d68] text-center mt-0.5">
+                        +{cell.entries.length + cell.events.length - 2} more
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
 
       {/* Kid color legend */}
       {kids.length > 0 && (
-        <div className="mt-4 flex flex-wrap gap-3 px-7">
-          {kids.map((kid) => {
-            const colors = kidColorMap[kid.id] || KID_COLORS[0];
+        <div className="mt-4 flex flex-wrap gap-4 px-7">
+          {kids.map((kid, i) => {
+            const colors = KID_COLORS[i % 4];
             return (
               <div key={kid.id} className="flex items-center gap-1.5">
                 <div
-                  className={`h-2.5 w-2.5 rounded-full ${colors.bg} border ${colors.border}`}
+                  className="h-2.5 w-2.5 rounded-full"
+                  style={{ backgroundColor: colors.dot }}
                 />
-                <span className="text-xs text-pg-muted">
-                  {kid.name || kid.email}
-                </span>
+                <span className="text-xs text-[#857d68]">{kid.name || kid.email}</span>
               </div>
             );
           })}
         </div>
+      )}
+
+      {/* Day detail modal */}
+      {selectedDay && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          onClick={() => setSelectedDay(null)}
+        >
+          <div
+            className="w-full max-w-md rounded-[14px] border border-[rgba(68,55,32,0.14)] bg-white overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="border-b border-[rgba(68,55,32,0.14)] bg-[#F9F4E8] px-5 py-3 flex items-center justify-between">
+              <h3 className="font-[family-name:var(--font-fraunces)] text-lg font-medium text-[#2f2a1f]">
+                {selectedDay.date.toLocaleDateString("en-US", {
+                  weekday: "long",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </h3>
+              <button
+                onClick={() => setSelectedDay(null)}
+                className="text-[#857d68] hover:text-[#2f2a1f] transition"
+              >
+                &times;
+              </button>
+            </div>
+            <div className="max-h-[60vh] overflow-y-auto p-4 space-y-2">
+              {selectedDay.events.map((ev) => {
+                const colorIdx = getEventColor(ev.summary, kids) % 4;
+                const colors = KID_COLORS[colorIdx] || KID_COLORS[0];
+                const time = ev.start.dateTime
+                  ? new Date(ev.start.dateTime).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
+                  : "All day";
+                return (
+                  <div
+                    key={ev.id}
+                    className="rounded-lg border-l-3 px-3 py-2"
+                    style={{ backgroundColor: colors.bg, borderLeftColor: colors.border, borderLeftWidth: 3 }}
+                  >
+                    <p className="text-sm font-medium" style={{ color: colors.text }}>{ev.summary}</p>
+                    <p className="text-xs mt-0.5" style={{ color: colors.text, opacity: 0.7 }}>{time}</p>
+                  </div>
+                );
+              })}
+              {selectedDay.entries.map((entry) => {
+                const colorIdx = kidColorMap[entry.kidId] ?? 0;
+                const colors = KID_COLORS[colorIdx] || KID_COLORS[0];
+                return (
+                  <div
+                    key={entry.id}
+                    className="rounded-lg px-3 py-2"
+                    style={{ backgroundColor: colors.bg, borderLeft: `3px solid ${colors.border}` }}
+                  >
+                    <p className="text-sm font-medium" style={{ color: colors.text }}>
+                      {entry.chore?.title || entry.note || "Points"}
+                    </p>
+                    <p className="text-xs mt-0.5" style={{ color: colors.text, opacity: 0.7 }}>
+                      {entry.kidName} &middot; +{entry.points} pts
+                    </p>
+                  </div>
+                );
+              })}
+              {selectedDay.events.length === 0 && selectedDay.entries.length === 0 && (
+                <p className="text-sm text-[#857d68] text-center py-4">No events this day</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add event form */}
+      {showEventForm && calendarSettings?.isConnected && (
+        <CalendarEventForm
+          event={null}
+          selectedDate={new Date()}
+          onClose={() => setShowEventForm(false)}
+          onSave={() => {
+            setShowEventForm(false);
+            loadCalendarEvents();
+          }}
+        />
       )}
 
       <ParentTabBar />
