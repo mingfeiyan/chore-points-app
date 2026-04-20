@@ -231,19 +231,12 @@ export default function ParentHome({ userName }: ParentHomeProps) {
       icon: <Gift size={16} />,
       onClick: () => setShowRewardModal(true),
     },
-    ...(kids.length > 0
-      ? [
-          {
-            label: `View as ${kids[0].name || "Kid"}`,
-            icon: <User size={16} />,
-            onClick: () => {
-              setViewingAsKid({ id: kids[0].id, name: kids[0].name, email: kids[0].email });
-              router.push("/view-as/points");
-            },
-          },
-        ]
-      : []),
   ];
+
+  const handleViewAsKid = (kid: KidWithPoints) => {
+    setViewingAsKid({ id: kid.id, name: kid.name, email: kid.email });
+    router.push("/view-as/points");
+  };
 
   return (
     <div className="min-h-screen bg-pg-cream pb-[110px] font-[family-name:var(--font-inter)]">
@@ -305,33 +298,45 @@ export default function ParentHome({ userName }: ParentHomeProps) {
           kids.map((kid) => (
             <div
               key={kid.id}
-              className="flex items-center gap-4 rounded-xl border border-[rgba(68,55,32,0.14)] bg-white p-4"
+              className="rounded-xl border border-[rgba(68,55,32,0.14)] bg-white overflow-hidden"
             >
-              {/* Avatar */}
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-pg-accent text-white font-semibold text-sm">
-                {(kid.name || kid.email)[0].toUpperCase()}
-              </div>
-
-              {/* Name + points */}
-              <div className="flex-1">
-                <p className="font-semibold text-pg-ink">
-                  {kid.name || kid.email}
-                </p>
-                <div className="flex items-center gap-1 text-sm text-pg-muted">
-                  <CoinSmall size={14} />
-                  <span>{kid.totalPoints} pts</span>
+              {/* Main card content */}
+              <div className="flex items-center gap-4 p-4">
+                {/* Avatar */}
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-pg-accent text-white font-semibold text-sm shrink-0">
+                  {(kid.name || kid.email)[0].toUpperCase()}
                 </div>
+
+                {/* Name + points */}
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-pg-ink">
+                    {kid.name || kid.email}
+                  </p>
+                  <div className="flex items-center gap-1 text-sm text-pg-muted">
+                    <CoinSmall size={14} />
+                    <span>{kid.totalPoints} pts</span>
+                  </div>
+                </div>
+
+                {/* 7-day sparkline */}
+                <Sparkline data={getLast7DaysPoints(kid.allEntries)} />
+
+                {/* Today delta */}
+                {kid.todayDelta > 0 && (
+                  <span className="text-sm font-medium text-pg-accent-deep">
+                    +{kid.todayDelta} today
+                  </span>
+                )}
               </div>
 
-              {/* 7-day sparkline */}
-              <Sparkline data={getLast7DaysPoints(kid.allEntries)} />
-
-              {/* Today delta */}
-              {kid.todayDelta > 0 && (
-                <span className="text-sm font-medium text-pg-accent-deep">
-                  +{kid.todayDelta} today
-                </span>
-              )}
+              {/* View as kid bar */}
+              <button
+                onClick={() => handleViewAsKid(kid)}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-pg-accent-deep bg-[rgba(107,142,78,0.06)] border-t border-[rgba(68,55,32,0.08)] hover:bg-[rgba(107,142,78,0.12)] transition-colors"
+              >
+                <User size={14} />
+                View as {kid.name || "Kid"}
+              </button>
             </div>
           ))}
       </div>
