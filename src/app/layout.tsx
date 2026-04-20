@@ -2,11 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import SessionProvider from "@/components/providers/SessionProvider";
-import NavBar from "@/components/NavBar";
-import MobileNav from "@/components/MobileNav";
 import LocaleProvider from "@/components/LocaleProvider";
 import KidModeProvider from "@/components/providers/KidModeProvider";
-import KidModeBanner from "@/components/KidModeBanner";
+import NewDesignProvider from "@/components/v2/NewDesignProvider";
+import LayoutShell from "@/components/v2/LayoutShell";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,10 +35,9 @@ export default function RootLayout({
         <SessionProvider>
           <LocaleProvider>
             <KidModeProvider>
-              <NavBar />
-              <KidModeBanner />
-              <main className="pb-20 sm:pb-0">{children}</main>
-              <MobileNav />
+              <NewDesignProvider>
+                <LayoutShell>{children}</LayoutShell>
+              </NewDesignProvider>
             </KidModeProvider>
           </LocaleProvider>
         </SessionProvider>

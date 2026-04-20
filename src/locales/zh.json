@@ -141,7 +141,9 @@
     "familyMembers": "家庭成员",
     "inviteCode": "邀请码",
     "inviteCodeHint": "分享此邀请码让家庭成员加入",
-    "smartHome": "智能家居"
+    "smartHome": "智能家居",
+    "newDesignToggle": "试用新设计（测试版）",
+    "newDesignDesc": "切换到新的 Coin Arcade / Paper Garden 设计风格"
   },
   "chores": {
     "noChoresYet": "还没有家务任务",

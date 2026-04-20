@@ -404,7 +404,9 @@
     "familyMembers": "Family Members",
     "inviteCode": "Invite Code",
     "inviteCodeHint": "Share this code with family members to let them join your family",
-    "smartHome": "Smart Home"
+    "smartHome": "Smart Home",
+    "newDesignToggle": "Try new design (beta)",
+    "newDesignDesc": "Switches the entire UI to the new Coin Arcade / Paper Garden design"
   },
   "todos": {
     "title": "Family To-Do",

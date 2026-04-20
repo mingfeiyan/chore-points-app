@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useNewDesign } from "@/hooks/useNewDesign";
 import FamilyInviteCode from "@/components/family/FamilyInviteCode";
 import BadgeManagementTabs from "@/components/settings/BadgeManagementTabs";
 
@@ -19,12 +20,40 @@ type Props = {
 export default function SettingsPageContent({ familyName, inviteCode, kids }: Props) {
   const t = useTranslations("settings");
   const tParent = useTranslations("parent");
+  const { isNewDesign, setNewDesign } = useNewDesign();
 
   return (
     <>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">{t("pageTitle")}</h1>
         <p className="text-gray-500 mt-1">{t("pageDesc")}</p>
+      </div>
+
+      {/* New Design Toggle */}
+      <div className="bg-white shadow rounded-lg p-6 mb-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">
+              {t("newDesignToggle")}
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">{t("newDesignDesc")}</p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={isNewDesign}
+            onClick={() => setNewDesign(!isNewDesign)}
+            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${
+              isNewDesign ? "bg-indigo-600" : "bg-gray-200"
+            }`}
+          >
+            <span
+              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                isNewDesign ? "translate-x-5" : "translate-x-0"
+              }`}
+            />
+          </button>
+        </div>
       </div>
 
       {/* Family Info Card */}
