@@ -7,6 +7,9 @@ import ParentTabBar from "@/components/v2/ParentTabBar";
 import OverflowMenu from "@/components/v2/OverflowMenu";
 import CoinSmall from "@/components/v2/CoinSmall";
 import LogRewardModal from "@/components/rewards/LogRewardModal";
+import WeeklyCalendarView from "@/components/calendar/WeeklyCalendarView";
+import PhotoCarousel from "@/components/dashboard/PhotoCarousel";
+import { useKidMode } from "@/components/providers/KidModeProvider";
 
 // ------- Types -------
 
@@ -75,9 +78,11 @@ function isToday(dateStr: string): boolean {
 
 export default function ParentHome({ userName }: ParentHomeProps) {
   const router = useRouter();
+  const { setViewingAsKid } = useKidMode();
   const [kids, setKids] = useState<KidWithPoints[]>([]);
   const [loading, setLoading] = useState(true);
   const [showRewardModal, setShowRewardModal] = useState(false);
+  const [weather, setWeather] = useState<{ temp: number; icon: string; location: string } | null>(null);
 
   const firstName = userName?.split(" ")[0] || "there";
 
@@ -115,7 +120,33 @@ export default function ParentHome({ userName }: ParentHomeProps) {
 
   useEffect(() => {
     fetchData();
+    fetchWeather();
   }, []);
+
+  const fetchWeather = async () => {
+    try {
+      if (!("geolocation" in navigator)) return;
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const { latitude, longitude } = pos.coords;
+          const [wRes, gRes] = await Promise.all([
+            fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code&temperature_unit=fahrenheit`),
+            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`),
+          ]);
+          const wData = await wRes.json();
+          const gData = await gRes.json();
+          if (wData.current) {
+            const code = wData.current.weather_code;
+            const icons: Record<number, string> = { 0: "☀️", 1: "🌤️", 2: "⛅", 3: "☁️", 45: "🌫️", 51: "🌧️", 61: "🌧️", 71: "🌨️", 80: "🌦️", 95: "⛈️" };
+            const icon = icons[code] || "🌡️";
+            const location = gData.address?.city || gData.address?.town || gData.address?.county || "";
+            setWeather({ temp: Math.round(wData.current.temperature_2m), icon, location });
+          }
+        },
+        () => {} // silently fail if location denied
+      );
+    } catch { /* ignore */ }
+  };
 
   const allTodayEntries = kids
     .flatMap((k) =>
@@ -135,11 +166,18 @@ export default function ParentHome({ userName }: ParentHomeProps) {
       icon: <Gift size={16} />,
       onClick: () => setShowRewardModal(true),
     },
-    {
-      label: "View as Kid",
-      icon: <User size={16} />,
-      onClick: () => router.push("/points"),
-    },
+    ...(kids.length > 0
+      ? [
+          {
+            label: `View as ${kids[0].name || "Kid"}`,
+            icon: <User size={16} />,
+            onClick: () => {
+              setViewingAsKid({ id: kids[0].id, name: kids[0].name, email: kids[0].email });
+              router.push("/view-as/points");
+            },
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -174,9 +212,14 @@ export default function ParentHome({ userName }: ParentHomeProps) {
           <OverflowMenu items={overflowItems} />
         </div>
 
-        {/* Date */}
+        {/* Date + weather */}
         <p className="text-[11px] font-bold uppercase tracking-wide text-pg-muted">
           {formatDate(new Date())}
+          {weather && (
+            <span>
+              {weather.location && ` · ${weather.location}`} · {weather.icon} {weather.temp}°F
+            </span>
+          )}
         </p>
 
         {/* Greeting */}
@@ -256,6 +299,26 @@ export default function ParentHome({ userName }: ParentHomeProps) {
           </div>
         </div>
       )}
+
+      {/* Weekly Calendar */}
+      <div className="mt-5 px-7">
+        <h2 className="font-[family-name:var(--font-fraunces)] text-xl text-pg-ink mb-3">
+          Family calendar
+        </h2>
+        <div className="rounded-xl border border-[rgba(68,55,32,0.14)] bg-white overflow-hidden p-4">
+          <WeeklyCalendarView />
+        </div>
+      </div>
+
+      {/* Photo Gallery */}
+      <div className="mt-5 px-7">
+        <h2 className="font-[family-name:var(--font-fraunces)] text-xl text-pg-ink mb-3">
+          Recent photos
+        </h2>
+        <div className="rounded-xl border border-[rgba(68,55,32,0.14)] bg-white overflow-hidden p-4">
+          <PhotoCarousel />
+        </div>
+      </div>
 
       {/* LogRewardModal */}
       {showRewardModal && (
