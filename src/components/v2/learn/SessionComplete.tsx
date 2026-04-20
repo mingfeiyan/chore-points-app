@@ -43,14 +43,16 @@ export default function SessionComplete({
       {/* White card */}
       <div className="flex-1 bg-white mx-4 -mt-4 rounded-2xl p-5 shadow-sm">
         {/* Personal best banner */}
-        <div className="bg-gradient-to-r from-amber-100 to-yellow-100 border border-amber-200 rounded-full px-4 py-1.5 text-center mb-5">
-          <span
-            className="text-sm font-extrabold text-amber-700"
-            style={{ fontFamily: "var(--font-baloo-2), sans-serif" }}
-          >
-            NEW PERSONAL BEST!
-          </span>
-        </div>
+        {bestCombo > 0 && correctCount === total && (
+          <div className="bg-gradient-to-r from-amber-100 to-yellow-100 border border-amber-200 rounded-full px-4 py-1.5 text-center mb-5">
+            <span
+              className="text-sm font-extrabold text-amber-700"
+              style={{ fontFamily: "var(--font-baloo-2), sans-serif" }}
+            >
+              NEW PERSONAL BEST!
+            </span>
+          </div>
+        )}
 
         {/* 3-column stats */}
         <div className="grid grid-cols-3 gap-3 mb-8">

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import KidHeaderBG from "@/components/v2/KidHeaderBG";
 import KidTabBar from "@/components/v2/KidTabBar";
 import CoinSmall from "@/components/v2/CoinSmall";
@@ -81,26 +82,26 @@ export default function KidLearnEntry() {
                 <CoinSmall size={14} /> +5
               </span>
             </div>
-            <a
+            <Link
               href="/learn/sight-words"
               className="mt-2 inline-block bg-ca-cobalt text-white text-sm font-bold px-5 py-1.5 rounded-xl"
             >
               Start
-            </a>
+            </Link>
           </div>
         </div>
 
         {/* Subject tiles */}
         <div className="grid grid-cols-2 gap-3">
           {subjectTiles.map((tile) => (
-            <a
+            <Link
               key={tile.name}
               href={tile.href}
               className={`${tile.bg} rounded-2xl p-4 flex flex-col items-center justify-center aspect-square shadow-sm`}
             >
               <span className="text-3xl mb-2">{tile.icon}</span>
               <span className="text-sm font-bold text-ca-ink text-center">{tile.name}</span>
-            </a>
+            </Link>
           ))}
         </div>
       </div>

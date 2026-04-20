@@ -29,6 +29,7 @@ type SessionState = {
   words: SightWord[];
   total: number;
   correctCount: number;
+  correctWordIds: string[];
   combo: number;
   bestCombo: number;
   coins: number;
@@ -52,6 +53,7 @@ const initialState: SessionState = {
   words: [],
   total: 0,
   correctCount: 0,
+  correctWordIds: [],
   combo: 0,
   bestCombo: 0,
   coins: 0,
@@ -68,6 +70,7 @@ function sessionReducer(state: SessionState, action: SessionAction): SessionStat
         step: "preview",
         wordIndex: 0,
         correctCount: 0,
+        correctWordIds: [],
         combo: 0,
         bestCombo: 0,
         coins: 0,
@@ -83,12 +86,16 @@ function sessionReducer(state: SessionState, action: SessionAction): SessionStat
     case "CORRECT_ANSWER": {
       const newCombo = state.combo + 1;
       const newBestCombo = Math.max(state.bestCombo, newCombo);
+      const currentWord = state.words[state.wordIndex];
       return {
         ...state,
         combo: newCombo,
         bestCombo: newBestCombo,
         coins: state.coins + 1,
         correctCount: state.correctCount + 1,
+        correctWordIds: currentWord
+          ? [...state.correctWordIds, currentWord.id]
+          : state.correctWordIds,
         showCelebration: true,
       };
     }
@@ -174,12 +181,15 @@ export default function LearnSession({ kidId, kidName, onExit }: LearnSessionPro
 
   // Record results on complete
   useEffect(() => {
-    if (state.step !== "complete" || state.words.length === 0) return;
+    if (state.step !== "complete" || state.correctWordIds.length === 0) return;
 
     async function recordResults() {
       try {
-        // Record each correct word
-        for (const word of state.words) {
+        const correctWords = state.words.filter((w) =>
+          state.correctWordIds.includes(w.id)
+        );
+        // Record only correct words
+        for (const word of correctWords) {
           await fetch("/api/sight-words/quiz", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -196,10 +206,8 @@ export default function LearnSession({ kidId, kidName, onExit }: LearnSessionPro
       }
     }
 
-    if (state.correctCount > 0) {
-      recordResults();
-    }
-  }, [state.step, state.words, state.correctCount, kidId]);
+    recordResults();
+  }, [state.step, state.words, state.correctWordIds, kidId]);
 
   const handleDismissCelebration = useCallback(() => {
     dispatch({ type: "DISMISS_CELEBRATION" });
