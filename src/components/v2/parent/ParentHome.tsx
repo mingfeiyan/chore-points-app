@@ -354,6 +354,51 @@ export default function ParentHome({ userName }: ParentHomeProps) {
         </div>
       )}
 
+      {/* Recent Rewards */}
+      {(() => {
+        const rewardEntries = kids
+          .flatMap((k) =>
+            k.allEntries
+              .filter((e) => e.points < 0)
+              .map((e) => ({ ...e, kidName: k.name || k.email }))
+          )
+          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          .slice(0, 5);
+
+        if (rewardEntries.length === 0) return null;
+
+        return (
+          <div className="mt-5 px-7">
+            <h2 className="font-[family-name:var(--font-fraunces)] text-xl text-pg-ink mb-3">
+              Recent rewards
+            </h2>
+            <div className="rounded-xl border border-[rgba(68,55,32,0.14)] bg-white overflow-hidden">
+              {rewardEntries.map((entry, i) => (
+                <div
+                  key={entry.id}
+                  className={`flex items-center gap-3 px-4 py-3 ${
+                    i < rewardEntries.length - 1 ? "border-b border-[rgba(68,55,32,0.08)]" : ""
+                  }`}
+                >
+                  <span className="text-lg">🎁</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-pg-ink truncate">
+                      {entry.note || "Reward"}
+                    </p>
+                    <p className="text-[11px] text-pg-muted">
+                      {entry.kidName} &middot; {new Date(entry.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                    </p>
+                  </div>
+                  <span className="text-sm font-semibold text-pg-coral">
+                    {entry.points} pts
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Weekly Calendar */}
       <div className="mt-5 px-7">
         <h2 className="font-[family-name:var(--font-fraunces)] text-xl text-pg-ink mb-3">
