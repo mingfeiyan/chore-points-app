@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import CalendarEventForm from "./CalendarEventForm";
+import { useNewDesign } from "@/hooks/useNewDesign";
 
 interface CalendarEvent {
   id: string;
@@ -50,6 +51,56 @@ function getEventColor(summary: string): { color: string; dotColor: string; memb
 
 export default function WeeklyCalendarView() {
   const t = useTranslations("calendar");
+  const { isNewDesign } = useNewDesign();
+
+  // Paper Garden theme classes (vs default gray/blue)
+  const theme = isNewDesign ? {
+    card: "bg-white rounded-[14px] border border-[rgba(68,55,32,0.14)] overflow-hidden",
+    headerBg: "bg-[#F9F4E8] border-b border-[rgba(68,55,32,0.14)]",
+    legendBg: "bg-[#F9F4E8] border-b border-[rgba(68,55,32,0.14)]",
+    legendText: "text-[#857d68]",
+    dayHeaderBg: "border-b border-[rgba(68,55,32,0.14)] bg-[#F9F4E8]",
+    dayHeaderText: "text-[#857d68]",
+    dayText: "text-[#2f2a1f]",
+    todayBg: "bg-[rgba(107,142,78,0.06)]",
+    todayPill: "w-7 h-7 mx-auto flex items-center justify-center bg-[#4a6a32] text-white rounded-full",
+    divider: "divide-[rgba(68,55,32,0.08)]",
+    borderDivider: "border-[rgba(68,55,32,0.08)]",
+    btnPrimary: "text-white bg-[#4a6a32] hover:bg-[#3d5a2a]",
+    linkColor: "text-[#4a6a32] hover:text-[#3d5a2a]",
+    navHover: "hover:bg-[rgba(68,55,32,0.08)]",
+    moreText: "text-[#4a6a32] hover:text-[#3d5a2a]",
+    modalFooterBg: "bg-[#F9F4E8]",
+    modalEditBtn: "text-[#4a6a32] hover:bg-[rgba(107,142,78,0.1)]",
+    skeleton: "bg-[rgba(68,55,32,0.08)]",
+    skeletonBlock: "bg-[rgba(68,55,32,0.06)]",
+    connectIcon: "bg-[rgba(107,142,78,0.15)]",
+    connectIconSvg: "text-[#4a6a32]",
+    connectBtn: "bg-[#4a6a32] text-white hover:bg-[#3d5a2a]",
+  } : {
+    card: "bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden",
+    headerBg: "bg-gray-50 border-b",
+    legendBg: "bg-gray-50 border-b",
+    legendText: "text-gray-600",
+    dayHeaderBg: "border-b border-gray-200 bg-gray-50",
+    dayHeaderText: "text-gray-500",
+    dayText: "text-gray-900",
+    todayBg: "bg-blue-50",
+    todayPill: "w-7 h-7 mx-auto flex items-center justify-center bg-blue-600 text-white rounded-full",
+    divider: "divide-gray-100",
+    borderDivider: "border-gray-100",
+    btnPrimary: "text-white bg-blue-600 hover:bg-blue-700",
+    linkColor: "text-blue-600 hover:text-blue-800",
+    navHover: "hover:bg-gray-200",
+    moreText: "text-gray-500 hover:text-gray-700",
+    modalFooterBg: "bg-gray-50",
+    modalEditBtn: "text-blue-600 hover:bg-blue-50",
+    skeleton: "bg-gray-200",
+    skeletonBlock: "bg-gray-100",
+    connectIcon: "bg-blue-100",
+    connectIconSvg: "text-blue-600",
+    connectBtn: "bg-blue-600 text-white hover:bg-blue-700",
+  };
   const [settings, setSettings] = useState<CalendarSettings | null>(null);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -348,12 +399,12 @@ export default function WeeklyCalendarView() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className={`${theme.card} p-6`}>
         <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 rounded w-1/4 mb-4"></div>
+          <div className={`h-6 ${theme.skeleton} rounded w-1/4 mb-4`}></div>
           <div className="grid grid-cols-7 gap-2">
             {Array.from({ length: 7 }).map((_, i) => (
-              <div key={i} className="h-24 bg-gray-100 rounded"></div>
+              <div key={i} className={`h-24 ${theme.skeletonBlock} rounded`}></div>
             ))}
           </div>
         </div>
@@ -363,11 +414,11 @@ export default function WeeklyCalendarView() {
 
   if (!settings?.isConnected) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className={`${theme.card} p-6`}>
         <div className="text-center py-4">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-3">
+          <div className={`inline-flex items-center justify-center w-12 h-12 ${theme.connectIcon} rounded-full mb-3`}>
             <svg
-              className="w-6 h-6 text-blue-600"
+              className={`w-6 h-6 ${theme.connectIconSvg}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -380,11 +431,11 @@ export default function WeeklyCalendarView() {
               />
             </svg>
           </div>
-          <h3 className="font-medium text-gray-900 mb-1">{t("connectCalendar")}</h3>
-          <p className="text-sm text-gray-500 mb-4">{t("connectDescription")}</p>
+          <h3 className={`font-medium ${theme.dayText} mb-1`}>{t("connectCalendar")}</h3>
+          <p className={`text-sm ${theme.legendText} mb-4`}>{t("connectDescription")}</p>
           <Link
             href="/calendar"
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+            className={`inline-flex items-center px-4 py-2 ${theme.connectBtn} rounded-lg transition text-sm font-medium`}
           >
             {t("connect")}
           </Link>
@@ -394,14 +445,14 @@ export default function WeeklyCalendarView() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div className={theme.card}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b">
+      <div className={`flex items-center justify-between px-4 py-3 ${theme.headerBg}`}>
         {/* Mobile: Navigation and date range */}
         <div className="md:hidden flex items-center gap-1">
           <button
             onClick={goToPreviousMobileWeek}
-            className="p-2 min-h-[44px] min-w-[44px] hover:bg-gray-200 rounded transition flex items-center justify-center"
+            className={`p-2 min-h-[44px] min-w-[44px] ${theme.navHover} rounded transition flex items-center justify-center`}
           >
             <svg
               className="w-5 h-5 text-gray-600"
@@ -419,7 +470,7 @@ export default function WeeklyCalendarView() {
           </button>
           <button
             onClick={goToNextMobileWeek}
-            className="p-2 min-h-[44px] min-w-[44px] hover:bg-gray-200 rounded transition flex items-center justify-center"
+            className={`p-2 min-h-[44px] min-w-[44px] ${theme.navHover} rounded transition flex items-center justify-center`}
           >
             <svg
               className="w-5 h-5 text-gray-600"
@@ -435,7 +486,7 @@ export default function WeeklyCalendarView() {
               />
             </svg>
           </button>
-          <span className="font-medium text-gray-900 text-sm">
+          <span className={`font-medium ${theme.dayText} text-sm`}>
             {mobileDays[0].toLocaleDateString(undefined, {
               month: "short",
               day: "numeric",
@@ -448,7 +499,7 @@ export default function WeeklyCalendarView() {
           </span>
           <button
             onClick={goToMobileToday}
-            className="text-xs text-blue-600 hover:text-blue-800 px-2 py-1 min-h-[44px] flex items-center"
+            className={`text-xs ${theme.linkColor} px-2 py-1 min-h-[44px] flex items-center`}
           >
             {t("today")}
           </button>
@@ -459,7 +510,7 @@ export default function WeeklyCalendarView() {
           <div className="flex items-center gap-1">
             <button
               onClick={goToPreviousTwoWeeks}
-              className="p-2 min-h-[44px] min-w-[44px] hover:bg-gray-200 rounded transition flex items-center justify-center"
+              className={`p-2 min-h-[44px] min-w-[44px] ${theme.navHover} rounded transition flex items-center justify-center`}
             >
               <svg
                 className="w-5 h-5 text-gray-600"
@@ -477,7 +528,7 @@ export default function WeeklyCalendarView() {
             </button>
             <button
               onClick={goToNextTwoWeeks}
-              className="p-2 min-h-[44px] min-w-[44px] hover:bg-gray-200 rounded transition flex items-center justify-center"
+              className={`p-2 min-h-[44px] min-w-[44px] ${theme.navHover} rounded transition flex items-center justify-center`}
             >
               <svg
                 className="w-5 h-5 text-gray-600"
@@ -494,7 +545,7 @@ export default function WeeklyCalendarView() {
               </svg>
             </button>
           </div>
-          <span className="font-medium text-gray-900">
+          <span className={`font-medium ${theme.dayText}`}>
             {firstWeekDays[0].toLocaleDateString(undefined, {
               month: "short",
               day: "numeric",
@@ -507,7 +558,7 @@ export default function WeeklyCalendarView() {
           </span>
           <button
             onClick={goToToday}
-            className="text-sm text-blue-600 hover:text-blue-800 p-2 min-h-[44px] flex items-center"
+            className={`text-sm ${theme.linkColor} p-2 min-h-[44px] flex items-center`}
           >
             {t("today")}
           </button>
@@ -517,7 +568,7 @@ export default function WeeklyCalendarView() {
         <div className="flex items-center gap-2">
           <button
             onClick={handleOpenCreateForm}
-            className="flex items-center justify-center gap-1 px-3 md:px-4 py-2.5 min-h-[44px] min-w-[44px] text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition"
+            className={`flex items-center justify-center gap-1 px-3 md:px-4 py-2.5 min-h-[44px] min-w-[44px] text-sm font-medium ${theme.btnPrimary} rounded-lg transition`}
           >
             <svg className="w-5 h-5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -526,7 +577,7 @@ export default function WeeklyCalendarView() {
           </button>
           <Link
             href="/calendar"
-            className="text-sm text-gray-500 hover:text-gray-700 p-2 min-h-[44px] flex items-center whitespace-nowrap"
+            className={`text-sm ${theme.moreText} p-2 min-h-[44px] flex items-center whitespace-nowrap`}
           >
             <span className="hidden md:inline">{t("viewFullCalendar") || "View Full Calendar"}</span>
             <span className="md:hidden">{t("more") || "More"}</span>
@@ -536,25 +587,25 @@ export default function WeeklyCalendarView() {
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 px-4 py-2 bg-gray-50 border-b text-xs">
+      <div className={`flex flex-wrap items-center justify-center gap-2 md:gap-4 px-4 py-2 ${theme.legendBg} text-xs`}>
         {FAMILY_MEMBERS.map((member) => (
           <div key={member.name} className="flex items-center gap-1.5">
             <span className={`w-2.5 h-2.5 rounded-full ${member.dotColor}`}></span>
-            <span className="text-gray-600">{member.name}</span>
+            <span className={theme.legendText}>{member.name}</span>
           </div>
         ))}
         <div className="flex items-center gap-1.5">
           <span className={`w-2.5 h-2.5 rounded-full ${DEFAULT_COLOR.dotColor}`}></span>
-          <span className="text-gray-600">{t("other") || "Other"}</span>
+          <span className={theme.legendText}>{t("other") || "Other"}</span>
         </div>
       </div>
 
       {/* Mobile View: 6 days from today in a 3x2 grid */}
       <div className="md:hidden">
-        <div className="grid grid-cols-3 divide-x divide-gray-100">
+        <div className={`grid grid-cols-3 divide-x ${theme.divider}`}>
           {mobileDays.slice(0, 3).map((day, index) => {
             const dayEvents = getEventsForDay(day);
-            const todayClass = isToday(day) ? "bg-blue-50" : "";
+            const todayClass = isToday(day) ? theme.todayBg : "";
             const dayName = dayNames[day.getDay()];
 
             return (
@@ -563,13 +614,13 @@ export default function WeeklyCalendarView() {
                 className={`min-h-[70px] ${todayClass}`}
               >
                 {/* Day Header */}
-                <div className="px-2 py-1 text-center border-b border-gray-100">
-                  <div className="text-xs text-gray-500 uppercase">{dayName}</div>
+                <div className="px-2 py-1 text-center border-b ${theme.borderDivider}">
+                  <div className={`text-xs ${theme.dayHeaderText} uppercase`}>{dayName}</div>
                   <div
                     className={`text-sm font-medium ${
                       isToday(day)
-                        ? "w-7 h-7 mx-auto flex items-center justify-center bg-blue-600 text-white rounded-full"
-                        : "text-gray-900"
+                        ? theme.todayPill
+                        : theme.dayText
                     }`}
                   >
                     {day.getDate()}
@@ -601,7 +652,7 @@ export default function WeeklyCalendarView() {
                         e.stopPropagation();
                         setSelectedDayEvents({ date: day, events: dayEvents });
                       }}
-                      className="text-xs text-blue-600 hover:text-blue-800 hover:underline cursor-pointer px-1"
+                      className={`text-xs ${theme.linkColor} hover:underline cursor-pointer px-1`}
                     >
                       +{dayEvents.length - 2}
                     </button>
@@ -611,10 +662,10 @@ export default function WeeklyCalendarView() {
             );
           })}
         </div>
-        <div className="grid grid-cols-3 divide-x divide-gray-100 border-t border-gray-200">
+        <div className={`grid grid-cols-3 divide-x ${theme.divider} border-t ${theme.borderDivider}`}>
           {mobileDays.slice(3, 6).map((day, index) => {
             const dayEvents = getEventsForDay(day);
-            const todayClass = isToday(day) ? "bg-blue-50" : "";
+            const todayClass = isToday(day) ? theme.todayBg : "";
             const dayName = dayNames[day.getDay()];
 
             return (
@@ -623,13 +674,13 @@ export default function WeeklyCalendarView() {
                 className={`min-h-[70px] ${todayClass}`}
               >
                 {/* Day Header */}
-                <div className="px-2 py-1 text-center border-b border-gray-100">
-                  <div className="text-xs text-gray-500 uppercase">{dayName}</div>
+                <div className="px-2 py-1 text-center border-b ${theme.borderDivider}">
+                  <div className={`text-xs ${theme.dayHeaderText} uppercase`}>{dayName}</div>
                   <div
                     className={`text-sm font-medium ${
                       isToday(day)
-                        ? "w-7 h-7 mx-auto flex items-center justify-center bg-blue-600 text-white rounded-full"
-                        : "text-gray-900"
+                        ? theme.todayPill
+                        : theme.dayText
                     }`}
                   >
                     {day.getDate()}
@@ -661,7 +712,7 @@ export default function WeeklyCalendarView() {
                         e.stopPropagation();
                         setSelectedDayEvents({ date: day, events: dayEvents });
                       }}
-                      className="text-xs text-blue-600 hover:text-blue-800 hover:underline cursor-pointer px-1"
+                      className={`text-xs ${theme.linkColor} hover:underline cursor-pointer px-1`}
                     >
                       +{dayEvents.length - 2}
                     </button>
@@ -676,19 +727,19 @@ export default function WeeklyCalendarView() {
       {/* Desktop View: Full 2-week calendar */}
       <div className="hidden md:block">
         {/* Day Headers */}
-        <div className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
+        <div className={`grid grid-cols-7 ${theme.dayHeaderBg}`}>
           {dayNames.map((name, index) => (
-            <div key={index} className="px-2 py-2 text-center text-xs text-gray-500 uppercase font-medium">
+            <div key={index} className={`px-2 py-2 text-center text-xs ${theme.dayHeaderText} uppercase font-medium`}>
               {name}
             </div>
           ))}
         </div>
 
         {/* First Week Grid */}
-        <div className="grid grid-cols-7 divide-x divide-gray-100">
+        <div className={`grid grid-cols-7 divide-x ${theme.divider}`}>
           {firstWeekDays.map((day, index) => {
             const dayEvents = getEventsForDay(day);
-            const todayClass = isToday(day) ? "bg-blue-50" : "";
+            const todayClass = isToday(day) ? theme.todayBg : "";
 
             return (
               <div
@@ -700,8 +751,8 @@ export default function WeeklyCalendarView() {
                   <div
                     className={`text-sm font-medium ${
                       isToday(day)
-                        ? "w-7 h-7 mx-auto flex items-center justify-center bg-blue-600 text-white rounded-full"
-                        : "text-gray-900"
+                        ? theme.todayPill
+                        : theme.dayText
                     }`}
                   >
                     {day.getDate()}
@@ -733,7 +784,7 @@ export default function WeeklyCalendarView() {
                         e.stopPropagation();
                         setSelectedDayEvents({ date: day, events: dayEvents });
                       }}
-                      className="text-xs text-blue-600 hover:text-blue-800 hover:underline cursor-pointer px-1"
+                      className={`text-xs ${theme.linkColor} hover:underline cursor-pointer px-1`}
                     >
                       +{dayEvents.length - 2} {t("more")}
                     </button>
@@ -745,13 +796,13 @@ export default function WeeklyCalendarView() {
         </div>
 
         {/* Divider between weeks */}
-        <div className="border-t border-gray-200"></div>
+        <div className={`border-t ${theme.borderDivider}`}></div>
 
         {/* Second Week Grid */}
-        <div className="grid grid-cols-7 divide-x divide-gray-100">
+        <div className={`grid grid-cols-7 divide-x ${theme.divider}`}>
           {secondWeekDays.map((day, index) => {
             const dayEvents = getEventsForDay(day);
-            const todayClass = isToday(day) ? "bg-blue-50" : "";
+            const todayClass = isToday(day) ? theme.todayBg : "";
 
             return (
               <div
@@ -763,8 +814,8 @@ export default function WeeklyCalendarView() {
                   <div
                     className={`text-sm font-medium ${
                       isToday(day)
-                        ? "w-7 h-7 mx-auto flex items-center justify-center bg-blue-600 text-white rounded-full"
-                        : "text-gray-900"
+                        ? theme.todayPill
+                        : theme.dayText
                     }`}
                   >
                     {day.getDate()}
@@ -796,7 +847,7 @@ export default function WeeklyCalendarView() {
                         e.stopPropagation();
                         setSelectedDayEvents({ date: day, events: dayEvents });
                       }}
-                      className="text-xs text-blue-600 hover:text-blue-800 hover:underline cursor-pointer px-1"
+                      className={`text-xs ${theme.linkColor} hover:underline cursor-pointer px-1`}
                     >
                       +{dayEvents.length - 2} {t("more")}
                     </button>
@@ -897,11 +948,11 @@ export default function WeeklyCalendarView() {
                 </div>
 
                 {/* Modal Footer */}
-                <div className="flex items-center justify-between p-4 border-t bg-gray-50">
+                <div className={`flex items-center justify-between p-4 border-t ${theme.modalFooterBg}`}>
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleOpenEditForm(selectedEvent)}
-                      className="px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                      className={`px-3 py-1.5 text-sm font-medium ${theme.modalEditBtn} rounded-lg transition`}
                     >
                       {t("edit") || "Edit"}
                     </button>
@@ -958,8 +1009,8 @@ export default function WeeklyCalendarView() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-4 border-b bg-gray-50">
-              <h3 className="text-lg font-semibold text-gray-900">
+            <div className={`flex items-center justify-between p-4 border-b ${theme.headerBg}`}>
+              <h3 className={`text-lg font-semibold ${theme.dayText}`}>
                 {selectedDayEvents.date.toLocaleDateString(undefined, {
                   weekday: "long",
                   month: "long",
@@ -1003,7 +1054,7 @@ export default function WeeklyCalendarView() {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 border-t bg-gray-50">
+            <div className={`p-4 border-t ${theme.modalFooterBg}`}>
               <button
                 onClick={() => setSelectedDayEvents(null)}
                 className="w-full px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition"
