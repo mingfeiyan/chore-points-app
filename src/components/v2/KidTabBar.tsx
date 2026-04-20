@@ -4,9 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useKidMode } from "@/components/providers/KidModeProvider";
-import { Home, CalendarDays, BookOpen, Trophy, Image } from "lucide-react";
+import { Home, CalendarDays, BookOpen, Image } from "lucide-react";
 
-// Prefix helper: kid users go to /points, /learn, etc.
+// Kid users go to /points, /learn, etc.
 // Parents in kid mode go to /view-as/points, /view-as/learn, etc.
 function useTabs() {
   const { data: session } = useSession();
@@ -14,17 +14,21 @@ function useTabs() {
   const isParentViewingAsKid = session?.user?.role === "PARENT" && isKidMode;
   const prefix = isParentViewingAsKid ? "/view-as" : "";
 
-  const tabs = [
-    { label: "Home", href: `${prefix}/points`, icon: Home },
-    { label: "History", href: `${prefix}/points/history`, icon: CalendarDays },
-    { label: "Learn", href: `${prefix}/learn`, icon: BookOpen },
-  ];
-
   if (isParentViewingAsKid) {
-    tabs.push({ label: "Gallery", href: "/view-as/gallery", icon: Image });
+    return [
+      { label: "Home", href: "/view-as/points", icon: Home },
+      { label: "History", href: "/view-as/points/history", icon: CalendarDays },
+      { label: "Learn", href: "/view-as/learn", icon: BookOpen },
+      { label: "Gallery", href: "/view-as/gallery", icon: Image },
+    ];
   }
 
-  return tabs;
+  // Direct kid user — only routes that exist under (kid)/
+  return [
+    { label: "Home", href: "/points", icon: Home },
+    { label: "History", href: "/points/history", icon: CalendarDays },
+    { label: "Learn", href: "/learn", icon: BookOpen },
+  ];
 }
 
 export default function KidTabBar() {
@@ -40,7 +44,9 @@ export default function KidTabBar() {
       }}
     >
       {tabs.map((tab) => {
-        const isActive = pathname === tab.href || (tab.href !== "/points" && tab.href !== "/view-as/points" && pathname.startsWith(tab.href));
+        // Exact match for Home to avoid /points matching /points/history
+        const isHome = tab.label === "Home";
+        const isActive = isHome ? pathname === tab.href : pathname.startsWith(tab.href);
         const Icon = tab.icon;
         return (
           <Link
