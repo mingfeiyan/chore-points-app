@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useReducer } from "react";
+import { useCallback, useEffect, useReducer, useState } from "react";
 import LearnHeader from "./LearnHeader";
 import LearnPreview from "./LearnPreview";
 import SightWordsMissing from "./SightWordsMissing";
@@ -137,8 +137,9 @@ interface LearnSessionProps {
 
 export default function LearnSession({ kidId, kidName, onExit }: LearnSessionProps) {
   const [state, dispatch] = useReducer(sessionReducer, initialState);
+  const [sessionKey, setSessionKey] = useState(0);
 
-  // Fetch session words on mount
+  // Fetch session words on mount or when sessionKey changes (play again)
   useEffect(() => {
     async function fetchSession() {
       try {
@@ -169,7 +170,7 @@ export default function LearnSession({ kidId, kidName, onExit }: LearnSessionPro
     }
 
     fetchSession();
-  }, [kidId]);
+  }, [kidId, sessionKey]);
 
   // Record results on complete
   useEffect(() => {
@@ -205,10 +206,8 @@ export default function LearnSession({ kidId, kidName, onExit }: LearnSessionPro
   }, []);
 
   const handlePlayAgain = () => {
-    // Re-fetch and restart
     dispatch({ type: "START_SESSION", words: [] });
-    // Trigger re-mount via key or refetch
-    window.location.reload();
+    setSessionKey((k) => k + 1);
   };
 
   // Calculate progress

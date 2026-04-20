@@ -52,6 +52,7 @@
   --color-ca-paper: var(--ca-paper);
   --color-ca-ink: var(--ca-ink);
   --color-ca-muted: var(--ca-muted);
+  --color-ca-divider: var(--ca-divider);
   --color-ca-gold: var(--ca-gold);
   --color-ca-gold-deep: var(--ca-gold-deep);
   --color-ca-gold-glow: var(--ca-gold-glow);
@@ -75,6 +76,7 @@
   --color-pg-cream: var(--pg-cream);
   --color-pg-ink: var(--pg-ink);
   --color-pg-muted: var(--pg-muted);
+  --color-pg-line: var(--pg-line);
   --color-pg-accent: var(--pg-accent);
   --color-pg-accent-deep: var(--pg-accent-deep);
   --color-pg-coral: var(--pg-coral);
