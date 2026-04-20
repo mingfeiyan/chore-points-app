@@ -368,7 +368,7 @@ export default function ParentHome({ userName }: ParentHomeProps) {
       </div>
 
       {/* Photo Gallery */}
-      <div className="mt-5 px-7">
+      <div className="mt-5 px-7 lg:w-1/2">
         <h2 className="font-[family-name:var(--font-fraunces)] text-xl text-pg-ink mb-3">
           Recent photos
         </h2>
