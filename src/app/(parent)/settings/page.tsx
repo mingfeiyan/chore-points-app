@@ -38,12 +38,10 @@ export default async function SettingsPage() {
   const kids = family?.users.filter((u) => u.role === "KID") || [];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
-      <SettingsPageContent
-        familyName={family?.name || ""}
-        inviteCode={family?.inviteCode || ""}
-        kids={kids}
-      />
-    </div>
+    <SettingsPageContent
+      familyName={family?.name || ""}
+      inviteCode={family?.inviteCode || ""}
+      kids={kids}
+    />
   );
 }
