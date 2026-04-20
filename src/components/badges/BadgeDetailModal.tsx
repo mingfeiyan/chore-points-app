@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import BadgeIcon from "./BadgeIcon";
 import { BADGE_LEVELS } from "@/lib/badges";
 
@@ -44,6 +46,8 @@ type EarnedAchievementBadge = {
   descriptionZh: string;
   icon: string;
   customImageUrl?: string | null;
+  isCustomAward?: boolean;
+  points?: number | null;
 };
 
 type BadgeDetailModalProps = {
@@ -58,6 +62,10 @@ type BadgeDetailModalProps = {
   | {
       type: "chore";
       badge: ChoreBadge;
+    }
+  | {
+      type: "customAward";
+      badge: EarnedAchievementBadge;
     }
 );
 
@@ -75,6 +83,32 @@ export default function BadgeDetailModal(props: BadgeDetailModalProps) {
   const { onClose } = props;
   const t = useTranslations("badges");
   const locale = useLocale();
+  const { data: session } = useSession();
+  const router = useRouter();
+  const [regenerating, setRegenerating] = useState(false);
+  const isParent = session?.user?.role === "PARENT";
+
+  const handleRegenerate = async (badgeId: string) => {
+    setRegenerating(true);
+    try {
+      const res = await fetch(
+        `/api/achievement-badges/${badgeId}/regenerate-image`,
+        { method: "POST" }
+      );
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || "Failed to regenerate");
+        return;
+      }
+      router.refresh();
+      onClose();
+    } catch (err) {
+      console.error("Regenerate failed:", err);
+      alert("Failed to regenerate");
+    } finally {
+      setRegenerating(false);
+    }
+  };
 
   // Close on escape key
   useEffect(() => {
@@ -119,7 +153,54 @@ export default function BadgeDetailModal(props: BadgeDetailModalProps) {
           </svg>
         </button>
 
-        {props.type === "achievement" ? (
+        {props.type === "customAward" ? (
+          <div className="flex flex-col items-center text-center">
+            <div className="mb-4">
+              {props.badge.customImageUrl ? (
+                <BadgeIcon
+                  imageUrl={props.badge.customImageUrl}
+                  emoji="🎨"
+                  size="2xl"
+                  alt={props.badge.name}
+                  className="w-32 h-32 text-8xl"
+                />
+              ) : (
+                <div className="w-32 h-32 rounded-lg bg-gradient-to-br from-pink-100 to-purple-100 animate-pulse flex items-center justify-center text-6xl">
+                  🎨
+                </div>
+              )}
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">
+              {props.badge.name}
+            </h2>
+            {props.badge.description && (
+              <p className="text-sm text-gray-600 mb-4">
+                {props.badge.description}
+              </p>
+            )}
+            {typeof props.badge.points === "number" && (
+              <div className="mb-3 text-sm font-semibold text-green-600">
+                +{props.badge.points} pts
+              </div>
+            )}
+            <div className="flex items-center gap-2 text-gray-600 bg-gray-50 px-4 py-2 rounded-full mb-3">
+              <span className="text-sm">{formatDate(props.badge.earnedAt)}</span>
+            </div>
+            {isParent && (
+              <button
+                onClick={() => handleRegenerate(props.badge.id)}
+                disabled={regenerating}
+                className="mt-2 px-4 py-2 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {regenerating
+                  ? t("regenerating")
+                  : props.badge.customImageUrl
+                    ? t("regenerate")
+                    : t("generate")}
+              </button>
+            )}
+          </div>
+        ) : props.type === "achievement" ? (
           // Achievement Badge Detail
           <div className="flex flex-col items-center text-center">
             {/* Large Badge */}

@@ -88,8 +88,27 @@ export async function GET(req: Request) {
       orderBy: { earnedAt: "desc" },
     });
 
-    // Enrich achievement badges with definitions and custom template data
     const enrichedAchievementBadges = achievementBadges.map((badge) => {
+      if (badge.badgeId.startsWith("custom-award-")) {
+        const meta = (badge.metadata ?? {}) as {
+          taskDescription?: string;
+          points?: number;
+          imageUrl?: string | null;
+        };
+        const name = meta.taskDescription?.slice(0, 40) || "Custom award";
+        return {
+          ...badge,
+          name,
+          nameZh: name,
+          description: meta.taskDescription || "",
+          descriptionZh: meta.taskDescription || "",
+          icon: "🎨",
+          customImageUrl: meta.imageUrl || null,
+          isCustomAward: true,
+          points: meta.points ?? null,
+        };
+      }
+
       const definition = getAchievementBadgeById(badge.badgeId);
       const template = achievementTemplateMap.get(badge.badgeId);
 
@@ -100,8 +119,8 @@ export async function GET(req: Request) {
         description: template?.description || definition?.description || "",
         descriptionZh: template?.descriptionZh || definition?.descriptionZh || "",
         icon: template?.icon || definition?.icon || "🏅",
-        // Add custom template data if available
         customImageUrl: template?.imageUrl || null,
+        isCustomAward: false,
       };
     });
 

@@ -34,6 +34,8 @@ type AchievementBadge = {
   descriptionZh: string;
   icon: string;
   customImageUrl?: string | null;
+  isCustomAward?: boolean;
+  points?: number | null;
 };
 
 type AllAchievementBadge = {
@@ -48,7 +50,8 @@ type AllAchievementBadge = {
 
 type SelectedBadge =
   | { type: "achievement"; badge: AllAchievementBadge; earned: boolean; earnedBadge?: AchievementBadge }
-  | { type: "chore"; badge: Badge };
+  | { type: "chore"; badge: Badge }
+  | { type: "customAward"; badge: AchievementBadge };
 
 // Level-based colors for the multiplier badge
 const levelBadgeColors: Record<number, string> = {
@@ -94,8 +97,13 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
     }
   };
 
-  // Create a set of earned achievement badge IDs
-  const earnedAchievementIds = new Set(achievementBadges.map((b) => b.badgeId));
+  const customAwardBadges = achievementBadges.filter((b) => b.isCustomAward);
+  const staticAchievementBadges = achievementBadges.filter(
+    (b) => !b.isCustomAward
+  );
+  const earnedAchievementIds = new Set(
+    staticAchievementBadges.map((b) => b.badgeId)
+  );
 
   // Create a map of earned chore badges by choreId
   const earnedChoreBadgeMap = new Map(badges.map((b) => [b.chore.id, b]));
@@ -119,7 +127,9 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
         {/* Achievement Badges - show all, gray out unearned */}
         {allAchievementBadges.map((badge) => {
           const earned = earnedAchievementIds.has(badge.id);
-          const earnedBadge = achievementBadges.find((b) => b.badgeId === badge.id);
+          const earnedBadge = staticAchievementBadges.find(
+            (b) => b.badgeId === badge.id
+          );
 
           return (
             <button
@@ -140,6 +150,37 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
               {/* Name */}
               <div className={`text-xs text-center mt-2 font-medium leading-tight ${earned ? "text-gray-700" : "text-gray-400"}`}>
                 {locale === "zh" ? badge.nameZh : badge.name}
+              </div>
+            </button>
+          );
+        })}
+
+        {customAwardBadges.map((badge) => {
+          const pending = !badge.customImageUrl;
+          return (
+            <button
+              key={badge.id}
+              className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform"
+              onClick={() =>
+                setSelectedBadge({ type: "customAward", badge })
+              }
+            >
+              <div className="relative">
+                {pending ? (
+                  <div className="w-20 h-20 rounded-lg bg-gradient-to-br from-pink-100 to-purple-100 animate-pulse flex items-center justify-center text-3xl">
+                    🎨
+                  </div>
+                ) : (
+                  <BadgeIcon
+                    imageUrl={badge.customImageUrl}
+                    emoji={badge.icon}
+                    size="2xl"
+                    alt={badge.name}
+                  />
+                )}
+              </div>
+              <div className="text-xs text-center mt-2 font-medium text-gray-700 leading-tight line-clamp-2">
+                {badge.name}
               </div>
             </button>
           );

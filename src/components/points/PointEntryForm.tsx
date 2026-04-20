@@ -80,6 +80,7 @@ export default function PointEntryForm({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [generateBadge, setGenerateBadge] = useState(!entry);
   const t = useTranslations("parent");
   const tCommon = useTranslations("common");
   const tPhotos = useTranslations("photos");
@@ -199,6 +200,8 @@ export default function PointEntryForm({
           note: note || null,
           photoUrl: finalPhotoUrl,
           date,
+          generateBadge:
+            !entry && mode === "custom" && pointsValue > 0 && generateBadge,
         }),
       });
 
@@ -453,6 +456,23 @@ export default function PointEntryForm({
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
+
+          {!entry && mode === "custom" && (
+            <label className="flex items-start gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={generateBadge}
+                onChange={(e) => setGenerateBadge(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-sm text-gray-700">
+                <span className="font-medium">🎨 {t("generateBadge")}</span>
+                <span className="block text-xs text-gray-500">
+                  {t("generateBadgeHint")}
+                </span>
+              </span>
+            </label>
+          )}
 
           <div>
             <label
