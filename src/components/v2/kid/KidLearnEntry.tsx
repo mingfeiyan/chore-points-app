@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { BookOpen, Hash, RotateCcw, Sparkles, BookMarked, PartyPopper } from "lucide-react";
 import KidHeaderBG from "@/components/v2/KidHeaderBG";
 import KidTabBar from "@/components/v2/KidTabBar";
 import CoinSmall from "@/components/v2/CoinSmall";
@@ -62,7 +63,7 @@ export default function KidLearnEntry({ kidId: kidIdProp }: KidLearnEntryProps =
               color: activeTab === "sight-words" ? "var(--ca-cobalt-deep)" : "#fff",
             }}
           >
-            📚 Sight Words
+            <BookOpen size={16} /> Sight Words
           </button>
           <button
             onClick={() => setActiveTab("math")}
@@ -72,7 +73,7 @@ export default function KidLearnEntry({ kidId: kidIdProp }: KidLearnEntryProps =
               color: activeTab === "math" ? "var(--ca-cobalt-deep)" : "#fff",
             }}
           >
-            🔢 Math
+            <Hash size={16} /> Math
           </button>
         </div>
       </KidHeaderBG>
@@ -108,13 +109,17 @@ export default function KidLearnEntry({ kidId: kidIdProp }: KidLearnEntryProps =
             {/* Session card */}
             {allDone ? (
               <div className="bg-white rounded-2xl p-5 border border-[rgba(26,24,19,0.06)] text-center">
-                <span className="text-4xl">🎉</span>
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-ca-tile-mint mb-2">
+                  <PartyPopper size={28} className="text-ca-mint" />
+                </div>
                 <h3 className="text-lg font-extrabold text-ca-ink mt-2">All done for today!</h3>
                 <p className="text-sm text-ca-muted mt-1">Great job! Come back tomorrow for more.</p>
               </div>
             ) : noWords ? (
               <div className="bg-white rounded-2xl p-5 border border-[rgba(26,24,19,0.06)] text-center">
-                <span className="text-4xl">📚</span>
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-ca-tile-teal mb-2">
+                  <BookMarked size={28} className="text-ca-teal" />
+                </div>
                 <h3 className="text-lg font-extrabold text-ca-ink mt-2">No words yet</h3>
                 <p className="text-sm text-ca-muted mt-1">Ask a parent to add sight words.</p>
               </div>
@@ -124,7 +129,7 @@ export default function KidLearnEntry({ kidId: kidIdProp }: KidLearnEntryProps =
                 {isReview && wordCount > 0 && (
                   <div className="bg-white rounded-2xl p-4 border border-[rgba(26,24,19,0.06)] flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-ca-tile-peach flex items-center justify-center shrink-0">
-                      <span className="text-2xl">🔄</span>
+                      <RotateCcw size={24} className="text-ca-peach" />
                     </div>
                     <div className="flex-1">
                       <h3 className="text-base font-extrabold text-ca-ink">Review time!</h3>
@@ -149,7 +154,9 @@ export default function KidLearnEntry({ kidId: kidIdProp }: KidLearnEntryProps =
                     background: "linear-gradient(160deg, var(--ca-cobalt) 0%, var(--ca-cobalt-deep) 70%, #0d2480 100%)",
                   }}
                 >
-                  <span className="text-5xl">📚</span>
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/15">
+                    <Sparkles size={32} className="text-white" />
+                  </div>
                   <h3 className="text-xl font-black mt-3 font-[family-name:var(--font-baloo-2)]">
                     Let&apos;s learn {wordCount} {isReview ? "review" : "new"} words!
                   </h3>
@@ -176,7 +183,9 @@ export default function KidLearnEntry({ kidId: kidIdProp }: KidLearnEntryProps =
         ) : (
           /* Math tab */
           <div className="bg-white rounded-2xl p-5 border border-[rgba(26,24,19,0.06)] text-center">
-            <span className="text-4xl">🔢</span>
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-ca-tile-peach mb-2">
+              <Hash size={28} className="text-ca-peach" />
+            </div>
             <h3 className="text-lg font-extrabold text-ca-ink mt-2">Math Practice</h3>
             <p className="text-sm text-ca-muted mt-1">Coming soon!</p>
           </div>
