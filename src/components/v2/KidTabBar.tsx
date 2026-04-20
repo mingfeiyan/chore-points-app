@@ -2,18 +2,34 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, ListChecks, BookOpen, ShoppingBag, User } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useKidMode } from "@/components/providers/KidModeProvider";
+import { Home, CalendarDays, BookOpen, Trophy, Image } from "lucide-react";
 
-const tabs = [
-  { label: "Home", href: "/points", icon: Home },
-  { label: "Chores", href: "/chores", icon: ListChecks },
-  { label: "Learn", href: "/learn", icon: BookOpen },
-  { label: "Shop", href: "/shop", icon: ShoppingBag },
-  { label: "Profile", href: "/profile", icon: User },
-];
+// Prefix helper: kid users go to /points, /learn, etc.
+// Parents in kid mode go to /view-as/points, /view-as/learn, etc.
+function useTabs() {
+  const { data: session } = useSession();
+  const { isKidMode } = useKidMode();
+  const isParentViewingAsKid = session?.user?.role === "PARENT" && isKidMode;
+  const prefix = isParentViewingAsKid ? "/view-as" : "";
+
+  const tabs = [
+    { label: "Home", href: `${prefix}/points`, icon: Home },
+    { label: "History", href: `${prefix}/points/history`, icon: CalendarDays },
+    { label: "Learn", href: `${prefix}/learn`, icon: BookOpen },
+  ];
+
+  if (isParentViewingAsKid) {
+    tabs.push({ label: "Gallery", href: "/view-as/gallery", icon: Image });
+  }
+
+  return tabs;
+}
 
 export default function KidTabBar() {
   const pathname = usePathname();
+  const tabs = useTabs();
 
   return (
     <nav
@@ -24,7 +40,7 @@ export default function KidTabBar() {
       }}
     >
       {tabs.map((tab) => {
-        const isActive = pathname.startsWith(tab.href);
+        const isActive = pathname === tab.href || (tab.href !== "/points" && tab.href !== "/view-as/points" && pathname.startsWith(tab.href));
         const Icon = tab.icon;
         return (
           <Link

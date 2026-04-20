@@ -44,13 +44,24 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
   const pathname = usePathname();
 
   if (isNewDesign) {
-    // Determine if we need to show a tab bar (for pages that don't render their own)
-    const isViewAsPage = pathname.startsWith("/view-as");
-    const isKidRoute = pathname.startsWith("/points") || pathname.startsWith("/learn") || pathname.startsWith("/shop") || pathname.startsWith("/profile");
-    const isParentRoute = pathname.startsWith("/dashboard") || pathname.startsWith("/ledger") || pathname.startsWith("/calendar") || pathname.startsWith("/settings") || pathname.startsWith("/chores") || pathname.startsWith("/gallery") || pathname.startsWith("/sight-words");
+    // Pages whose v2 components render their own tab bar internally
+    const v2KidPages = ["/points", "/learn", "/badges"];
+    const v2ViewAsPages = ["/view-as/points", "/view-as/learn", "/view-as/gallery"];
+    const v2ParentPages = ["/dashboard", "/ledger", "/calendar", "/settings"];
 
-    const showKidTabBar = isViewAsPage || (session?.user?.role === "KID" && !isKidRoute);
-    const showParentTabBar = !isKidMode && !isViewAsPage && session?.user?.role === "PARENT" && !isParentRoute && !isKidRoute;
+    const isViewAsPage = pathname.startsWith("/view-as");
+    const hasOwnKidTabBar =
+      v2KidPages.some((p) => pathname === p || pathname.startsWith(p + "/")) ||
+      v2ViewAsPages.some((p) => pathname === p || pathname.startsWith(p + "/"));
+    const hasOwnParentTabBar = v2ParentPages.some((p) => pathname === p || pathname.startsWith(p + "/"));
+
+    const isKid = session?.user?.role === "KID";
+    const isParent = session?.user?.role === "PARENT";
+
+    // Show fallback KidTabBar for kid users on pages that don't render their own
+    const showKidTabBar = (isKid || isViewAsPage) && !hasOwnKidTabBar;
+    // Show fallback ParentTabBar for parent (not in kid mode) on pages without own tab bar
+    const showParentTabBar = isParent && !isKidMode && !isViewAsPage && !hasOwnParentTabBar && !hasOwnKidTabBar;
 
     return (
       <>
