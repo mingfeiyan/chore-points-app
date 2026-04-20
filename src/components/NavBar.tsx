@@ -128,14 +128,6 @@ export default function NavBar() {
                     {t("learn")}
                   </Link>
                   <Link
-                    href="/view-as/redeem"
-                    className={`hover:text-gray-300 transition ${
-                      pathname === "/view-as/redeem" ? "text-blue-400" : ""
-                    }`}
-                  >
-                    {t("redeem")}
-                  </Link>
-                  <Link
                     href="/view-as/gallery"
                     className={`hover:text-gray-300 transition ${
                       pathname === "/view-as/gallery" ? "text-blue-400" : ""
@@ -162,14 +154,6 @@ export default function NavBar() {
                     }`}
                   >
                     {t("pointsNav")}
-                  </Link>
-                  <Link
-                    href="/rewards"
-                    className={`hover:text-gray-300 transition ${
-                      pathname === "/rewards" ? "text-blue-400" : ""
-                    }`}
-                  >
-                    {t("rewards")}
                   </Link>
                   <Link
                     href="/gallery"
@@ -272,14 +256,6 @@ export default function NavBar() {
                     }`}
                   >
                     {t("learn")}
-                  </Link>
-                  <Link
-                    href="/redeem"
-                    className={`hover:text-gray-300 transition ${
-                      pathname === "/redeem" ? "text-blue-400" : ""
-                    }`}
-                  >
-                    {t("redeem")}
                   </Link>
                   <Link
                     href="/gallery"

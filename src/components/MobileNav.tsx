@@ -31,7 +31,6 @@ export default function MobileNav() {
   const parentPrimaryLinks = [
     { href: "/ledger", label: t("pointsNav"), icon: "💎" },
     { href: "/chores", label: t("chores"), icon: "✅" },
-    { href: "/rewards", label: t("rewards"), icon: "🎁" },
   ];
 
   // Secondary links shown in the "More" popup
@@ -54,7 +53,6 @@ export default function MobileNav() {
   const kidModeLinks = [
     { href: "/view-as/points", label: t("myPoints"), icon: "💎" },
     { href: "/view-as/learn", label: t("learn"), icon: "📚" },
-    { href: "/view-as/redeem", label: t("redeem"), icon: "🎁" },
     { href: "/view-as/gallery", label: t("gallery"), icon: "📷" },
   ];
 
@@ -62,7 +60,6 @@ export default function MobileNav() {
     { href: "/dashboard", label: t("dashboard"), icon: "🏠" },
     { href: "/points", label: t("myPoints"), icon: "💎" },
     { href: "/learn", label: t("learn"), icon: "📚" },
-    { href: "/redeem", label: t("redeem"), icon: "🎁" },
     { href: "/gallery", label: t("gallery"), icon: "📷" },
   ];
 

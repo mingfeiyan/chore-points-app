@@ -24,9 +24,7 @@
     "dashboard": "Dashboard",
     "chores": "Chores",
     "pointsNav": "Points",
-    "rewards": "Rewards",
     "myPoints": "My Points",
-    "redeem": "Redeem",
     "loggedInAs": "Logged in as",
     "parent": "Parent",
     "kid": "Kid",
@@ -53,8 +51,7 @@
     "thisMonth": "This Month",
     "dailyProgress": "Daily Progress",
     "ptsThisMonth": "pts this month",
-    "trackPoints": "Track your points and see your chore history",
-    "redeemRewards": "Redeem Rewards"
+    "trackPoints": "Track your points and see your chore history"
   },
   "calendar": {
     "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
@@ -149,32 +146,6 @@
     "noEntries": "No point entries yet. Complete chores to start earning points!",
     "redeemed": "Redeemed:",
     "custom": "Custom"
-  },
-  "rewards": {
-    "redeemRewards": "Redeem Rewards",
-    "usePoints": "Use your points to redeem awesome rewards!",
-    "availablePoints": "Available Points",
-    "saveUp": "Save up to redeem awesome rewards!",
-    "availableRewards": "Available Rewards",
-    "noRewardsYet": "No rewards available yet. Ask your parent to add some!",
-    "youCanAfford": "You can afford this!",
-    "needMore": "Need {count} more",
-    "redeemButton": "Redeem",
-    "notEnoughPoints": "Not Enough Points",
-    "myRedemptionHistory": "My Redemption History",
-    "noRedemptionsYet": "No redemptions yet. Earn points and redeem rewards!",
-    "reward": "Reward",
-    "cost": "Cost",
-    "status": "Status",
-    "requested": "Requested",
-    "resolved": "Resolved",
-    "pending": "Pending",
-    "approved": "Approved",
-    "denied": "Denied",
-    "confirmRedeem": "Redeem \"{title}\"?",
-    "confirmRedeemDesc": "This will create a pending request for your parent to approve.",
-    "redemptionSubmitted": "Redemption request submitted! Waiting for parent approval.",
-    "redemptionFailed": "Failed to request redemption"
   },
   "logReward": {
     "button": "Log reward",

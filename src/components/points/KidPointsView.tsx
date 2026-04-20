@@ -99,12 +99,6 @@ export default function KidPointsView({ kidId, readOnly = false }: KidPointsView
               >
                 {t("viewHistory")}
               </Link>
-              <Link
-                href={readOnly ? "/view-as/redeem" : "/redeem"}
-                className="px-4 py-2 bg-purple-500 hover:bg-purple-600 rounded-full text-sm font-medium transition-colors"
-              >
-                {t("redeemRewards")}
-              </Link>
               {canReplay && (
                 <button
                   onClick={onReplay}

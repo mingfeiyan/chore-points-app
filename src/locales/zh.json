@@ -24,9 +24,7 @@
     "dashboard": "控制台",
     "chores": "家务",
     "pointsNav": "积分",
-    "rewards": "奖励",
     "myPoints": "我的积分",
-    "redeem": "兑换",
     "loggedInAs": "登录为",
     "parent": "家长",
     "kid": "孩子",
@@ -53,8 +51,7 @@
     "thisMonth": "本月",
     "dailyProgress": "每日进度",
     "ptsThisMonth": "分 本月",
-    "trackPoints": "查看你的积分和家务记录",
-    "redeemRewards": "兑换奖励"
+    "trackPoints": "查看你的积分和家务记录"
   },
   "calendar": {
     "weekdays": ["日", "一", "二", "三", "四", "五", "六"],
@@ -159,32 +156,6 @@
     "noEntries": "还没有积分记录。完成家务开始赚取积分！",
     "redeemed": "兑换了：",
     "custom": "自定义"
-  },
-  "rewards": {
-    "redeemRewards": "兑换奖励",
-    "usePoints": "用你的积分兑换超棒的奖励！",
-    "availablePoints": "可用积分",
-    "saveUp": "攒够积分来兑换超棒的奖励！",
-    "availableRewards": "可兑换的奖励",
-    "noRewardsYet": "还没有奖励。让家长添加一些吧！",
-    "youCanAfford": "你买得起！",
-    "needMore": "还差 {count} 分",
-    "redeemButton": "兑换",
-    "notEnoughPoints": "积分不够",
-    "myRedemptionHistory": "我的兑换记录",
-    "noRedemptionsYet": "还没有兑换记录。赚取积分来兑换奖励！",
-    "reward": "奖励",
-    "cost": "所需积分",
-    "status": "状态",
-    "requested": "申请时间",
-    "resolved": "处理时间",
-    "pending": "等待中",
-    "approved": "已批准",
-    "denied": "已拒绝",
-    "confirmRedeem": "兑换「{title}」？",
-    "confirmRedeemDesc": "这将创建一个等待家长批准的申请。",
-    "redemptionSubmitted": "兑换申请已提交！等待家长批准。",
-    "redemptionFailed": "兑换申请失败"
   },
   "logReward": {
     "button": "记录奖励",
