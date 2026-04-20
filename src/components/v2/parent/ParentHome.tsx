@@ -2,11 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Gift, User } from "lucide-react";
+import { User } from "lucide-react";
 import ParentTabBar from "@/components/v2/ParentTabBar";
-import OverflowMenu from "@/components/v2/OverflowMenu";
 import CoinSmall from "@/components/v2/CoinSmall";
-import LogRewardModal from "@/components/rewards/LogRewardModal";
 import WeeklyCalendarView from "@/components/calendar/WeeklyCalendarView";
 import PhotoCarousel from "@/components/dashboard/PhotoCarousel";
 import { useKidMode } from "@/components/providers/KidModeProvider";
@@ -145,7 +143,6 @@ export default function ParentHome({ userName }: ParentHomeProps) {
   const { setViewingAsKid } = useKidMode();
   const [kids, setKids] = useState<KidWithPoints[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showRewardModal, setShowRewardModal] = useState(false);
   const [weather, setWeather] = useState<{ temp: number; icon: string; location: string } | null>(null);
 
   const firstName = userName?.split(" ")[0] || "there";
@@ -225,14 +222,6 @@ export default function ParentHome({ userName }: ParentHomeProps) {
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
-  const overflowItems = [
-    {
-      label: "Log Reward",
-      icon: <Gift size={16} />,
-      onClick: () => setShowRewardModal(true),
-    },
-  ];
-
   const handleViewAsKid = (kid: KidWithPoints) => {
     setViewingAsKid({ id: kid.id, name: kid.name, email: kid.email });
     router.push("/view-as/points");
@@ -264,11 +253,6 @@ export default function ParentHome({ userName }: ParentHomeProps) {
             opacity="0.7"
           />
         </svg>
-
-        {/* Overflow menu */}
-        <div className="absolute right-5 top-8">
-          <OverflowMenu items={overflowItems} />
-        </div>
 
         {/* Date + weather */}
         <p className="text-[11px] font-bold uppercase tracking-wide text-pg-muted">
@@ -392,17 +376,6 @@ export default function ParentHome({ userName }: ParentHomeProps) {
           <PhotoCarousel />
         </div>
       </div>
-
-      {/* LogRewardModal */}
-      {showRewardModal && (
-        <LogRewardModal
-          onClose={() => setShowRewardModal(false)}
-          onSuccess={() => {
-            fetchData();
-            router.refresh();
-          }}
-        />
-      )}
 
       <ParentTabBar />
     </div>
