@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import BadgeIcon from "@/components/badges/BadgeIcon";
 import BadgeTemplateForm from "./BadgeTemplateForm";
+import { useNewDesign } from "@/hooks/useNewDesign";
 
 type Chore = {
   id: string;
@@ -35,6 +36,8 @@ export default function ChoreBadgeTemplateList() {
   } | null>(null);
   const t = useTranslations("badges");
   const tChores = useTranslations("chores");
+  const { isNewDesign } = useNewDesign();
+  const pg = isNewDesign;
 
   useEffect(() => {
     Promise.all([fetchTemplates(), fetchChores()]).finally(() =>
@@ -88,7 +91,7 @@ export default function ChoreBadgeTemplateList() {
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="h-24 bg-gray-100 rounded-lg animate-pulse"
+            className={pg ? "h-24 bg-[rgba(68,55,32,0.06)] rounded-lg animate-pulse" : "h-24 bg-gray-100 rounded-lg animate-pulse"}
           />
         ))}
       </div>
@@ -97,7 +100,7 @@ export default function ChoreBadgeTemplateList() {
 
   if (chores.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className={pg ? "text-center py-8 text-[#857d68]" : "text-center py-8 text-gray-500"}>
         <p>{tChores("noChoresYet")}</p>
       </div>
     );
@@ -114,15 +117,14 @@ export default function ChoreBadgeTemplateList() {
             <button
               key={chore.id}
               onClick={() => handleChoreClick(chore)}
-              className={`
-                relative p-4 rounded-lg border-2 text-left transition-all
-                hover:shadow-md hover:border-purple-300
-                ${hasCustomization ? "border-purple-200 bg-purple-50" : "border-gray-200 bg-white"}
-              `}
+              className={pg
+                ? `relative p-4 rounded-lg border-2 text-left transition-all hover:shadow-md hover:border-[#6b8e4e] ${hasCustomization ? "border-[#6b8e4e] bg-[rgba(107,142,78,0.06)]" : "border-[rgba(68,55,32,0.14)] bg-white"}`
+                : `relative p-4 rounded-lg border-2 text-left transition-all hover:shadow-md hover:border-purple-300 ${hasCustomization ? "border-purple-200 bg-purple-50" : "border-gray-200 bg-white"}`
+              }
             >
               {/* Custom indicator */}
               {hasCustomization && (
-                <div className="absolute top-1 right-1 w-2 h-2 bg-purple-500 rounded-full" />
+                <div className={pg ? "absolute top-1 right-1 w-2 h-2 bg-[#6b8e4e] rounded-full" : "absolute top-1 right-1 w-2 h-2 bg-purple-500 rounded-full"} />
               )}
 
               {/* Badge Icon */}
@@ -136,12 +138,12 @@ export default function ChoreBadgeTemplateList() {
               </div>
 
               {/* Chore Title */}
-              <div className="text-sm font-medium text-gray-900 text-center truncate">
+              <div className={pg ? "text-sm font-medium text-[#2f2a1f] text-center truncate" : "text-sm font-medium text-gray-900 text-center truncate"}>
                 {chore.title}
               </div>
 
               {/* Status */}
-              <div className="text-xs text-gray-500 text-center mt-1">
+              <div className={pg ? "text-xs text-[#857d68] text-center mt-1" : "text-xs text-gray-500 text-center mt-1"}>
                 {hasCustomization ? t("customImage") : t("builtInBadge")}
               </div>
             </button>

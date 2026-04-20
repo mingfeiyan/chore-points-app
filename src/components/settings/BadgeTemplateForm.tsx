@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import BadgeImageUpload from "@/components/badges/BadgeImageUpload";
 import BadgeIcon from "@/components/badges/BadgeIcon";
+import { useNewDesign } from "@/hooks/useNewDesign";
 
 type BadgeTemplate = {
   id: string;
@@ -68,6 +69,8 @@ export default function BadgeTemplateForm({
   const t = useTranslations("badges");
   const tCommon = useTranslations("common");
   const locale = useLocale();
+  const { isNewDesign } = useNewDesign();
+  const pg = isNewDesign;
 
   const isEditing = !!template;
   const isCustom = type === "custom";
@@ -180,10 +183,10 @@ export default function BadgeTemplateForm({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-auto">
+      <div className={pg ? "bg-white rounded-[14px] p-6 w-full max-w-md max-h-[90vh] overflow-auto" : "bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-auto"}>
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-900">
+          <h2 className={pg ? "text-xl font-bold text-[#2f2a1f]" : "text-xl font-bold text-gray-900"}>
             {isCustom
               ? isEditing
                 ? t("editCustomBadge")
@@ -212,18 +215,18 @@ export default function BadgeTemplateForm({
 
         {/* Preview current badge for non-custom */}
         {!isCustom && (
-          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg mb-4">
+          <div className={pg ? "flex items-center gap-3 p-3 bg-[#F9F4E8] rounded-lg mb-4" : "flex items-center gap-3 p-3 bg-gray-50 rounded-lg mb-4"}>
             <BadgeIcon
               imageUrl={imageUrl || template?.imageUrl}
               emoji={icon || template?.icon || displayInfo.icon}
               size="lg"
             />
             <div>
-              <div className="font-medium text-gray-900">
+              <div className={pg ? "font-medium text-[#2f2a1f]" : "font-medium text-gray-900"}>
                 {displayInfo.name}
               </div>
               {displayInfo.description && (
-                <div className="text-sm text-gray-500">
+                <div className={pg ? "text-sm text-[#857d68]" : "text-sm text-gray-500"}>
                   {displayInfo.description}
                 </div>
               )}
@@ -247,7 +250,7 @@ export default function BadgeTemplateForm({
 
           {/* Fallback Icon */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className={pg ? "block text-sm font-medium text-[#2f2a1f] mb-1" : "block text-sm font-medium text-gray-700 mb-1"}>
               {t("badgeIcon")}
             </label>
             <input
@@ -255,9 +258,9 @@ export default function BadgeTemplateForm({
               value={icon}
               onChange={(e) => setIcon(e.target.value)}
               placeholder={displayInfo.icon}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+              className={pg ? "w-full px-3 py-2 border border-[rgba(68,55,32,0.14)] rounded-md shadow-sm focus:outline-none focus:ring-[#6b8e4e] focus:border-[#6b8e4e]" : "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"}
             />
-            <p className="mt-1 text-xs text-gray-500">
+            <p className={pg ? "mt-1 text-xs text-[#857d68]" : "mt-1 text-xs text-gray-500"}>
               Emoji shown when no image is set
             </p>
           </div>
@@ -266,7 +269,7 @@ export default function BadgeTemplateForm({
           {isCustom && (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className={pg ? "block text-sm font-medium text-[#2f2a1f] mb-1" : "block text-sm font-medium text-gray-700 mb-1"}>
                   {t("badgeName")}
                 </label>
                 <input
@@ -274,12 +277,12 @@ export default function BadgeTemplateForm({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g., Super Helper"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                  className={pg ? "w-full px-3 py-2 border border-[rgba(68,55,32,0.14)] rounded-md shadow-sm focus:outline-none focus:ring-[#6b8e4e] focus:border-[#6b8e4e]" : "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className={pg ? "block text-sm font-medium text-[#2f2a1f] mb-1" : "block text-sm font-medium text-gray-700 mb-1"}>
                   {t("badgeNameZh")}
                 </label>
                 <input
@@ -287,12 +290,12 @@ export default function BadgeTemplateForm({
                   value={nameZh}
                   onChange={(e) => setNameZh(e.target.value)}
                   placeholder="e.g., 超级小帮手"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                  className={pg ? "w-full px-3 py-2 border border-[rgba(68,55,32,0.14)] rounded-md shadow-sm focus:outline-none focus:ring-[#6b8e4e] focus:border-[#6b8e4e]" : "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className={pg ? "block text-sm font-medium text-[#2f2a1f] mb-1" : "block text-sm font-medium text-gray-700 mb-1"}>
                   {t("badgeDescription")}
                 </label>
                 <textarea
@@ -300,12 +303,12 @@ export default function BadgeTemplateForm({
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Describe how to earn this badge..."
                   rows={2}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                  className={pg ? "w-full px-3 py-2 border border-[rgba(68,55,32,0.14)] rounded-md shadow-sm focus:outline-none focus:ring-[#6b8e4e] focus:border-[#6b8e4e]" : "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className={pg ? "block text-sm font-medium text-[#2f2a1f] mb-1" : "block text-sm font-medium text-gray-700 mb-1"}>
                   {t("badgeDescriptionZh")}
                 </label>
                 <textarea
@@ -313,7 +316,7 @@ export default function BadgeTemplateForm({
                   onChange={(e) => setDescriptionZh(e.target.value)}
                   placeholder="描述如何获得这个徽章..."
                   rows={2}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                  className={pg ? "w-full px-3 py-2 border border-[rgba(68,55,32,0.14)] rounded-md shadow-sm focus:outline-none focus:ring-[#6b8e4e] focus:border-[#6b8e4e]" : "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"}
                 />
               </div>
             </>
@@ -327,7 +330,7 @@ export default function BadgeTemplateForm({
                 type="button"
                 onClick={handleReset}
                 disabled={loading}
-                className="px-4 py-2 border border-red-300 rounded-md text-red-700 hover:bg-red-50 font-medium disabled:opacity-50"
+                className={pg ? "px-4 py-2 border border-[#c5543d] rounded-md text-[#c5543d] hover:bg-red-50 font-medium disabled:opacity-50" : "px-4 py-2 border border-red-300 rounded-md text-red-700 hover:bg-red-50 font-medium disabled:opacity-50"}
               >
                 {t("resetToDefault")}
               </button>
@@ -336,14 +339,14 @@ export default function BadgeTemplateForm({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium"
+              className={pg ? "flex-1 px-4 py-2 border border-[rgba(68,55,32,0.14)] rounded-md text-[#2f2a1f] hover:bg-[#F9F4E8] font-medium" : "flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium"}
             >
               {tCommon("cancel")}
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className={pg ? "flex-1 px-4 py-2 bg-[#4a6a32] text-white rounded-md hover:bg-[#3d5a2a] font-medium disabled:opacity-50 disabled:cursor-not-allowed" : "flex-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"}
             >
               {loading
                 ? tCommon("saving")

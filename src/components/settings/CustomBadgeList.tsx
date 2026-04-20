@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import BadgeIcon from "@/components/badges/BadgeIcon";
 import BadgeTemplateForm from "./BadgeTemplateForm";
+import { useNewDesign } from "@/hooks/useNewDesign";
 
 type BadgeTemplate = {
   id: string;
@@ -27,6 +28,8 @@ export default function CustomBadgeList() {
     useState<BadgeTemplate | null>(null);
   const t = useTranslations("badges");
   const locale = useLocale();
+  const { isNewDesign } = useNewDesign();
+  const pg = isNewDesign;
 
   useEffect(() => {
     fetchTemplates();
@@ -78,7 +81,7 @@ export default function CustomBadgeList() {
         {[1, 2].map((i) => (
           <div
             key={i}
-            className="h-24 bg-gray-100 rounded-lg animate-pulse"
+            className={pg ? "h-24 bg-[rgba(68,55,32,0.06)] rounded-lg animate-pulse" : "h-24 bg-gray-100 rounded-lg animate-pulse"}
           />
         ))}
       </div>
@@ -91,7 +94,7 @@ export default function CustomBadgeList() {
       <div className="mb-4">
         <button
           onClick={() => setShowForm(true)}
-          className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          className={pg ? "inline-flex items-center px-4 py-2 bg-[#4a6a32] text-white rounded-lg hover:bg-[#3d5a2a] transition-colors" : "inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"}
         >
           <svg
             className="w-5 h-5 mr-2"
@@ -111,17 +114,17 @@ export default function CustomBadgeList() {
       </div>
 
       {templates.length === 0 ? (
-        <div className="text-center py-8 bg-gray-50 rounded-lg">
+        <div className={pg ? "text-center py-8 bg-[#F9F4E8] rounded-lg" : "text-center py-8 bg-gray-50 rounded-lg"}>
           <div className="text-4xl mb-2">🏅</div>
-          <p className="text-gray-500">{t("noBadgeTemplates")}</p>
-          <p className="text-gray-400 text-sm mt-1">{t("addFirstBadge")}</p>
+          <p className={pg ? "text-[#857d68]" : "text-gray-500"}>{t("noBadgeTemplates")}</p>
+          <p className={pg ? "text-[#857d68] text-sm mt-1" : "text-gray-400 text-sm mt-1"}>{t("addFirstBadge")}</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {templates.map((template) => (
             <div
               key={template.id}
-              className="relative p-4 rounded-lg border-2 border-gray-200 bg-white hover:shadow-md transition-all"
+              className={pg ? "relative p-4 rounded-lg border-2 border-[rgba(68,55,32,0.14)] bg-white hover:shadow-md transition-all" : "relative p-4 rounded-lg border-2 border-gray-200 bg-white hover:shadow-md transition-all"}
             >
               {/* Badge Icon */}
               <div className="flex justify-center mb-2">
@@ -134,14 +137,14 @@ export default function CustomBadgeList() {
               </div>
 
               {/* Badge Name */}
-              <div className="text-sm font-medium text-gray-900 text-center truncate">
+              <div className={pg ? "text-sm font-medium text-[#2f2a1f] text-center truncate" : "text-sm font-medium text-gray-900 text-center truncate"}>
                 {locale === "zh"
                   ? template.nameZh || template.name
                   : template.name || template.nameZh}
               </div>
 
               {/* Description */}
-              <div className="text-xs text-gray-500 text-center truncate mt-1">
+              <div className={pg ? "text-xs text-[#857d68] text-center truncate mt-1" : "text-xs text-gray-500 text-center truncate mt-1"}>
                 {locale === "zh"
                   ? template.descriptionZh || template.description
                   : template.description || template.descriptionZh}
@@ -151,13 +154,13 @@ export default function CustomBadgeList() {
               <div className="flex justify-center gap-2 mt-3">
                 <button
                   onClick={() => setSelectedTemplate(template)}
-                  className="text-xs px-2 py-1 text-purple-600 hover:bg-purple-50 rounded"
+                  className={pg ? "text-xs px-2 py-1 text-[#6b8e4e] hover:bg-[rgba(107,142,78,0.06)] rounded" : "text-xs px-2 py-1 text-purple-600 hover:bg-purple-50 rounded"}
                 >
                   {t("customizeBadge")}
                 </button>
                 <button
                   onClick={() => handleDelete(template.id)}
-                  className="text-xs px-2 py-1 text-red-600 hover:bg-red-50 rounded"
+                  className={pg ? "text-xs px-2 py-1 text-[#c5543d] hover:bg-red-50 rounded" : "text-xs px-2 py-1 text-red-600 hover:bg-red-50 rounded"}
                 >
                   Delete
                 </button>
