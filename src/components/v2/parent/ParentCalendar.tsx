@@ -185,22 +185,13 @@ export default function ParentCalendar() {
     loadCalendarEvents();
   }, [loadCalendarEvents]);
 
-  // Build family member list: kids first, then detect parents from calendar events
-  const familyNames: string[] = kids.map((k) => (k.name || k.email).split(" ")[0]);
-
-  // Add names found in calendar events that aren't already kids
-  const knownLower = new Set(familyNames.map((n) => n.toLowerCase()));
-  for (const ev of calendarEvents) {
-    const words = ev.summary.split(/\s+/);
-    for (const word of words) {
-      const lower = word.toLowerCase().replace(/[^a-z]/g, "");
-      if (lower.length >= 3 && !knownLower.has(lower) && word[0] === word[0].toUpperCase()) {
-        // Only add if it appears as a name-like pattern (starts uppercase)
-        familyNames.push(word.replace(/[^a-zA-Z]/g, ""));
-        knownLower.add(lower);
-      }
-    }
-  }
+  // Family members for legend + color matching: kids + parents
+  // Kids come from API, parents are the logged-in user + partner
+  const familyNames: string[] = [
+    ...kids.map((k) => (k.name || k.email).split(" ")[0]),
+    "Mingfei",
+    "Yue",
+  ];
 
   // Build kid color map for point entries
   const kidColorMap: Record<string, number> = {};
