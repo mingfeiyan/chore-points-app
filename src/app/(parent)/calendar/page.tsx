@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/permissions";
 import CalendarView from "@/components/calendar/CalendarView";
+import ParentCalendarWrapper from "@/components/v2/parent/ParentCalendarWrapper";
 
 export default async function CalendarPage() {
   const session = await getSession();
@@ -17,9 +18,11 @@ export default async function CalendarPage() {
     redirect("/dashboard");
   }
 
-  return (
+  const fallback = (
     <div className="max-w-6xl mx-auto px-4 py-6">
       <CalendarView />
     </div>
   );
+
+  return <ParentCalendarWrapper fallback={fallback} />;
 }

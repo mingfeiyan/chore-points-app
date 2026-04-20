@@ -4,6 +4,7 @@ import FamilySetup from "@/components/family/FamilySetup";
 import ParentDashboardHeader from "@/components/parent/ParentDashboardHeader";
 import WeeklyCalendarView from "@/components/calendar/WeeklyCalendarView";
 import PhotoCarousel from "@/components/dashboard/PhotoCarousel";
+import ParentHomeWrapper from "@/components/v2/parent/ParentHomeWrapper";
 
 export default async function DashboardPage() {
   const session = await getSession();
@@ -23,7 +24,7 @@ export default async function DashboardPage() {
 
   // If user has a family, show appropriate dashboard based on role
   if (session.user.role === "PARENT") {
-    return (
+    const fallback = (
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <ParentDashboardHeader />
@@ -35,6 +36,13 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
+    );
+
+    return (
+      <ParentHomeWrapper
+        userName={session.user.name || session.user.email || ""}
+        fallback={fallback}
+      />
     );
   }
 
