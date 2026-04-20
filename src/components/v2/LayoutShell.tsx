@@ -10,6 +10,24 @@ import MobileNav from "@/components/MobileNav";
 import KidTabBar from "@/components/v2/KidTabBar";
 import ParentTabBar from "@/components/v2/ParentTabBar";
 
+function DesignToggleFAB() {
+  const { isNewDesign, setNewDesign } = useNewDesign();
+  const { data: session } = useSession();
+
+  // Only show for parents, and only when old design is active
+  if (isNewDesign || session?.user?.role !== "PARENT") return null;
+
+  return (
+    <button
+      onClick={() => setNewDesign(true)}
+      className="fixed bottom-24 right-4 z-50 sm:hidden flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold text-white shadow-lg"
+      style={{ background: "linear-gradient(135deg, #6b8e4e, #4a6a32)" }}
+    >
+      ✨ Try New Design
+    </button>
+  );
+}
+
 function V2KidModeBanner() {
   const { isKidMode, viewingAsKid, exitKidMode } = useKidMode();
   const { data: session } = useSession();
@@ -79,6 +97,8 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
       <KidModeBanner />
       <main className="pb-20 sm:pb-0">{children}</main>
       <MobileNav />
+      {/* Floating toggle for easy access on mobile */}
+      <DesignToggleFAB />
     </>
   );
 }
