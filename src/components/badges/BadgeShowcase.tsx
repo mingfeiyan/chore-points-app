@@ -78,18 +78,30 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
   const locale = useLocale();
   const { isNewDesign } = useNewDesign();
 
+  // Coin Arcade badge tiles cycle through these pastel backgrounds
+  const tileBgs = [
+    "bg-ca-tile-teal", "bg-ca-tile-peach", "bg-ca-tile-pink",
+    "bg-ca-tile-mint", "bg-ca-tile-lavender", "bg-ca-tile-butter",
+  ];
+
   const theme = isNewDesign ? {
-    skeleton: "bg-[rgba(68,55,32,0.06)]",
-    nameEarned: "text-[#2f2a1f]",
-    nameUnearned: "text-[#857d68]",
-    choreName: "text-[#2f2a1f]",
-    customName: "text-[#2f2a1f]",
+    skeleton: "bg-[rgba(26,24,19,0.04)]",
+    nameEarned: "text-ca-ink",
+    nameUnearned: "text-ca-muted",
+    choreName: "text-ca-ink",
+    customName: "text-ca-ink",
+    grid: "grid grid-cols-3 sm:grid-cols-4 gap-3",
+    badgeFrame: "w-16 h-16 rounded-2xl flex items-center justify-center",
+    countBadge: "bg-ca-cobalt",
   } : {
     skeleton: "bg-gray-100",
     nameEarned: "text-gray-700",
     nameUnearned: "text-gray-400",
     choreName: "text-gray-700",
     customName: "text-gray-700",
+    grid: "grid grid-cols-4 gap-4",
+    badgeFrame: "",
+    countBadge: "",
   };
 
   useEffect(() => {
@@ -139,13 +151,14 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
 
   return (
     <>
-      <div className="grid grid-cols-4 gap-4">
+      <div className={theme.grid}>
         {/* Achievement Badges - show all, gray out unearned */}
-        {allAchievementBadges.map((badge) => {
+        {allAchievementBadges.map((badge, idx) => {
           const earned = earnedAchievementIds.has(badge.id);
           const earnedBadge = staticAchievementBadges.find(
             (b) => b.badgeId === badge.id
           );
+          const tileBg = isNewDesign ? tileBgs[idx % tileBgs.length] : "";
 
           return (
             <button
@@ -153,36 +166,52 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
               className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform"
               onClick={() => setSelectedBadge({ type: "achievement", badge, earned, earnedBadge })}
             >
-              {/* Sticker */}
               <div className={`${earned ? "" : "grayscale opacity-30"} transition-all`}>
-                <BadgeIcon
-                  imageUrl={earnedBadge?.customImageUrl || badge.customImageUrl}
-                  emoji={badge.icon}
-                  size="2xl"
-                  alt={badge.name}
-                  className={earned ? "" : "grayscale opacity-30"}
-                />
+                {isNewDesign ? (
+                  <div className={`${theme.badgeFrame} ${tileBg}`}>
+                    {(earnedBadge?.customImageUrl || badge.customImageUrl) ? (
+                      <img src={earnedBadge?.customImageUrl || badge.customImageUrl || ""} alt={badge.name} className="w-12 h-12 rounded-xl object-cover" />
+                    ) : (
+                      <span className="text-3xl">{badge.icon}</span>
+                    )}
+                  </div>
+                ) : (
+                  <BadgeIcon
+                    imageUrl={earnedBadge?.customImageUrl || badge.customImageUrl}
+                    emoji={badge.icon}
+                    size="2xl"
+                    alt={badge.name}
+                    className={earned ? "" : "grayscale opacity-30"}
+                  />
+                )}
               </div>
-              {/* Name */}
-              <div className={`text-xs text-center mt-2 font-medium leading-tight ${earned ? theme.nameEarned : theme.nameUnearned}`}>
+              <div className={`text-[11px] text-center mt-1.5 font-bold leading-tight ${earned ? theme.nameEarned : theme.nameUnearned}`}>
                 {locale === "zh" ? badge.nameZh : badge.name}
               </div>
             </button>
           );
         })}
 
-        {customAwardBadges.map((badge) => {
+        {customAwardBadges.map((badge, idx) => {
           const pending = !badge.customImageUrl;
+          const tileBg = isNewDesign ? tileBgs[(allAchievementBadges.length + idx) % tileBgs.length] : "";
+
           return (
             <button
               key={badge.id}
               className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform"
-              onClick={() =>
-                setSelectedBadge({ type: "customAward", badge })
-              }
+              onClick={() => setSelectedBadge({ type: "customAward", badge })}
             >
               <div className="relative">
-                {pending ? (
+                {isNewDesign ? (
+                  <div className={`${theme.badgeFrame} ${pending ? "animate-pulse" : ""} ${tileBg}`}>
+                    {pending ? (
+                      <span className="text-2xl opacity-50">✨</span>
+                    ) : (
+                      <img src={badge.customImageUrl!} alt={badge.name} className="w-12 h-12 rounded-xl object-cover" />
+                    )}
+                  </div>
+                ) : pending ? (
                   <div className="w-20 h-20 rounded-lg bg-gradient-to-br from-pink-100 to-purple-100 animate-pulse flex items-center justify-center text-3xl">
                     🎨
                   </div>
@@ -195,7 +224,7 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
                   />
                 )}
               </div>
-              <div className={`text-xs text-center mt-2 font-medium ${theme.customName} leading-tight line-clamp-2`}>
+              <div className={`text-[11px] text-center mt-1.5 font-bold ${theme.customName} leading-tight line-clamp-2`}>
                 {badge.name}
               </div>
             </button>
@@ -203,9 +232,10 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
         })}
 
         {/* Chore Badges - show earned ones */}
-        {badges.map((badge) => {
+        {badges.map((badge, idx) => {
           const showCount = badge.count > 1;
-          const badgeColor = levelBadgeColors[badge.level] || levelBadgeColors[1];
+          const badgeColor = isNewDesign ? theme.countBadge : (levelBadgeColors[badge.level] || levelBadgeColors[1]);
+          const tileBg = isNewDesign ? tileBgs[(allAchievementBadges.length + customAwardBadges.length + idx) % tileBgs.length] : "";
 
           return (
             <button
@@ -213,23 +243,30 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
               className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform"
               onClick={() => setSelectedBadge({ type: "chore", badge })}
             >
-              {/* Sticker with count indicator */}
               <div className="relative">
-                <BadgeIcon
-                  imageUrl={badge.customImageUrl}
-                  emoji={badge.customIcon || badge.chore.icon || "✨"}
-                  size="2xl"
-                  alt={badge.chore.title}
-                />
-                {/* Count indicator like "2x" */}
+                {isNewDesign ? (
+                  <div className={`${theme.badgeFrame} ${tileBg}`}>
+                    {badge.customImageUrl ? (
+                      <img src={badge.customImageUrl} alt={badge.chore.title} className="w-12 h-12 rounded-xl object-cover" />
+                    ) : (
+                      <span className="text-3xl">{badge.customIcon || badge.chore.icon || "✨"}</span>
+                    )}
+                  </div>
+                ) : (
+                  <BadgeIcon
+                    imageUrl={badge.customImageUrl}
+                    emoji={badge.customIcon || badge.chore.icon || "✨"}
+                    size="2xl"
+                    alt={badge.chore.title}
+                  />
+                )}
                 {showCount && (
-                  <div className={`absolute -bottom-1 -right-1 ${badgeColor} text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-sm`}>
-                    {badge.count}x
+                  <div className={`absolute -bottom-1 -right-1 ${badgeColor} text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-sm`}>
+                    {badge.count}×
                   </div>
                 )}
               </div>
-              {/* Name */}
-              <div className={`text-xs text-center mt-2 font-medium ${theme.choreName} leading-tight`}>
+              <div className={`text-[11px] text-center mt-1.5 font-bold ${theme.choreName} leading-tight`}>
                 {badge.chore.title}
               </div>
             </button>
