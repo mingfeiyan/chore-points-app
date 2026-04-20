@@ -5,8 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useKidMode } from "@/components/providers/KidModeProvider";
-import { Home, BookOpen, Gift } from "lucide-react";
-import CoinSmall from "@/components/v2/CoinSmall";
+import { Home, BookOpen } from "lucide-react";
 
 // Kid users: /points, /learn
 // Parents in kid mode: /view-as/points, /view-as/learn, /view-as/gallery
@@ -18,7 +17,6 @@ function useTabs() {
 
   const tabs = [
     { id: "home", label: "Home", href: `${prefix}/points`, icon: "home" as const },
-    { id: "gems", label: "Gems", href: `${prefix}/points/history`, icon: "gem" as const },
     { id: "learn", label: "Learn", href: `${prefix}/learn`, icon: "learn" as const },
   ];
 
@@ -77,14 +75,10 @@ export default function KidTabBar() {
                   background: isActive ? ACTIVE_BG : "transparent",
                 }}
               >
-                {tab.icon === "gem" ? (
-                  <CoinSmall size={18} />
-                ) : tab.icon === "home" ? (
+                {tab.icon === "home" ? (
                   <Home size={20} color={isActive ? ACTIVE_COLOR : INACTIVE_COLOR} />
-                ) : tab.icon === "learn" ? (
-                  <BookOpen size={20} color={isActive ? ACTIVE_COLOR : INACTIVE_COLOR} />
                 ) : (
-                  <Gift size={20} color={isActive ? ACTIVE_COLOR : INACTIVE_COLOR} />
+                  <BookOpen size={20} color={isActive ? ACTIVE_COLOR : INACTIVE_COLOR} />
                 )}
               </div>
               <span

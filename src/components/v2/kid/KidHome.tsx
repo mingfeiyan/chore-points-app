@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState, useMemo, useRef, useCallback } from "react";
-import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import KidHeaderBG from "@/components/v2/KidHeaderBG";
 import KidTabBar from "@/components/v2/KidTabBar";
 import CoinCounter from "@/components/v2/CoinCounter";
 import CoinSmall from "@/components/v2/CoinSmall";
+import BadgeShowcase from "@/components/badges/BadgeShowcase";
 import PointsCelebrationWrapper from "@/components/points/PointsCelebrationWrapper";
 
 // ------- Types -------
@@ -23,69 +23,12 @@ interface PointsResponse {
   entries: PointEntry[];
 }
 
-interface DayData {
-  day: string;
-  total: number;
-  type: "fire" | "gem" | "none";
-  isToday: boolean;
-  dateStr: string;
-}
-
 interface KidHomeProps {
   kidId: string;
   kidName: string;
 }
 
 // ------- Helpers -------
-
-function getWeekData(entries: PointEntry[]): DayData[] {
-  const today = new Date();
-  const dayOfWeek = today.getDay(); // 0=Sun
-  const weekStart = new Date(today);
-  weekStart.setDate(today.getDate() - dayOfWeek);
-  weekStart.setHours(0, 0, 0, 0);
-
-  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const result: DayData[] = [];
-
-  for (let i = 0; i < 7; i++) {
-    const date = new Date(weekStart);
-    date.setDate(weekStart.getDate() + i);
-    const dateStr = date.toISOString().split("T")[0];
-
-    const dayEntries = entries.filter((e) => {
-      const entryDate = new Date(e.date).toISOString().split("T")[0];
-      return entryDate === dateStr && e.points > 0;
-    });
-
-    const total = dayEntries.reduce((sum, e) => sum + e.points, 0);
-    const isToday = i === dayOfWeek;
-
-    let type: "fire" | "gem" | "none" = "none";
-    if (total >= 10) type = "fire";
-    else if (total > 0) type = "gem";
-
-    result.push({ day: days[i], total, type, isToday, dateStr });
-  }
-
-  return result;
-}
-
-function getStreakText(weekData: DayData[]): string {
-  // Count consecutive days with points > 0 from end (up to today)
-  const todayIdx = weekData.findIndex((d) => d.isToday);
-  let streak = 0;
-  for (let i = todayIdx; i >= 0; i--) {
-    if (weekData[i].total > 0) {
-      streak++;
-    } else {
-      break;
-    }
-  }
-  if (streak === 0) return "Start your streak!";
-  if (streak === 1) return "1 day streak";
-  return `${streak} day streak`;
-}
 
 // ------- Month calendar helpers -------
 
@@ -284,16 +227,7 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
   const todayDelta = todayEntries.reduce((sum, e) => sum + e.points, 0);
   const previousPoints = data.totalPoints - todayDelta;
 
-  const weekData = getWeekData(data.entries);
-  const streakText = getStreakText(weekData);
-
   const todayChores = todayEntries.filter((e) => e.chore?.title);
-
-  const dayBgMap: Record<string, string> = {
-    fire: "#ffe4d4",
-    gem: "#d7eaf8",
-    none: "#f0ede2",
-  };
 
   return (
     <PointsCelebrationWrapper kidId={kidId} currentPoints={data.totalPoints}>
@@ -331,54 +265,7 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
           <CoinCounter base={previousPoints} delta={todayDelta} size="hero" />
         </div>
 
-        {/* Pill buttons */}
-        <div className="flex justify-center gap-3 mt-2">
-          <Link
-            href="/points/history"
-            className="px-5 py-2 rounded-full text-sm font-bold text-white"
-            style={{ background: "rgba(255,255,255,0.2)" }}
-          >
-            History
-          </Link>
-          <Link
-            href="/shop"
-            className="px-5 py-2 rounded-full text-sm font-bold"
-            style={{ background: "var(--ca-gold)", color: "var(--ca-gold-deep)" }}
-          >
-            Redeem
-          </Link>
-        </div>
       </KidHeaderBG>
-
-      {/* Week Strip */}
-      <section className="px-4 mt-6">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-bold text-ca-ink">This week 🔥</h2>
-          <span className="text-sm font-semibold text-ca-muted">{streakText}</span>
-        </div>
-        <div className="grid grid-cols-7 gap-1.5">
-          {weekData.map((d) => (
-            <div
-              key={d.dateStr}
-              className="flex flex-col items-center rounded-xl py-2 px-1"
-              style={{
-                background: dayBgMap[d.type],
-                border: d.isToday ? "2px solid var(--ca-cobalt)" : "2px solid transparent",
-              }}
-            >
-              <span className="text-[10px] font-bold text-ca-muted uppercase">
-                {d.day}
-              </span>
-              <span className="text-sm font-bold text-ca-ink mt-0.5">
-                {d.total > 0 ? d.total : "-"}
-              </span>
-              <span className="text-sm mt-0.5">
-                {d.type === "fire" ? "🔥" : d.type === "gem" ? "💎" : ""}
-              </span>
-            </div>
-          ))}
-        </div>
-      </section>
 
       {/* Today's Chores */}
       {todayChores.length > 0 && (
@@ -466,6 +353,16 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
             <span>🔥 10+ pts</span>
             <span>💎 1+ pts</span>
           </div>
+        </div>
+      </section>
+
+      {/* Badges */}
+      <section className="px-4 mt-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-bold text-ca-ink">My badges 🏆</h2>
+        </div>
+        <div className="bg-white rounded-2xl p-4 border border-[rgba(26,24,19,0.08)]">
+          <BadgeShowcase kidId={kidId} />
         </div>
       </section>
 
