@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import KidHeaderBG from "@/components/v2/KidHeaderBG";
 import KidTabBar from "@/components/v2/KidTabBar";
 import CoinCounter from "@/components/v2/CoinCounter";
 import CoinSmall from "@/components/v2/CoinSmall";
+import PointsCelebrationWrapper from "@/components/points/PointsCelebrationWrapper";
 
 // ------- Types -------
 
@@ -83,6 +85,34 @@ function getStreakText(weekData: DayData[]): string {
   if (streak === 0) return "Start your streak!";
   if (streak === 1) return "1 day streak";
   return `${streak} day streak`;
+}
+
+// ------- Month calendar helpers -------
+
+function buildMonthCells(year: number, month: number) {
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const prevDays = new Date(year, month, 0).getDate();
+  const cells: Array<{ day: number; inMonth: boolean; dateStr: string }> = [];
+
+  for (let i = firstDay - 1; i >= 0; i--) {
+    const d = prevDays - i;
+    const m = month === 0 ? 11 : month - 1;
+    const y = month === 0 ? year - 1 : year;
+    cells.push({ day: d, inMonth: false, dateStr: `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}` });
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    cells.push({ day: d, inMonth: true, dateStr: `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}` });
+  }
+  while (cells.length < 42) {
+    const d = cells.length - firstDay - daysInMonth + 1;
+    const m = month === 11 ? 0 : month + 1;
+    const y = month === 11 ? year + 1 : year;
+    cells.push({ day: d, inMonth: false, dateStr: `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}` });
+  }
+  // Trim last row if entirely next month
+  if (cells.slice(35).every((c) => !c.inMonth)) return cells.slice(0, 35);
+  return cells;
 }
 
 // ------- Tile colors for chore cards -------
@@ -192,6 +222,9 @@ function SwipeableChoreCard({
 export default function KidHome({ kidId, kidName }: KidHomeProps) {
   const [data, setData] = useState<PointsResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const today = new Date();
+  const [calYear, setCalYear] = useState(today.getFullYear());
+  const [calMonth, setCalMonth] = useState(today.getMonth());
 
   useEffect(() => {
     fetch(`/api/points?kidId=${kidId}`)
@@ -204,6 +237,29 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
         setLoading(false);
       });
   }, [kidId]);
+
+  // Day totals for calendar
+  const dayTotals = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const e of data?.entries || []) {
+      const ds = new Date(e.date).toISOString().split("T")[0];
+      if (e.points > 0) map[ds] = (map[ds] || 0) + e.points;
+    }
+    return map;
+  }, [data?.entries]);
+
+  const monthCells = useMemo(() => buildMonthCells(calYear, calMonth), [calYear, calMonth]);
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  const monthName = new Date(calYear, calMonth).toLocaleDateString("en-US", { month: "long", year: "numeric" });
+
+  const prevMonth = () => {
+    if (calMonth === 0) { setCalYear((y) => y - 1); setCalMonth(11); }
+    else setCalMonth((m) => m - 1);
+  };
+  const nextMonth = () => {
+    if (calMonth === 11) { setCalYear((y) => y + 1); setCalMonth(0); }
+    else setCalMonth((m) => m + 1);
+  };
 
   if (loading) {
     return (
@@ -241,6 +297,8 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
   };
 
   return (
+    <PointsCelebrationWrapper kidId={kidId} currentPoints={data.totalPoints}>
+      {({ onReplay, canReplay }) => (
     <div className="min-h-screen bg-ca-cream pb-[110px] font-[family-name:var(--font-baloo-2)]">
       {/* Header */}
       <KidHeaderBG>
@@ -343,8 +401,79 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
         </section>
       )}
 
+      {/* Month Calendar */}
+      <section className="px-4 mt-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-bold text-ca-ink">My calendar</h2>
+          {canReplay && (
+            <button onClick={onReplay} className="text-xl" title="Replay celebration">
+              🎉
+            </button>
+          )}
+        </div>
+        <div className="bg-white rounded-2xl p-3 border border-[rgba(26,24,19,0.08)]">
+          {/* Month nav */}
+          <div className="flex items-center justify-between mb-2">
+            <button onClick={prevMonth} className="w-8 h-8 rounded-full hover:bg-ca-cream flex items-center justify-center">
+              <ChevronLeft size={18} className="text-ca-muted" />
+            </button>
+            <span className="text-sm font-bold text-ca-ink">{monthName}</span>
+            <button onClick={nextMonth} className="w-8 h-8 rounded-full hover:bg-ca-cream flex items-center justify-center">
+              <ChevronRight size={18} className="text-ca-muted" />
+            </button>
+          </div>
+          {/* Day headers */}
+          <div className="grid grid-cols-7 mb-1">
+            {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
+              <div key={i} className="text-center text-[10px] font-bold text-ca-muted py-0.5">{d}</div>
+            ))}
+          </div>
+          {/* Cells */}
+          <div className="grid grid-cols-7 gap-1">
+            {monthCells.map((cell, i) => {
+              const pts = dayTotals[cell.dateStr] || 0;
+              const isFire = pts >= 10;
+              const isGem = pts > 0 && pts < 10;
+              const isToday = cell.dateStr === todayStr && cell.inMonth;
+
+              let bg = "#f7f3e6";
+              if (!cell.inMonth) bg = "transparent";
+              else if (isFire) bg = "#ffe4d4";
+              else if (isGem) bg = "#d7eaf8";
+
+              return (
+                <div
+                  key={i}
+                  className="aspect-square rounded-[10px] flex flex-col items-center justify-center"
+                  style={{
+                    backgroundColor: bg,
+                    border: isToday ? "2px solid var(--ca-cobalt)" : "none",
+                    opacity: cell.inMonth ? 1 : 0.3,
+                  }}
+                >
+                  {cell.inMonth && (
+                    <>
+                      <span className="text-[12px] font-extrabold text-ca-ink leading-none">{cell.day}</span>
+                      {isFire && <span className="text-[9px] leading-none">🔥</span>}
+                      {isGem && <span className="text-[9px] leading-none">💎</span>}
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          {/* Legend */}
+          <div className="flex items-center justify-center gap-4 mt-2 text-[10px] text-ca-muted">
+            <span>🔥 10+ pts</span>
+            <span>💎 1+ pts</span>
+          </div>
+        </div>
+      </section>
+
       {/* Tab Bar */}
       <KidTabBar />
     </div>
+      )}
+    </PointsCelebrationWrapper>
   );
 }
