@@ -6,6 +6,7 @@ import KidHeaderBG from "@/components/v2/KidHeaderBG";
 import KidTabBar from "@/components/v2/KidTabBar";
 import CoinCounter from "@/components/v2/CoinCounter";
 import CoinSmall from "@/components/v2/CoinSmall";
+import FlameIcon from "@/components/v2/FlameIcon";
 import BadgeShowcase from "@/components/badges/BadgeShowcase";
 import PointsCelebrationWrapper from "@/components/points/PointsCelebrationWrapper";
 
@@ -343,8 +344,8 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
                     {cell.inMonth && (
                       <>
                         <span className="text-sm font-extrabold text-ca-ink leading-none">{cell.day}</span>
-                        <span className="text-base leading-none mt-0.5">
-                          {isFire ? "🔥" : isGem ? "💎" : ""}
+                        <span className="leading-none mt-0.5 flex items-center justify-center">
+                          {isFire ? <FlameIcon size={16} /> : isGem ? <CoinSmall size={16} /> : null}
                         </span>
                         {(isFire || isGem) && (
                           <span className="text-[10px] font-bold text-ca-muted leading-none mt-0.5">
@@ -359,8 +360,8 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
             </div>
             {/* Legend */}
             <div className="flex items-center justify-center gap-6 mt-3 text-xs font-bold text-ca-muted">
-              <span>🔥 10+ gems</span>
-              <span>💎 1+ gems</span>
+              <span className="flex items-center gap-1"><FlameIcon size={14} /> 10+ gems</span>
+              <span className="flex items-center gap-1"><CoinSmall size={14} /> 1+ gems</span>
               <span className="flex items-center gap-1">
                 <span className="w-2.5 h-2.5 rounded-full border-2 border-ca-cobalt inline-block" />
                 Today
