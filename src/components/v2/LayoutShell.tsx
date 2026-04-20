@@ -47,7 +47,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
     // Pages whose v2 components render their own tab bar internally
     const v2KidPages = ["/points", "/learn", "/badges"];
     const v2ViewAsPages = ["/view-as/points", "/view-as/learn", "/view-as/gallery"];
-    const v2ParentPages = ["/dashboard", "/ledger", "/calendar", "/settings"];
+    const v2ParentPages = ["/dashboard", "/ledger", "/calendar", "/settings", "/rewards"];
 
     const isViewAsPage = pathname.startsWith("/view-as");
     const hasOwnKidTabBar =
