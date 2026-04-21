@@ -91,7 +91,7 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
     choreName: "text-ca-ink",
     customName: "text-ca-ink",
     grid: "grid grid-cols-3 sm:grid-cols-4 gap-3",
-    badgeFrame: "w-16 h-16 rounded-2xl flex items-center justify-center",
+    badgeFrame: "w-16 h-16 flex items-center justify-center",
     countBadge: "bg-ca-cobalt",
   } : {
     skeleton: "bg-gray-100",
@@ -168,7 +168,7 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
             >
               <div className={`${earned ? "" : "grayscale opacity-30"} transition-all`}>
                 {isNewDesign ? (
-                  <div className={`${theme.badgeFrame} ${tileBg}`}>
+                  <div className={theme.badgeFrame}>
                     {(earnedBadge?.customImageUrl || badge.customImageUrl) ? (
                       <img src={earnedBadge?.customImageUrl || badge.customImageUrl || ""} alt={badge.name} className="w-12 h-12 rounded-xl object-cover" />
                     ) : (
@@ -204,7 +204,7 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
             >
               <div className="relative">
                 {isNewDesign ? (
-                  <div className={`${theme.badgeFrame} ${pending ? "animate-pulse" : ""} ${tileBg}`}>
+                  <div className={`${theme.badgeFrame} ${pending ? "animate-pulse" : ""}`}>
                     {pending ? (
                       <span className="text-2xl opacity-50">✨</span>
                     ) : (
@@ -245,7 +245,7 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
             >
               <div className="relative">
                 {isNewDesign ? (
-                  <div className={`${theme.badgeFrame} ${tileBg}`}>
+                  <div className={theme.badgeFrame}>
                     {badge.customImageUrl ? (
                       <img src={badge.customImageUrl} alt={badge.chore.title} className="w-12 h-12 rounded-xl object-cover" />
                     ) : (
