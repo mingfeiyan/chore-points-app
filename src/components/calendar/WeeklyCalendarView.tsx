@@ -76,7 +76,7 @@ export default function WeeklyCalendarView() {
     dayHeaderText: "text-[#857d68]",
     dayText: "text-[#2f2a1f]",
     todayBg: "bg-[rgba(107,142,78,0.06)]",
-    todayPill: "w-7 h-7 mx-auto flex items-center justify-center bg-[#4a6a32] text-white rounded-full",
+    todayPill: "bg-[#4a6a32] text-white",
     divider: "divide-[rgba(68,55,32,0.08)]",
     borderDivider: "border-[rgba(68,55,32,0.08)]",
     btnPrimary: "text-white bg-[#4a6a32] hover:bg-[#3d5a2a]",
@@ -108,7 +108,7 @@ export default function WeeklyCalendarView() {
     dayHeaderText: "text-gray-500",
     dayText: "text-gray-900",
     todayBg: "bg-blue-50",
-    todayPill: "w-7 h-7 mx-auto flex items-center justify-center bg-blue-600 text-white rounded-full",
+    todayPill: "bg-blue-600 text-white",
     divider: "divide-gray-100",
     borderDivider: "border-gray-100",
     btnPrimary: "text-white bg-blue-600 hover:bg-blue-700",
@@ -652,7 +652,7 @@ export default function WeeklyCalendarView() {
                 <div className="px-2 py-1 text-center border-b ${theme.borderDivider}">
                   <div className={`text-xs ${theme.dayHeaderText} uppercase`}>{dayName}</div>
                   <div
-                    className={`text-sm font-medium ${
+                    className={`text-sm font-medium w-7 h-7 mx-auto flex items-center justify-center rounded-full ${
                       isToday(day)
                         ? theme.todayPill
                         : theme.dayText
@@ -713,7 +713,7 @@ export default function WeeklyCalendarView() {
                 <div className="px-2 py-1 text-center border-b ${theme.borderDivider}">
                   <div className={`text-xs ${theme.dayHeaderText} uppercase`}>{dayName}</div>
                   <div
-                    className={`text-sm font-medium ${
+                    className={`text-sm font-medium w-7 h-7 mx-auto flex items-center justify-center rounded-full ${
                       isToday(day)
                         ? theme.todayPill
                         : theme.dayText
@@ -786,7 +786,7 @@ export default function WeeklyCalendarView() {
                 {/* Day Number */}
                 <div className="px-2 py-1 text-center">
                   <div
-                    className={`text-sm font-medium ${
+                    className={`text-sm font-medium w-7 h-7 mx-auto flex items-center justify-center rounded-full ${
                       isToday(day)
                         ? theme.todayPill
                         : theme.dayText
@@ -850,7 +850,7 @@ export default function WeeklyCalendarView() {
                 {/* Day Number */}
                 <div className="px-2 py-1 text-center">
                   <div
-                    className={`text-sm font-medium ${
+                    className={`text-sm font-medium w-7 h-7 mx-auto flex items-center justify-center rounded-full ${
                       isToday(day)
                         ? theme.todayPill
                         : theme.dayText
