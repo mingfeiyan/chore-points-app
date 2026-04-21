@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNewDesign } from "@/hooks/useNewDesign";
 import { useKidMode } from "@/components/providers/KidModeProvider";
 import { useSession } from "next-auth/react";
@@ -37,9 +37,16 @@ function V2KidModeBanner() {
 
   const isKidPage = pathname.startsWith("/view-as") || pathname.startsWith("/points") || pathname.startsWith("/learn");
 
-  // Auto-exit kid mode when parent navigates to a non-kid page
+  // Auto-exit kid mode when parent is on a non-kid page
+  // Use a ref to track if we were previously on a kid page to avoid
+  // clearing kid mode during the navigation transition from dashboard
+  const wasOnKidPage = useRef(false);
   useEffect(() => {
-    if (isKidMode && session?.user?.role === "PARENT" && !isKidPage) {
+    if (isKidPage) {
+      wasOnKidPage.current = true;
+    } else if (wasOnKidPage.current && isKidMode && session?.user?.role === "PARENT") {
+      // Only auto-exit if we were on a kid page and navigated away
+      wasOnKidPage.current = false;
       exitKidMode();
     }
   }, [isKidMode, isKidPage, session?.user?.role, exitKidMode]);
