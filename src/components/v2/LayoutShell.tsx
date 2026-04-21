@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useNewDesign } from "@/hooks/useNewDesign";
 import { useKidMode } from "@/components/providers/KidModeProvider";
 import { useSession } from "next-auth/react";
@@ -34,10 +35,16 @@ function V2KidModeBanner() {
   const router = useRouter();
   const pathname = usePathname();
 
-  if (!isKidMode || session?.user?.role !== "PARENT") return null;
-
-  // Use Coin Arcade style on kid/view-as pages, Paper Garden elsewhere
   const isKidPage = pathname.startsWith("/view-as") || pathname.startsWith("/points") || pathname.startsWith("/learn");
+
+  // Auto-exit kid mode when parent navigates to a non-kid page
+  useEffect(() => {
+    if (isKidMode && session?.user?.role === "PARENT" && !isKidPage) {
+      exitKidMode();
+    }
+  }, [isKidMode, isKidPage, session?.user?.role, exitKidMode]);
+
+  if (!isKidMode || session?.user?.role !== "PARENT") return null;
 
   if (isKidPage) {
     return (
