@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { useNewDesign } from "@/hooks/useNewDesign";
 
 type Chore = {
   id: string;
@@ -85,9 +84,8 @@ export default function PointEntryForm({
   const t = useTranslations("parent");
   const tCommon = useTranslations("common");
   const tPhotos = useTranslations("photos");
-  const { isNewDesign } = useNewDesign();
 
-  const theme = isNewDesign ? {
+  const theme = {
     title: "text-[#2f2a1f]",
     label: "text-[#2f2a1f]",
     muted: "text-[#857d68]",
@@ -108,27 +106,6 @@ export default function PointEntryForm({
     infoText: "text-[#4a6a32]",
     photoBorder: "border-[rgba(68,55,32,0.14)] hover:border-[#4a6a32] hover:bg-[rgba(107,142,78,0.06)]",
     photoText: "text-[#857d68]",
-  } : {
-    title: "text-gray-900",
-    label: "text-gray-700",
-    muted: "text-gray-500",
-    close: "${theme.muted} hover:text-gray-600",
-    input: "border-gray-300 focus:ring-blue-500 focus:border-blue-500",
-    checkbox: "border-gray-300 text-blue-600 focus:ring-blue-500",
-    errorBg: "bg-red-50 border border-red-200 text-red-700",
-    cancelBtn: "border-gray-300 text-gray-700 hover:bg-gray-50",
-    choreBtn: "bg-blue-600 hover:bg-blue-700",
-    customBtn: "bg-green-600 hover:bg-green-700",
-    choreBorder: "border-gray-300 hover:border-blue-500 hover:bg-blue-50",
-    customBorder: "border-gray-300 hover:border-green-500 hover:bg-green-50",
-    choreIcon: "bg-blue-100",
-    choreIconSvg: "text-blue-600",
-    customIcon: "bg-green-100",
-    customIconSvg: "text-green-600",
-    infoBg: "bg-blue-50 border border-blue-200",
-    infoText: "text-blue-700",
-    photoBorder: "border-gray-300 hover:border-blue-500 hover:bg-blue-50",
-    photoText: "text-gray-500",
   };
 
   useEffect(() => {

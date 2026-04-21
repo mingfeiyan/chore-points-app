@@ -4,7 +4,6 @@ import "./globals.css";
 import SessionProvider from "@/components/providers/SessionProvider";
 import LocaleProvider from "@/components/LocaleProvider";
 import KidModeProvider from "@/components/providers/KidModeProvider";
-import NewDesignProvider from "@/components/v2/NewDesignProvider";
 import LayoutShell from "@/components/v2/LayoutShell";
 
 const geistSans = Geist({
@@ -59,9 +58,7 @@ export default function RootLayout({
         <SessionProvider>
           <LocaleProvider>
             <KidModeProvider>
-              <NewDesignProvider>
-                <LayoutShell>{children}</LayoutShell>
-              </NewDesignProvider>
+              <LayoutShell>{children}</LayoutShell>
             </KidModeProvider>
           </LocaleProvider>
         </SessionProvider>

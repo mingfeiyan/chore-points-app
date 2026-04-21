@@ -5,7 +5,6 @@ import { useTranslations } from "next-intl";
 import PointEntryForm from "./PointEntryForm";
 import BadgeLevelUpToast from "@/components/badges/BadgeLevelUpToast";
 import AchievementBadgeToast from "@/components/badges/AchievementBadgeToast";
-import { useNewDesign } from "@/hooks/useNewDesign";
 
 type Kid = {
   id: string;
@@ -59,9 +58,8 @@ export default function PointsLedger() {
   const tCommon = useTranslations("common");
   const tHistory = useTranslations("history");
   const tPhotos = useTranslations("photos");
-  const { isNewDesign } = useNewDesign();
 
-  const theme = isNewDesign ? {
+  const theme = {
     card: "bg-white rounded-[14px] border border-[rgba(68,55,32,0.14)]",
     title: "text-[#2f2a1f]",
     points: "text-[#4a6a32]",
@@ -78,23 +76,6 @@ export default function PointsLedger() {
     negative: "text-[#c5543d]",
     redeemed: "text-[#7b6bad]",
     photoPlaceholder: "text-[#857d68]",
-  } : {
-    card: "bg-white rounded-lg shadow",
-    title: "text-gray-900",
-    points: "text-blue-600",
-    addBtn: "bg-blue-600 text-white hover:bg-blue-700",
-    emptyText: "text-gray-500",
-    tableHead: "bg-gray-50",
-    tableHeadText: "text-gray-500",
-    tableDivide: "divide-gray-200",
-    cellText: "text-gray-900",
-    cellMuted: "text-gray-500",
-    editBtn: "text-blue-600 hover:text-blue-900 hover:bg-blue-50",
-    deleteBtn: "text-red-600 hover:text-red-900 hover:bg-red-50",
-    positive: "text-green-600",
-    negative: "text-red-600",
-    redeemed: "text-purple-600",
-    photoPlaceholder: "text-gray-400",
   };
 
   const [viewingPhoto, setViewingPhoto] = useState<string | null>(null);

@@ -6,14 +6,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useKidMode } from "@/components/providers/KidModeProvider";
-import { useNewDesign } from "@/hooks/useNewDesign";
 
 export default function MobileNav() {
   const { data: session } = useSession();
   const pathname = usePathname();
   const t = useTranslations("nav");
   const { isKidMode } = useKidMode();
-  const { setNewDesign } = useNewDesign();
   const [showMore, setShowMore] = useState(false);
   const [learnExpanded, setLearnExpanded] = useState(false);
 
@@ -33,7 +31,6 @@ export default function MobileNav() {
   const parentPrimaryLinks = [
     { href: "/ledger", label: t("pointsNav"), icon: "💎" },
     { href: "/chores", label: t("chores"), icon: "✅" },
-    { href: "__new_ui__", label: "New UI ✨", icon: "🎨" },
   ];
 
   // Secondary links shown in the "More" popup
@@ -162,20 +159,6 @@ export default function MobileNav() {
       <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-gray-800 text-white border-t border-gray-700 z-50 pb-[env(safe-area-inset-bottom)]">
         <div className="flex justify-around items-center h-[68px]">
           {primaryLinks.map((link) => {
-            if (link.href === "__new_ui__") {
-              return (
-                <button
-                  key={link.href}
-                  onClick={() => setNewDesign(true)}
-                  className="flex flex-col items-center justify-center flex-1 h-full min-h-[68px] text-yellow-400 hover:text-yellow-300 transition-colors"
-                >
-                  <span className="text-2xl mb-1">{link.icon}</span>
-                  <span className="text-xs font-medium truncate max-w-[70px]">
-                    {link.label}
-                  </span>
-                </button>
-              );
-            }
             const isActive = pathname === link.href;
             return (
               <Link

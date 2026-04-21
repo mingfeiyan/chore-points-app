@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { useNewDesign } from "@/hooks/useNewDesign";
 
 type Kid = {
   id: string;
@@ -18,9 +17,8 @@ type Props = {
 export default function LogRewardModal({ onClose, onSuccess }: Props) {
   const t = useTranslations("logReward");
   const tCommon = useTranslations("common");
-  const { isNewDesign } = useNewDesign();
 
-  const theme = isNewDesign ? {
+  const theme = {
     title: "text-[#2f2a1f]",
     label: "text-[#2f2a1f]",
     muted: "text-[#857d68]",
@@ -31,17 +29,6 @@ export default function LogRewardModal({ onClose, onSuccess }: Props) {
     submitBtn: "bg-[#4a6a32] text-white hover:bg-[#3d5a2a]",
     photoBorder: "border-[rgba(68,55,32,0.14)] hover:border-[#4a6a32] hover:bg-[rgba(107,142,78,0.06)]",
     photoText: "text-[#857d68]",
-  } : {
-    title: "text-gray-900",
-    label: "text-gray-700",
-    muted: "text-gray-500",
-    close: "text-gray-400 hover:text-gray-600",
-    input: "border-gray-300 focus:ring-blue-500 focus:border-blue-500",
-    errorBg: "bg-red-50 border border-red-200 text-red-700",
-    cancelBtn: "border-gray-300 text-gray-700 hover:bg-gray-50",
-    submitBtn: "bg-blue-600 text-white hover:bg-blue-700",
-    photoBorder: "border-gray-300 hover:border-blue-500 hover:bg-blue-50",
-    photoText: "text-gray-500",
   };
 
   const [kids, setKids] = useState<Kid[]>([]);

@@ -6,7 +6,6 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import BadgeIcon from "./BadgeIcon";
 import { BADGE_LEVELS } from "@/lib/badges";
-import { useNewDesign } from "@/hooks/useNewDesign";
 
 type ChoreBadge = {
   id: string;
@@ -88,9 +87,8 @@ export default function BadgeDetailModal(props: BadgeDetailModalProps) {
   const router = useRouter();
   const [regenerating, setRegenerating] = useState(false);
   const isParent = session?.user?.role === "PARENT";
-  const { isNewDesign } = useNewDesign();
 
-  const theme = isNewDesign ? {
+  const theme = {
     close: "text-[#857d68] hover:text-[#2f2a1f]",
     title: "text-[#2f2a1f]",
     titleUnearned: "text-[#857d68]",
@@ -105,21 +103,6 @@ export default function BadgeDetailModal(props: BadgeDetailModalProps) {
     maxLevel: "text-[#6b8e4e] bg-[rgba(107,142,78,0.1)]",
     completedText: "text-[#857d68]",
     regenBtn: "bg-[#4a6a32] text-white hover:bg-[#3d5a2a]",
-  } : {
-    close: "text-gray-400 hover:text-gray-600",
-    title: "text-gray-900",
-    titleUnearned: "text-gray-400",
-    desc: "text-gray-600",
-    descUnearned: "text-gray-400",
-    earnedBg: "text-green-600 bg-green-50",
-    unearnedBg: "text-gray-400 bg-gray-100",
-    dateBg: "text-gray-600 bg-gray-50",
-    positive: "text-green-600",
-    levelText: "text-gray-700",
-    progress: "text-gray-500",
-    maxLevel: "text-yellow-600 bg-yellow-50",
-    completedText: "text-gray-500",
-    regenBtn: "bg-purple-600 text-white hover:bg-purple-700",
   };
 
   const handleRegenerate = async (badgeId: string) => {

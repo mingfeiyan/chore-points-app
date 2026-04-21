@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { useNewDesign } from "@/hooks/useNewDesign";
 
 type Chore = {
   id: string;
@@ -252,18 +251,12 @@ export default function ChoreFlashcards() {
   const [loading, setLoading] = useState(true);
   const t = useTranslations("chores");
   const tCommon = useTranslations("common");
-  const { isNewDesign } = useNewDesign();
 
-  const theme = isNewDesign ? {
+  const theme = {
     skeleton: "bg-[rgba(68,55,32,0.06)]",
     emptyCard: "bg-white rounded-[14px] border border-[rgba(68,55,32,0.14)]",
     emptyText: "text-[#857d68]",
     emptyHint: "text-[#857d68]",
-  } : {
-    skeleton: "bg-gray-100",
-    emptyCard: "bg-white rounded-lg shadow",
-    emptyText: "text-gray-500",
-    emptyHint: "text-gray-400",
   };
 
   useEffect(() => {

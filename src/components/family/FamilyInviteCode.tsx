@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useNewDesign } from "@/hooks/useNewDesign";
 
 export default function FamilyInviteCode({ inviteCode: initialCode }: { inviteCode: string }) {
   const router = useRouter();
@@ -12,9 +11,8 @@ export default function FamilyInviteCode({ inviteCode: initialCode }: { inviteCo
   const [showCode, setShowCode] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const t = useTranslations("family");
-  const { isNewDesign } = useNewDesign();
 
-  const theme = isNewDesign ? {
+  const theme = {
     muted: "text-[#857d68]",
     codeBg: "bg-[#F9F4E8]",
     showLink: "text-[#4a6a32] hover:text-[#3d5a2a]",
@@ -22,14 +20,6 @@ export default function FamilyInviteCode({ inviteCode: initialCode }: { inviteCo
     copyDefault: "bg-[rgba(107,142,78,0.15)] text-[#4a6a32] hover:bg-[rgba(107,142,78,0.25)]",
     refreshBtn: "bg-[rgba(68,55,32,0.06)] text-[#857d68] hover:bg-[rgba(68,55,32,0.12)]",
     hint: "text-[#857d68]",
-  } : {
-    muted: "text-gray-500",
-    codeBg: "bg-gray-100",
-    showLink: "text-blue-600 hover:text-blue-800",
-    copyActive: "bg-green-100 text-green-700",
-    copyDefault: "bg-blue-100 text-blue-700 hover:bg-blue-200",
-    refreshBtn: "bg-gray-100 text-gray-700 hover:bg-gray-200",
-    hint: "text-gray-400",
   };
 
   const handleCopy = async () => {

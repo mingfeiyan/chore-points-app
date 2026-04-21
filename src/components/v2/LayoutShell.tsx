@@ -1,33 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useNewDesign } from "@/hooks/useNewDesign";
 import { useKidMode } from "@/components/providers/KidModeProvider";
 import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
-import NavBar from "@/components/NavBar";
-import KidModeBanner from "@/components/KidModeBanner";
-import MobileNav from "@/components/MobileNav";
 import KidTabBar from "@/components/v2/KidTabBar";
 import ParentTabBar from "@/components/v2/ParentTabBar";
-
-function DesignToggleFAB() {
-  const { isNewDesign, setNewDesign } = useNewDesign();
-  const { data: session } = useSession();
-
-  // Only show for parents, and only when old design is active
-  if (isNewDesign || session?.user?.role !== "PARENT") return null;
-
-  return (
-    <button
-      onClick={() => setNewDesign(true)}
-      className="fixed bottom-24 right-4 z-50 sm:hidden flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold text-white shadow-lg"
-      style={{ background: "linear-gradient(135deg, #6b8e4e, #4a6a32)" }}
-    >
-      ✨ Try New Design
-    </button>
-  );
-}
 
 function V2KidModeBanner() {
   const { isKidMode, viewingAsKid, exitKidMode } = useKidMode();
@@ -109,49 +87,35 @@ function V2KidModeBanner() {
 }
 
 export default function LayoutShell({ children }: { children: React.ReactNode }) {
-  const { isNewDesign } = useNewDesign();
   const { data: session } = useSession();
   const { isKidMode } = useKidMode();
   const pathname = usePathname();
 
-  if (isNewDesign) {
-    // Pages whose v2 components render their own tab bar internally
-    const v2KidPages = ["/points", "/learn", "/badges"];
-    const v2ViewAsPages = ["/view-as/points", "/view-as/learn", "/view-as/gallery"];
-    const v2ParentPages = ["/dashboard", "/ledger", "/calendar", "/settings", "/rewards", "/gallery"];
+  // Pages whose v2 components render their own tab bar internally
+  const v2KidPages = ["/points", "/learn", "/badges"];
+  const v2ViewAsPages = ["/view-as/points", "/view-as/learn", "/view-as/gallery"];
+  const v2ParentPages = ["/dashboard", "/ledger", "/calendar", "/settings", "/rewards", "/gallery"];
 
-    const isViewAsPage = pathname.startsWith("/view-as");
-    const hasOwnKidTabBar =
-      v2KidPages.some((p) => pathname === p || pathname.startsWith(p + "/")) ||
-      v2ViewAsPages.some((p) => pathname === p || pathname.startsWith(p + "/"));
-    const hasOwnParentTabBar = v2ParentPages.some((p) => pathname === p || pathname.startsWith(p + "/"));
+  const isViewAsPage = pathname.startsWith("/view-as");
+  const hasOwnKidTabBar =
+    v2KidPages.some((p) => pathname === p || pathname.startsWith(p + "/")) ||
+    v2ViewAsPages.some((p) => pathname === p || pathname.startsWith(p + "/"));
+  const hasOwnParentTabBar = v2ParentPages.some((p) => pathname === p || pathname.startsWith(p + "/"));
 
-    const isKid = session?.user?.role === "KID";
-    const isParent = session?.user?.role === "PARENT";
+  const isKid = session?.user?.role === "KID";
+  const isParent = session?.user?.role === "PARENT";
 
-    // Show fallback KidTabBar for kid users on pages that don't render their own
-    const showKidTabBar = (isKid || isViewAsPage) && !hasOwnKidTabBar;
-    // Show fallback ParentTabBar for parent (not in kid mode) on pages without own tab bar
-    const showParentTabBar = isParent && !isKidMode && !isViewAsPage && !hasOwnParentTabBar && !hasOwnKidTabBar;
-
-    return (
-      <>
-        <V2KidModeBanner />
-        <main className="min-h-screen">{children}</main>
-        {showKidTabBar && <KidTabBar />}
-        {showParentTabBar && <ParentTabBar />}
-      </>
-    );
-  }
+  // Show fallback KidTabBar for kid users on pages that don't render their own
+  const showKidTabBar = (isKid || isViewAsPage) && !hasOwnKidTabBar;
+  // Show fallback ParentTabBar for parent (not in kid mode) on pages without own tab bar
+  const showParentTabBar = isParent && !isKidMode && !isViewAsPage && !hasOwnParentTabBar && !hasOwnKidTabBar;
 
   return (
     <>
-      <NavBar />
-      <KidModeBanner />
-      <main className="pb-20 sm:pb-0">{children}</main>
-      <MobileNav />
-      {/* Floating toggle for easy access on mobile */}
-      <DesignToggleFAB />
+      <V2KidModeBanner />
+      <main className="min-h-screen">{children}</main>
+      {showKidTabBar && <KidTabBar />}
+      {showParentTabBar && <ParentTabBar />}
     </>
   );
 }

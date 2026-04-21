@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/permissions";
-import KidLearnEntryWrapper from "@/components/v2/kid/KidLearnEntryWrapper";
+import KidLearnEntry from "@/components/v2/kid/KidLearnEntry";
 
 export default async function LearnPage() {
   const session = await getSession();
@@ -17,5 +17,5 @@ export default async function LearnPage() {
     redirect("/dashboard");
   }
 
-  return <KidLearnEntryWrapper />;
+  return <KidLearnEntry />;
 }

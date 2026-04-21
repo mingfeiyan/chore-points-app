@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { useNewDesign } from "@/hooks/useNewDesign";
 
 interface CalendarEvent {
   id: string;
@@ -120,9 +119,8 @@ export default function CalendarEventForm({
 }: Props) {
   const t = useTranslations("calendar");
   const tCommon = useTranslations("common");
-  const { isNewDesign } = useNewDesign();
 
-  const theme = isNewDesign ? {
+  const theme = {
     title: "text-[#2f2a1f]",
     label: "text-[#2f2a1f]",
     muted: "text-[#857d68]",
@@ -141,25 +139,6 @@ export default function CalendarEventForm({
     memberMingfeiBg: "rgba(155,191,122,0.15)",
     memberYue: "border-[#d88b8b] text-[#a05555]",
     memberYueBg: "rgba(216,139,139,0.15)",
-  } : {
-    title: "text-gray-900",
-    label: "text-gray-700",
-    muted: "text-gray-500",
-    close: "text-gray-400 hover:text-gray-600",
-    input: "border-gray-300 focus:ring-blue-500 focus:border-blue-500",
-    checkbox: "text-blue-600 border-gray-300 focus:ring-blue-500",
-    footerBg: "bg-gray-50",
-    cancelBtn: "text-gray-700 border-gray-300 hover:bg-gray-50",
-    submitBtn: "bg-blue-600 text-white hover:bg-blue-700",
-    errorBg: "bg-red-50 border border-red-200 text-red-700",
-    memberNone: "bg-blue-100 border-blue-500 text-blue-700",
-    memberNoneInactive: "bg-white border-gray-300 text-gray-600 hover:border-gray-400",
-    memberJasper: "bg-purple-100 border-purple-500 text-purple-700",
-    memberJasperBg: "",
-    memberMingfei: "bg-green-100 border-green-500 text-green-700",
-    memberMingfeiBg: "",
-    memberYue: "bg-pink-100 border-pink-500 text-pink-700",
-    memberYueBg: "",
   };
 
   const [summary, setSummary] = useState("");
@@ -389,7 +368,7 @@ export default function CalendarEventForm({
                     ? theme.memberNone
                     : theme.memberNoneInactive
                 }`}
-                style={selectedMember === "" && isNewDesign ? { backgroundColor: "rgba(68,55,32,0.06)" } : undefined}
+                style={selectedMember === "" ? { backgroundColor: "rgba(68,55,32,0.06)" } : undefined}
               >
                 {t("noAssignment")}
               </button>

@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import OptimizedImage from "@/components/ui/OptimizedImage";
-import { useNewDesign } from "@/hooks/useNewDesign";
 
 type PhotoEntry = {
   id: string;
@@ -23,9 +22,8 @@ type PhotoEntry = {
 export default function PhotoCarousel() {
   const t = useTranslations("photos");
   const tCommon = useTranslations("common");
-  const { isNewDesign } = useNewDesign();
 
-  const theme = isNewDesign ? {
+  const theme = {
     card: "bg-white rounded-[14px] border border-[rgba(68,55,32,0.14)]",
     title: "text-[#2f2a1f] font-[family-name:var(--font-fraunces)]",
     link: "text-[#4a6a32] hover:text-[#3d5a2a]",
@@ -34,15 +32,6 @@ export default function PhotoCarousel() {
     emptyIcon: "text-[rgba(68,55,32,0.2)]",
     emptyText: "text-[#857d68]",
     dateText: "text-[#857d68]",
-  } : {
-    card: "bg-white rounded-lg shadow",
-    title: "text-gray-900",
-    link: "text-blue-600 hover:text-blue-700",
-    skeleton: "bg-gray-200",
-    emptyBg: "bg-gray-100",
-    emptyIcon: "text-gray-300",
-    emptyText: "text-gray-400",
-    dateText: "text-gray-400",
   };
 
   const [photos, setPhotos] = useState<PhotoEntry[]>([]);

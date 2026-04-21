@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import CalendarEventForm from "./CalendarEventForm";
-import { useNewDesign } from "@/hooks/useNewDesign";
 
 interface CalendarEvent {
   id: string;
@@ -29,23 +28,14 @@ function toLocalDateString(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-// Family member color mapping (default theme)
-const FAMILY_MEMBERS_DEFAULT = [
-  { name: "Jasper", color: "bg-purple-100 text-purple-800", dotColor: "bg-purple-500", style: undefined as React.CSSProperties | undefined },
-  { name: "Mingfei", color: "bg-green-100 text-green-800", dotColor: "bg-green-500", style: undefined as React.CSSProperties | undefined },
-  { name: "Yue", color: "bg-pink-100 text-pink-800", dotColor: "bg-pink-500", style: undefined as React.CSSProperties | undefined },
-];
-
-const DEFAULT_COLOR_DEFAULT = { color: "bg-blue-100 text-blue-800", dotColor: "bg-blue-500", style: undefined as React.CSSProperties | undefined };
-
 // Family member color mapping (Paper Garden theme) — uses inline styles for rgba backgrounds
-const FAMILY_MEMBERS_GARDEN = [
+const FAMILY_MEMBERS = [
   { name: "Jasper", color: "text-[#7b6bad]", dotColor: "bg-[#b49ef0]", style: { backgroundColor: "rgba(180,158,240,0.15)" } as React.CSSProperties },
   { name: "Mingfei", color: "text-[#4a6a32]", dotColor: "bg-[#9bbf7a]", style: { backgroundColor: "rgba(155,191,122,0.15)" } as React.CSSProperties },
   { name: "Yue", color: "text-[#a05555]", dotColor: "bg-[#d88b8b]", style: { backgroundColor: "rgba(216,139,139,0.15)" } as React.CSSProperties },
 ];
 
-const DEFAULT_COLOR_GARDEN = { color: "text-[#4a6a8a]", dotColor: "bg-[#7fa8dd]", style: { backgroundColor: "rgba(127,168,221,0.15)" } as React.CSSProperties };
+const DEFAULT_COLOR = { color: "text-[#4a6a8a]", dotColor: "bg-[#7fa8dd]", style: { backgroundColor: "rgba(127,168,221,0.15)" } as React.CSSProperties };
 
 type FamilyMember = { name: string; color: string; dotColor: string; style: React.CSSProperties | undefined };
 type ColorBase = { color: string; dotColor: string; style: React.CSSProperties | undefined };
@@ -64,10 +54,9 @@ function getEventColor(summary: string, members: FamilyMember[], defaultColor: C
 
 export default function WeeklyCalendarView() {
   const t = useTranslations("calendar");
-  const { isNewDesign } = useNewDesign();
 
-  // Paper Garden theme classes (vs default gray/blue)
-  const theme = isNewDesign ? {
+  // Paper Garden theme classes
+  const theme = {
     card: "bg-white rounded-[14px] border border-[rgba(68,55,32,0.14)] overflow-hidden",
     headerBg: "bg-[#F9F4E8] border-b border-[rgba(68,55,32,0.14)]",
     legendBg: "bg-[#F9F4E8] border-b border-[rgba(68,55,32,0.14)]",
@@ -99,42 +88,10 @@ export default function WeeklyCalendarView() {
     modalDelete: "text-[#c5543d] hover:bg-[rgba(197,84,61,0.08)]",
     modalDeleteConfirm: "text-white bg-[#c5543d] hover:bg-[#a84632]",
     modalGoogleLink: "text-[#857d68] hover:text-[#2f2a1f]",
-  } : {
-    card: "bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden",
-    headerBg: "bg-gray-50 border-b",
-    legendBg: "bg-gray-50 border-b",
-    legendText: "text-gray-600",
-    dayHeaderBg: "border-b border-gray-200 bg-gray-50",
-    dayHeaderText: "text-gray-500",
-    dayText: "text-gray-900",
-    todayBg: "bg-blue-50",
-    todayPill: "bg-blue-600 text-white",
-    divider: "divide-gray-100",
-    borderDivider: "border-gray-100",
-    btnPrimary: "text-white bg-blue-600 hover:bg-blue-700",
-    linkColor: "text-blue-600 hover:text-blue-800",
-    navHover: "hover:bg-gray-200",
-    moreText: "text-gray-500 hover:text-gray-700",
-    modalFooterBg: "bg-gray-50",
-    modalEditBtn: "text-blue-600 hover:bg-blue-50",
-    skeleton: "bg-gray-200",
-    skeletonBlock: "bg-gray-100",
-    connectIcon: "bg-blue-100",
-    connectIconSvg: "text-blue-600",
-    connectBtn: "bg-blue-600 text-white hover:bg-blue-700",
-    modalTitle: "text-gray-900",
-    modalBody: "text-gray-900",
-    modalMuted: "text-gray-500",
-    modalIcon: "text-gray-400",
-    modalClose: "text-gray-400 hover:text-gray-600",
-    modalCancel: "text-gray-700 bg-gray-200 hover:bg-gray-300",
-    modalDelete: "text-red-600 hover:bg-red-50",
-    modalDeleteConfirm: "text-white bg-red-600 hover:bg-red-700",
-    modalGoogleLink: "text-gray-600 hover:text-gray-800",
   };
 
-  const familyMembers = isNewDesign ? FAMILY_MEMBERS_GARDEN : FAMILY_MEMBERS_DEFAULT;
-  const defaultColor = isNewDesign ? DEFAULT_COLOR_GARDEN : DEFAULT_COLOR_DEFAULT;
+  const familyMembers = FAMILY_MEMBERS;
+  const defaultColor = DEFAULT_COLOR;
 
   const [settings, setSettings] = useState<CalendarSettings | null>(null);
   const [events, setEvents] = useState<CalendarEvent[]>([]);

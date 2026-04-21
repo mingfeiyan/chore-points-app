@@ -1,11 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslations, useLocale } from "next-intl";
+import { useLocale } from "next-intl";
 import { ACHIEVEMENT_BADGES } from "@/lib/achievement-badges";
 import BadgeIcon from "@/components/badges/BadgeIcon";
 import BadgeTemplateForm from "./BadgeTemplateForm";
-import { useNewDesign } from "@/hooks/useNewDesign";
 
 type BadgeTemplate = {
   id: string;
@@ -27,10 +26,7 @@ export default function AchievementBadgeTemplateList() {
     badgeId: string;
     template?: BadgeTemplate;
   } | null>(null);
-  const t = useTranslations("badges");
   const locale = useLocale();
-  const { isNewDesign } = useNewDesign();
-  const pg = isNewDesign;
 
   useEffect(() => {
     fetchTemplates();
@@ -72,7 +68,7 @@ export default function AchievementBadgeTemplateList() {
         {[1, 2, 3, 4, 5, 6].map((i) => (
           <div
             key={i}
-            className={pg ? "h-24 bg-[rgba(68,55,32,0.06)] rounded-lg animate-pulse" : "h-24 bg-gray-100 rounded-lg animate-pulse"}
+            className="h-24 bg-[rgba(68,55,32,0.06)] rounded-lg animate-pulse"
           />
         ))}
       </div>
@@ -90,14 +86,11 @@ export default function AchievementBadgeTemplateList() {
             <button
               key={badge.id}
               onClick={() => handleBadgeClick(badge.id)}
-              className={pg
-                ? `relative p-4 rounded-lg border-2 text-left transition-all hover:shadow-md hover:border-[#6b8e4e] ${hasCustomization ? "border-[#6b8e4e] bg-[rgba(107,142,78,0.06)]" : "border-[rgba(68,55,32,0.14)] bg-white"}`
-                : `relative p-4 rounded-lg border-2 text-left transition-all hover:shadow-md hover:border-purple-300 ${hasCustomization ? "border-purple-200 bg-purple-50" : "border-gray-200 bg-white"}`
-              }
+              className={`relative p-4 rounded-lg border-2 text-left transition-all hover:shadow-md hover:border-[#6b8e4e] ${hasCustomization ? "border-[#6b8e4e] bg-[rgba(107,142,78,0.06)]" : "border-[rgba(68,55,32,0.14)] bg-white"}`}
             >
               {/* Custom indicator */}
               {hasCustomization && (
-                <div className={pg ? "absolute top-1 right-1 w-2 h-2 bg-[#6b8e4e] rounded-full" : "absolute top-1 right-1 w-2 h-2 bg-purple-500 rounded-full"} />
+                <div className="absolute top-1 right-1 w-2 h-2 bg-[#6b8e4e] rounded-full" />
               )}
 
               {/* Badge Icon */}
@@ -111,12 +104,12 @@ export default function AchievementBadgeTemplateList() {
               </div>
 
               {/* Badge Name */}
-              <div className={pg ? "text-sm font-medium text-[#2f2a1f] text-center truncate" : "text-sm font-medium text-gray-900 text-center truncate"}>
+              <div className="text-sm font-medium text-[#2f2a1f] text-center truncate">
                 {template?.name || (locale === "zh" ? badge.nameZh : badge.name)}
               </div>
 
               {/* Description */}
-              <div className={pg ? "text-xs text-[#857d68] text-center truncate mt-1" : "text-xs text-gray-500 text-center truncate mt-1"}>
+              <div className="text-xs text-[#857d68] text-center truncate mt-1">
                 {template?.description ||
                   (locale === "zh" ? badge.descriptionZh : badge.description)}
               </div>
