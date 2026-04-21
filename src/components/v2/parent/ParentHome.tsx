@@ -267,55 +267,32 @@ export default function ParentHome({ userName }: ParentHomeProps) {
     <div className="min-h-screen bg-pg-cream pb-[110px] font-[family-name:var(--font-inter)]">
       {/* Header */}
       <div className="relative px-7 pt-8">
-        <div className="flex items-start justify-between">
-          <div>
-            {/* Date + weather */}
-            <p className="text-[11px] font-bold uppercase tracking-wide text-pg-muted">
-              {formatDate(new Date())}
-              {weather && (
-                <span>
-                  {weather.location && ` · ${weather.location}`} · {weather.icon} {weather.temp}°F
-                </span>
-              )}
-            </p>
-
-            {/* Greeting */}
-            <h1 className="mt-1.5 font-[family-name:var(--font-fraunces)] text-[38px] font-medium text-pg-ink leading-tight tracking-tight">
-              {getGreeting()},{" "}
-              <em className="italic text-pg-accent-deep">{firstName}</em>
-            </h1>
-
-            {/* Subtitle */}
-            {primaryKid && (
-              <p className="mt-1.5 text-sm text-pg-muted max-w-[500px]">
-                {primaryKid.todayDelta > 0 ? (
-                  <>
-                    {primaryKid.name} earned{" "}
-                    <strong className="text-pg-ink">{primaryKid.todayDelta} gems</strong> today
-                    {streakCount > 1 && (
-                      <>, keeping a <strong className="text-pg-coral inline-flex items-center gap-0.5">{streakCount}-day <FlameIcon size={14} /> streak</strong> alive</>
-                    )}
-                    .
-                  </>
-                ) : (
-                  <>{primaryKid.name} hasn&apos;t earned gems yet today.</>
-                )}
-              </p>
-            )}
-          </div>
-
-          {/* View as Kid button */}
-          {primaryKid && (
-            <button
-              onClick={() => handleViewAsKid(primaryKid)}
-              className="shrink-0 flex items-center gap-2 rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-white"
-              style={{ background: "#6b8e4e", boxShadow: "0 2px 0 rgba(74,106,50,0.4)" }}
-            >
-              <User size={16} />
-              View as Kid
-            </button>
+        {/* Date + weather */}
+        <p className="text-[11px] font-bold uppercase tracking-wide text-pg-muted">
+          {formatDate(new Date())}
+          {weather && (
+            <span>
+              {weather.location && ` · ${weather.location}`} · {weather.icon} {weather.temp}°F
+            </span>
           )}
-        </div>
+        </p>
+
+        {/* Greeting — single line */}
+        <h1 className="mt-1.5 font-[family-name:var(--font-fraunces)] text-2xl md:text-[38px] font-medium text-pg-ink leading-tight tracking-tight whitespace-nowrap">
+          {getGreeting()}, <em className="italic text-pg-accent-deep">{firstName}</em>
+        </h1>
+
+        {/* View as Kid — full width on mobile */}
+        {primaryKid && (
+          <button
+            onClick={() => handleViewAsKid(primaryKid)}
+            className="mt-3 w-full sm:w-auto flex items-center justify-center gap-2 rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-white"
+            style={{ background: "#6b8e4e", boxShadow: "0 2px 0 rgba(74,106,50,0.4)" }}
+          >
+            <User size={16} />
+            View as {primaryKid.name || "Kid"}
+          </button>
+        )}
       </div>
 
       {/* Stats row */}
