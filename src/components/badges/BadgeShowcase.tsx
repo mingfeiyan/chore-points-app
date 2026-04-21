@@ -78,12 +78,6 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
   const locale = useLocale();
   const { isNewDesign } = useNewDesign();
 
-  // Coin Arcade badge tiles cycle through these pastel backgrounds
-  const tileBgs = [
-    "bg-ca-tile-teal", "bg-ca-tile-peach", "bg-ca-tile-pink",
-    "bg-ca-tile-mint", "bg-ca-tile-lavender", "bg-ca-tile-butter",
-  ];
-
   const theme = isNewDesign ? {
     skeleton: "bg-[rgba(26,24,19,0.04)]",
     nameEarned: "text-ca-ink",
@@ -160,8 +154,6 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
           const earnedBadge = staticAchievementBadges.find(
             (b) => b.badgeId === badge.id
           );
-          const tileBg = isNewDesign ? tileBgs[idx % tileBgs.length] : "";
-
           return (
             <button
               key={badge.id}
@@ -196,8 +188,6 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
 
         {customAwardBadges.map((badge, idx) => {
           const pending = !badge.customImageUrl;
-          const tileBg = isNewDesign ? tileBgs[(allAchievementBadges.length + idx) % tileBgs.length] : "";
-
           return (
             <button
               key={badge.id}
@@ -237,8 +227,6 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
         {badges.map((badge, idx) => {
           const showCount = badge.count > 1;
           const badgeColor = isNewDesign ? theme.countBadge : (levelBadgeColors[badge.level] || levelBadgeColors[1]);
-          const tileBg = isNewDesign ? tileBgs[(allAchievementBadges.length + customAwardBadges.length + idx) % tileBgs.length] : "";
-
           return (
             <button
               key={badge.id}

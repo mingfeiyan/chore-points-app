@@ -13,16 +13,6 @@ interface Kid {
   email: string;
 }
 
-interface PointEntry {
-  id: string;
-  points: number;
-  date: string;
-  createdAt: string;
-  note: string | null;
-  chore?: { title: string } | null;
-  kidId?: string;
-}
-
 interface CalendarEvent {
   id: string;
   summary: string;
@@ -43,7 +33,6 @@ interface DayCell {
   dayNum: number;
   isToday: boolean;
   isCurrentMonth: boolean;
-  entries: Array<PointEntry & { kidName: string; kidId: string }>;
   events: CalendarEvent[];
 }
 
@@ -178,12 +167,6 @@ export default function ParentCalendar() {
     "Yue",
   ];
 
-  // Build kid color map for point entries
-  const kidColorMap: Record<string, number> = {};
-  kids.forEach((kid, i) => {
-    kidColorMap[kid.id] = i % 4;
-  });
-
   // Build month grid (6 weeks × 7 days = 42 cells)
   const firstDayOfMonth = new Date(viewYear, viewMonth, 1).getDay(); // 0=Sun
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
@@ -194,14 +177,12 @@ export default function ParentCalendar() {
   const prevMonthDays = new Date(viewYear, viewMonth, 0).getDate();
   for (let i = firstDayOfMonth - 1; i >= 0; i--) {
     const date = new Date(viewYear, viewMonth - 1, prevMonthDays - i);
-    cells.push({ date, dayNum: date.getDate(), isToday: false, isCurrentMonth: false, entries: [], events: [] });
+    cells.push({ date, dayNum: date.getDate(), isToday: false, isCurrentMonth: false, events: [] });
   }
 
   // Current month
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(viewYear, viewMonth, d);
-    const dayEntries: Array<PointEntry & { kidName: string; kidId: string }> = [];
-
     const dateStr = toLocalDateString(date);
     const dayEvents = calendarEvents.filter((ev) => {
       const startStr = ev.start.date || (ev.start.dateTime ? toLocalDateString(new Date(ev.start.dateTime)) : undefined);
@@ -220,7 +201,6 @@ export default function ParentCalendar() {
       dayNum: d,
       isToday: isSameDay(date, today),
       isCurrentMonth: true,
-      entries: dayEntries,
       events: dayEvents,
     });
   }
@@ -228,7 +208,7 @@ export default function ParentCalendar() {
   // Next month fill
   while (cells.length < 42) {
     const date = new Date(viewYear, viewMonth + 1, cells.length - firstDayOfMonth - daysInMonth + 1);
-    cells.push({ date, dayNum: date.getDate(), isToday: false, isCurrentMonth: false, entries: [], events: [] });
+    cells.push({ date, dayNum: date.getDate(), isToday: false, isCurrentMonth: false, events: [] });
   }
 
   // If last row is entirely next month, trim to 35

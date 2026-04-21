@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Camera } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ParentTabBar from "@/components/v2/ParentTabBar";
 import CoinSmall from "@/components/v2/CoinSmall";
@@ -223,7 +223,7 @@ export default function ParentLedger({ kids }: ParentLedgerProps) {
 
                   {/* Photo indicator */}
                   {entry.photoUrl && (
-                    <span className="text-sm">📷</span>
+                    <Camera size={14} className="text-pg-muted" />
                   )}
 
                   {/* Points */}

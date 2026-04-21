@@ -649,7 +649,7 @@ export default function WeeklyCalendarView() {
                 className={`min-h-[70px] ${todayClass}`}
               >
                 {/* Day Header */}
-                <div className="px-2 py-1 text-center border-b ${theme.borderDivider}">
+                <div className={`px-2 py-1 text-center border-b ${theme.borderDivider}`}>
                   <div className={`text-xs ${theme.dayHeaderText} uppercase`}>{dayName}</div>
                   <div
                     className={`text-sm font-medium w-7 h-7 mx-auto flex items-center justify-center rounded-full ${
@@ -710,7 +710,7 @@ export default function WeeklyCalendarView() {
                 className={`min-h-[70px] ${todayClass}`}
               >
                 {/* Day Header */}
-                <div className="px-2 py-1 text-center border-b ${theme.borderDivider}">
+                <div className={`px-2 py-1 text-center border-b ${theme.borderDivider}`}>
                   <div className={`text-xs ${theme.dayHeaderText} uppercase`}>{dayName}</div>
                   <div
                     className={`text-sm font-medium w-7 h-7 mx-auto flex items-center justify-center rounded-full ${

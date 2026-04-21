@@ -37,19 +37,32 @@ function V2KidModeBanner() {
 
   const isKidPage = pathname.startsWith("/view-as") || pathname.startsWith("/points") || pathname.startsWith("/learn");
 
-  // Auto-exit kid mode when parent is on a non-kid page
-  // Use a ref to track if we were previously on a kid page to avoid
-  // clearing kid mode during the navigation transition from dashboard
-  const wasOnKidPage = useRef(false);
+  // Clear stale kid mode on mount: parent landing on a parent page with
+  // kid mode persisted in localStorage should not see the kid-mode banner.
+  const didMountExitRef = useRef(false);
   useEffect(() => {
-    if (isKidPage) {
-      wasOnKidPage.current = true;
-    } else if (wasOnKidPage.current && isKidMode && session?.user?.role === "PARENT") {
-      // Only auto-exit if we were on a kid page and navigated away
-      wasOnKidPage.current = false;
+    if (didMountExitRef.current) return;
+    didMountExitRef.current = true;
+    if (isKidMode && !isKidPage && session?.user?.role === "PARENT") {
       exitKidMode();
     }
-  }, [isKidMode, isKidPage, session?.user?.role, exitKidMode]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Auto-exit kid mode on navigation AWAY from kid pages.
+  // Track the previous pathname so we only fire on actual transitions —
+  // not on fresh mount (which would race with entering kid mode from the dashboard).
+  const prevPathnameRef = useRef<string | null>(null);
+  useEffect(() => {
+    const prev = prevPathnameRef.current;
+    prevPathnameRef.current = pathname;
+    // Skip on first mount
+    if (prev === null) return;
+    const wasKidPage = prev.startsWith("/view-as") || prev.startsWith("/points") || prev.startsWith("/learn");
+    if (wasKidPage && !isKidPage && isKidMode && session?.user?.role === "PARENT") {
+      exitKidMode();
+    }
+  }, [pathname, isKidPage, isKidMode, session?.user?.role, exitKidMode]);
 
   if (!isKidMode || session?.user?.role !== "PARENT") return null;
 
