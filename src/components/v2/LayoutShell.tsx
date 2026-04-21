@@ -32,8 +32,34 @@ function V2KidModeBanner() {
   const { isKidMode, viewingAsKid, exitKidMode } = useKidMode();
   const { data: session } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
 
   if (!isKidMode || session?.user?.role !== "PARENT") return null;
+
+  // Use Coin Arcade style on kid/view-as pages, Paper Garden elsewhere
+  const isKidPage = pathname.startsWith("/view-as") || pathname.startsWith("/points") || pathname.startsWith("/learn");
+
+  if (isKidPage) {
+    return (
+      <div
+        className="sticky top-0 z-50 flex items-center justify-center gap-3 px-4 py-2.5 font-[family-name:var(--font-nunito)] text-sm text-white"
+        style={{ background: "linear-gradient(90deg, var(--ca-cobalt), var(--ca-cobalt-deep))" }}
+      >
+        <div className="w-5 h-5 rounded-full bg-white/25 flex items-center justify-center text-[10px] font-extrabold">
+          {(viewingAsKid?.name || "K")[0].toUpperCase()}
+        </div>
+        <span>
+          Viewing as <strong>{viewingAsKid?.name || viewingAsKid?.email || "Kid"}</strong>
+        </span>
+        <button
+          onClick={() => { exitKidMode(); router.push("/dashboard"); }}
+          className="px-3 py-1 rounded-full text-xs font-bold bg-white/20 hover:bg-white/30 transition-colors"
+        >
+          Exit Kid Mode
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="sticky top-0 z-50 flex items-center justify-center gap-3 px-4 py-2.5 font-[family-name:var(--font-inter)] text-sm"
