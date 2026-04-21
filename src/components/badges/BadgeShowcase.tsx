@@ -91,7 +91,8 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
     choreName: "text-ca-ink",
     customName: "text-ca-ink",
     grid: "grid grid-cols-3 sm:grid-cols-4 gap-3",
-    badgeFrame: "w-16 h-16 flex items-center justify-center",
+    badgeFrame: "w-14 h-14 rounded-full bg-[rgba(26,24,19,0.04)] flex items-center justify-center",
+    badgeImg: "w-14 h-14 rounded-full object-cover",
     countBadge: "bg-ca-cobalt",
   } : {
     skeleton: "bg-gray-100",
@@ -101,6 +102,7 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
     customName: "text-gray-700",
     grid: "grid grid-cols-4 gap-4",
     badgeFrame: "",
+    badgeImg: "",
     countBadge: "",
   };
 
@@ -170,9 +172,9 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
                 {isNewDesign ? (
                   <div className={theme.badgeFrame}>
                     {(earnedBadge?.customImageUrl || badge.customImageUrl) ? (
-                      <img src={earnedBadge?.customImageUrl || badge.customImageUrl || ""} alt={badge.name} className="w-12 h-12 rounded-xl object-cover" />
+                      <img src={earnedBadge?.customImageUrl || badge.customImageUrl || ""} alt={badge.name} className={theme.badgeImg} />
                     ) : (
-                      <span className="text-3xl">{badge.icon}</span>
+                      <span className="text-2xl">{badge.icon}</span>
                     )}
                   </div>
                 ) : (
@@ -208,7 +210,7 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
                     {pending ? (
                       <span className="text-2xl opacity-50">✨</span>
                     ) : (
-                      <img src={badge.customImageUrl!} alt={badge.name} className="w-12 h-12 rounded-xl object-cover" />
+                      <img src={badge.customImageUrl!} alt={badge.name} className={theme.badgeImg} />
                     )}
                   </div>
                 ) : pending ? (
@@ -247,9 +249,9 @@ export default function BadgeShowcase({ kidId }: BadgeShowcaseProps) {
                 {isNewDesign ? (
                   <div className={theme.badgeFrame}>
                     {badge.customImageUrl ? (
-                      <img src={badge.customImageUrl} alt={badge.chore.title} className="w-12 h-12 rounded-xl object-cover" />
+                      <img src={badge.customImageUrl} alt={badge.chore.title} className={theme.badgeImg} />
                     ) : (
-                      <span className="text-3xl">{badge.customIcon || badge.chore.icon || "✨"}</span>
+                      <span className="text-2xl">{badge.customIcon || badge.chore.icon || "✨"}</span>
                     )}
                   </div>
                 ) : (
