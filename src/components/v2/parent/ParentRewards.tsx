@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus } from "lucide-react";
+import { Plus, Gift } from "lucide-react";
 import ParentTabBar from "@/components/v2/ParentTabBar";
 import CoinSmall from "@/components/v2/CoinSmall";
 import LogRewardModal from "@/components/rewards/LogRewardModal";
@@ -99,7 +99,9 @@ export default function ParentRewards() {
           <div className="py-12 text-center text-pg-muted">Loading...</div>
         ) : rewards.length === 0 ? (
           <div className="py-12 text-center">
-            <span className="text-4xl">🎁</span>
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[rgba(107,142,78,0.1)] mb-1">
+              <Gift size={28} className="text-pg-accent" />
+            </div>
             <p className="mt-3 text-pg-muted">No rewards logged yet</p>
             <p className="text-sm text-pg-muted mt-1">
               Tap &quot;Log Reward&quot; to record a treat or celebration
@@ -128,7 +130,7 @@ export default function ParentRewards() {
                     </button>
                   ) : (
                     <div className="w-16 h-16 rounded-xl bg-[rgba(107,142,78,0.08)] flex items-center justify-center shrink-0">
-                      <span className="text-2xl">🎁</span>
+                      <Gift size={24} className="text-pg-accent" />
                     </div>
                   )}
 
