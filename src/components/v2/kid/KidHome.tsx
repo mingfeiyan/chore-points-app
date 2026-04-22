@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo, useRef, useCallback } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, PartyPopper, Trophy } from "lucide-react";
 import KidHeaderBG from "@/components/v2/KidHeaderBG";
 import KidTabBar from "@/components/v2/KidTabBar";
 import CoinCounter from "@/components/v2/CoinCounter";
@@ -277,11 +277,15 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
       <section className="px-4 mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 md:items-start">
         {/* Month Calendar */}
         <div>
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2 mb-3">
             <h2 className="text-lg font-bold text-ca-ink">My calendar</h2>
             {canReplay && (
-              <button onClick={onReplay} className="text-xl" title="Replay celebration">
-                🎉
+              <button
+                onClick={onReplay}
+                title="Replay celebration"
+                className="rounded-full p-1.5 text-ca-coral hover:bg-[rgba(236,128,120,0.12)] transition-colors"
+              >
+                <PartyPopper size={18} />
               </button>
             )}
           </div>
@@ -357,8 +361,9 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
 
         {/* Badges */}
         <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-bold text-ca-ink">My badges 🏆</h2>
+          <div className="flex items-center gap-2 mb-3">
+            <h2 className="text-lg font-bold text-ca-ink">My badges</h2>
+            <Trophy size={18} className="text-ca-gold-deep" />
           </div>
           <div className="bg-white rounded-2xl p-4 border border-[rgba(26,24,19,0.08)]">
             <BadgeShowcase kidId={kidId} />
