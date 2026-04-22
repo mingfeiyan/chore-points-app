@@ -16,6 +16,12 @@ type SessionData = {
   message?: "noWords" | "alreadyDoneToday";
 };
 
+type MathData = {
+  questionsCompleted: number;
+  questionsTarget: number;
+  allComplete: boolean;
+};
+
 interface KidLearnEntryProps {
   kidId?: string;
 }
@@ -24,7 +30,9 @@ export default function KidLearnEntry({ kidId: kidIdProp }: KidLearnEntryProps =
   const { data: session } = useSession();
   const resolvedKidId = kidIdProp || session?.user?.id;
   const [data, setData] = useState<SessionData | null>(null);
+  const [mathData, setMathData] = useState<MathData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mathLoading, setMathLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"sight-words" | "math">("sight-words");
   const [started, setStarted] = useState(false);
 
@@ -36,6 +44,18 @@ export default function KidLearnEntry({ kidId: kidIdProp }: KidLearnEntryProps =
       .then((d) => setData(d))
       .catch((err) => console.error("Failed to fetch session:", err))
       .finally(() => setLoading(false));
+
+    fetch(`/api/math/today?kidId=${resolvedKidId}&timezone=${encodeURIComponent(tz)}`)
+      .then((res) => res.json())
+      .then((d) =>
+        setMathData({
+          questionsCompleted: d.questionsCompleted ?? 0,
+          questionsTarget: d.questionsTarget ?? 0,
+          allComplete: !!d.allComplete,
+        })
+      )
+      .catch((err) => console.error("Failed to fetch math:", err))
+      .finally(() => setMathLoading(false));
   }, [resolvedKidId]);
 
   const progress = data?.progress || { current: 0, total: 0 };
@@ -211,15 +231,73 @@ export default function KidLearnEntry({ kidId: kidIdProp }: KidLearnEntryProps =
               </>
             )}
           </>
-        ) : (
-          /* Math tab */
+        ) : mathLoading ? (
+          <div className="py-12 text-center text-ca-muted">Loading...</div>
+        ) : !mathData || mathData.questionsTarget === 0 ? (
           <div className="bg-white rounded-2xl p-5 border border-[rgba(26,24,19,0.06)] text-center">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-ca-tile-peach mb-2">
               <Hash size={28} className="text-ca-peach" />
             </div>
-            <h3 className="text-lg font-extrabold text-ca-ink mt-2">Math Practice</h3>
-            <p className="text-sm text-ca-muted mt-1">Coming soon!</p>
+            <h3 className="text-lg font-extrabold text-ca-ink mt-2">No math set up</h3>
+            <p className="text-sm text-ca-muted mt-1">Ask a parent to set a daily question count.</p>
           </div>
+        ) : mathData.allComplete ? (
+          <div className="bg-white rounded-2xl p-5 border border-[rgba(26,24,19,0.06)] text-center">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-ca-tile-mint mb-2">
+              <PartyPopper size={28} className="text-ca-mint" />
+            </div>
+            <h3 className="text-lg font-extrabold text-ca-ink mt-2">All done for today!</h3>
+            <p className="text-sm text-ca-muted mt-1">Great job! Come back tomorrow for more.</p>
+          </div>
+        ) : (
+          <>
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <h2 className="text-base font-extrabold text-ca-ink">Today&apos;s math</h2>
+                <span className="text-sm font-bold text-ca-muted">
+                  {mathData.questionsCompleted} / {mathData.questionsTarget}
+                </span>
+              </div>
+              <div className="h-2.5 rounded-full bg-[rgba(26,24,19,0.06)] overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{
+                    width: `${(mathData.questionsCompleted / mathData.questionsTarget) * 100}%`,
+                    background: "linear-gradient(90deg, var(--ca-cobalt), var(--ca-sky))",
+                  }}
+                />
+              </div>
+            </div>
+
+            <div
+              className="rounded-3xl p-6 text-white text-center relative overflow-hidden"
+              style={{
+                background: "linear-gradient(160deg, var(--ca-cobalt) 0%, var(--ca-cobalt-deep) 70%, #0d2480 100%)",
+              }}
+            >
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/15">
+                <Hash size={32} className="text-white" />
+              </div>
+              <h3 className="text-xl font-black mt-3 font-[family-name:var(--font-baloo-2)]">
+                {mathData.questionsTarget - mathData.questionsCompleted} math{" "}
+                {mathData.questionsTarget - mathData.questionsCompleted === 1 ? "question" : "questions"} to go!
+              </h3>
+              <p className="text-sm opacity-80 mt-1">
+                Solve them all to earn your gem.
+              </p>
+
+              <button
+                onClick={() => setStarted(true)}
+                className="inline-flex items-center gap-2 mt-4 px-6 py-3 rounded-full text-sm font-extrabold"
+                style={{ background: "var(--ca-gold)", color: "var(--ca-gold-deep)" }}
+              >
+                <CoinSmall size={16} />
+                Start solving →
+              </button>
+
+              <p className="text-xs opacity-60 mt-3">+1 gem when you finish</p>
+            </div>
+          </>
         )}
       </div>
 
