@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import confetti from "canvas-confetti";
+import { Volume2, BookOpen, Trophy, RotateCcw, PartyPopper } from "lucide-react";
 
 type SightWord = {
   id: string;
@@ -231,27 +232,26 @@ export default function LearnView({ kidId, onComplete }: Props) {
 
   if (data?.message === "noWords" || (data && data.words.length === 0 && data.message !== "alreadyDoneToday")) {
     return (
-      <div className="text-center py-16">
-        <span className="text-8xl mb-4 block">📚</span>
-        <h2 className="text-2xl font-bold text-gray-700 mb-2">{t("noWordsYet")}</h2>
-        <p className="text-gray-500">Ask your parent to add some sight words!</p>
+      <div className="bg-white rounded-2xl p-5 border border-[rgba(26,24,19,0.06)] text-center">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-ca-tile-teal mb-2">
+          <BookOpen size={28} className="text-ca-teal" />
+        </div>
+        <h2 className="text-lg font-extrabold text-ca-ink mt-2">{t("noWordsYet")}</h2>
+        <p className="text-sm text-ca-muted mt-1">Ask a parent to add some sight words.</p>
       </div>
     );
   }
 
   if (data?.message === "alreadyDoneToday") {
     return (
-      <div className="text-center py-16">
-        <span className="text-8xl mb-4 block">✅</span>
-        <h2 className="text-2xl font-bold text-gray-700 mb-2">{t("allDoneToday")}</h2>
-        <p className="text-gray-500">{t("allDoneTodayDesc")}</p>
-        <div className="mt-6">
-          <div className="inline-flex items-center px-4 py-2 bg-green-100 text-green-700 rounded-full">
-            <span className="font-bold">
-              {data.progress.total}/{data.progress.total}
-            </span>
-            <span className="ml-2">{t("wordsMastered")}</span>
-          </div>
+      <div className="bg-white rounded-2xl p-5 border border-[rgba(26,24,19,0.06)] text-center">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-ca-tile-mint mb-2">
+          <PartyPopper size={28} className="text-ca-mint" />
+        </div>
+        <h2 className="text-lg font-extrabold text-ca-ink mt-2">{t("allDoneToday")}</h2>
+        <p className="text-sm text-ca-muted mt-1">{t("allDoneTodayDesc")}</p>
+        <div className="mt-3 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-ca-tile-mint text-ca-mint text-sm font-bold">
+          {data.progress.total}/{data.progress.total} {t("wordsMastered")}
         </div>
       </div>
     );
@@ -261,20 +261,23 @@ export default function LearnView({ kidId, onComplete }: Props) {
 
   const { words, isReview, progress } = data;
 
+  const cardGradient = "linear-gradient(160deg, var(--ca-cobalt) 0%, var(--ca-cobalt-deep) 70%, #0d2480 100%)";
+
   return (
-    <div className="max-w-lg mx-auto">
-      <div className="mb-8">
-        <div className="flex justify-between text-sm text-gray-600 mb-2">
+    <div className="max-w-lg mx-auto font-[family-name:var(--font-nunito)]">
+      <div className="mb-5">
+        <div className="flex justify-between text-sm font-bold text-ca-muted mb-1.5">
           <span>{isReview ? t("reviewProgress") : t("progress")}</span>
           <span>
             {progress.current}/{progress.total}
           </span>
         </div>
-        <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+        <div className="h-2.5 rounded-full bg-[rgba(26,24,19,0.06)] overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500"
+            className="h-full rounded-full transition-all duration-500"
             style={{
               width: `${(progress.current / Math.max(progress.total, 1)) * 100}%`,
+              background: "linear-gradient(90deg, var(--ca-cobalt), var(--ca-sky))",
             }}
           />
         </div>
@@ -282,41 +285,45 @@ export default function LearnView({ kidId, onComplete }: Props) {
 
       {phase === "study" && words[studyIndex] && (
         <div className="text-center">
-          <h2 className="text-lg font-semibold text-gray-600 mb-2">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-ca-muted mb-2">
             {t("study.heading", {
               current: studyIndex + 1,
               total: words.length,
             })}
           </h2>
-          <div className="bg-gradient-to-br from-blue-400 to-purple-500 rounded-3xl p-8 shadow-2xl">
+          <div
+            className="rounded-3xl p-6 text-white shadow-xl"
+            style={{ background: cardGradient }}
+          >
             {words[studyIndex].imageUrl ? (
               <img
                 src={words[studyIndex].imageUrl!}
                 alt={words[studyIndex].word}
-                className="w-48 h-48 object-cover rounded-2xl mx-auto mb-6 shadow-lg border-4 border-white/30"
+                className="w-44 h-44 object-cover rounded-2xl mx-auto mb-5 border-4 border-white/20"
               />
             ) : (
-              <div className="w-48 h-48 bg-white/20 rounded-2xl mx-auto mb-6 flex items-center justify-center">
-                <span className="text-8xl">📖</span>
+              <div className="w-44 h-44 bg-white/15 rounded-2xl mx-auto mb-5 flex items-center justify-center">
+                <BookOpen size={56} className="text-white/70" />
               </div>
             )}
 
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <h1 className="text-6xl sm:text-7xl font-bold text-white tracking-wide drop-shadow-lg">
+            <div className="flex items-center justify-center gap-3 mb-5">
+              <h1 className="text-5xl sm:text-6xl font-black tracking-wide font-[family-name:var(--font-baloo-2)]">
                 {words[studyIndex].word}
               </h1>
               <button
                 onClick={() => speak(words[studyIndex].word)}
                 aria-label={t("speak")}
-                className="bg-white/20 hover:bg-white/30 rounded-full p-3 transition"
+                className="bg-white/15 hover:bg-white/25 rounded-full p-3 transition-colors"
               >
-                <span className="text-2xl">🔊</span>
+                <Volume2 size={22} />
               </button>
             </div>
 
             <button
               onClick={handleNextStudy}
-              className="bg-white text-purple-600 font-bold text-xl px-8 py-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-extrabold"
+              style={{ background: "var(--ca-gold)", color: "var(--ca-gold-deep)" }}
             >
               {studyIndex < words.length - 1
                 ? t("study.next")
@@ -329,31 +336,34 @@ export default function LearnView({ kidId, onComplete }: Props) {
 
       {phase === "quiz" && currentQuizItem && (
         <div className="text-center">
-          <h2 className="text-lg font-semibold text-gray-600 mb-2">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-ca-muted mb-2">
             {t("quiz.heading", {
               current: quizIndex + 1,
               total: quizItems.length,
             })}
           </h2>
-          <div className="bg-gradient-to-br from-green-400 to-teal-500 rounded-3xl p-8 shadow-2xl">
+          <div
+            className="rounded-3xl p-6 text-white shadow-xl"
+            style={{ background: cardGradient }}
+          >
             {currentQuizItem.word.imageUrl ? (
               <img
                 src={currentQuizItem.word.imageUrl!}
                 alt="Hint"
-                className="w-40 h-40 object-cover rounded-2xl mx-auto mb-4 shadow-lg border-4 border-white/30"
+                className="w-36 h-36 object-cover rounded-2xl mx-auto mb-4 border-4 border-white/20"
               />
             ) : (
-              <div className="w-40 h-40 bg-white/20 rounded-2xl mx-auto mb-4 flex items-center justify-center">
-                <span className="text-6xl">🤔</span>
+              <div className="w-36 h-36 bg-white/15 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+                <BookOpen size={48} className="text-white/70" />
               </div>
             )}
 
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="text-5xl font-bold text-white tracking-[0.4em] drop-shadow-lg font-mono">
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <div className="text-4xl sm:text-5xl font-black tracking-[0.3em] font-[family-name:var(--font-baloo-2)]">
                 {currentQuizItem.display.split("").map((ch, i) => (
                   <span
                     key={i}
-                    className={ch === "_" ? "text-yellow-200" : ""}
+                    style={ch === "_" ? { color: "var(--ca-gold)" } : undefined}
                   >
                     {ch === "_" ? "_" : ch}
                   </span>
@@ -362,25 +372,28 @@ export default function LearnView({ kidId, onComplete }: Props) {
               <button
                 onClick={() => speak(currentQuizItem.word.word)}
                 aria-label={t("speak")}
-                className="bg-white/20 hover:bg-white/30 rounded-full p-3 transition"
+                className="bg-white/15 hover:bg-white/25 rounded-full p-3 transition-colors"
               >
-                <span className="text-2xl">🔊</span>
+                <Volume2 size={22} />
               </button>
             </div>
 
-            <p className="text-white/90 text-sm mb-4">
+            <p className="text-white/80 text-sm mb-4">
               {currentQuizItem.hiddenIndex === null
                 ? t("quiz.typeWord")
                 : t("quiz.typeMissingLetter")}
             </p>
 
             {feedback === "correct" ? (
-              <div className="text-white">
-                <span className="text-6xl block mb-2">🎉</span>
-                <h3 className="text-2xl font-bold mb-4">{t("correct")}</h3>
+              <div>
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-white/15 mb-3">
+                  <PartyPopper size={28} className="text-ca-gold" />
+                </div>
+                <h3 className="text-xl font-black mb-4 font-[family-name:var(--font-baloo-2)]">{t("correct")}</h3>
                 <button
                   onClick={handleNextQuiz}
-                  className="bg-white text-teal-600 font-bold px-6 py-3 rounded-full shadow-lg hover:shadow-xl"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-extrabold"
+                  style={{ background: "var(--ca-gold)", color: "var(--ca-gold-deep)" }}
                 >
                   {quizIndex < quizItems.length - 1
                     ? t("quiz.next")
@@ -403,30 +416,32 @@ export default function LearnView({ kidId, onComplete }: Props) {
                       ? currentQuizItem.word.word.length
                       : 1
                   }
-                  className="w-32 text-center text-5xl font-bold py-3 rounded-2xl border-4 border-white/30 bg-white/90 text-gray-800 placeholder-gray-300 focus:outline-none focus:border-white mb-4"
+                  className="w-28 text-center text-5xl font-black py-3 rounded-2xl border-4 border-white/20 bg-white text-ca-ink placeholder-ca-muted focus:outline-none focus:border-white mb-3 font-[family-name:var(--font-baloo-2)]"
                   autoComplete="off"
                   autoCapitalize="off"
                   autoFocus
                 />
                 {feedback === "wrong" && (
-                  <p className="text-white text-lg mb-3">
-                    🤔 {t("quiz.tryAgain")}
+                  <p className="text-white/90 text-base mb-3">
+                    {t("quiz.tryAgain")}
                   </p>
                 )}
-                <div className="flex gap-3 justify-center">
+                <div className="flex gap-2 justify-center items-center">
                   {feedback === "wrong" && (
                     <button
                       type="button"
                       onClick={handleTryAgain}
-                      className="bg-white/20 text-white font-bold px-4 py-3 rounded-full hover:bg-white/30"
+                      aria-label="Try again"
+                      className="bg-white/15 hover:bg-white/25 rounded-full p-3 transition-colors"
                     >
-                      ↺
+                      <RotateCcw size={18} />
                     </button>
                   )}
                   <button
                     type="submit"
                     disabled={submitting || !userInput.trim()}
-                    className="bg-white text-teal-600 font-bold px-8 py-3 rounded-full shadow-lg hover:shadow-xl disabled:opacity-50"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-extrabold disabled:opacity-50"
+                    style={{ background: "var(--ca-gold)", color: "var(--ca-gold-deep)" }}
                   >
                     {submitting ? "..." : t("submit")}
                   </button>
@@ -439,17 +454,23 @@ export default function LearnView({ kidId, onComplete }: Props) {
 
       {phase === "done" && (
         <div className="text-center">
-          <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-3xl p-8 shadow-2xl">
-            <span className="text-8xl block mb-4">🏆</span>
-            <h2 className="text-3xl font-bold text-white mb-2">
+          <div
+            className="rounded-3xl p-6 text-white shadow-xl"
+            style={{ background: "linear-gradient(160deg, var(--ca-coral) 0%, var(--ca-gold) 100%)" }}
+          >
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/15 mb-3">
+              <Trophy size={44} className="text-white" />
+            </div>
+            <h2 className="text-2xl font-black mb-2 font-[family-name:var(--font-baloo-2)]">
               {t("done.title")}
             </h2>
-            <p className="text-white/90 text-xl mb-6">
+            <p className="text-white/90 text-lg mb-5">
               {t("done.earned", { points: pointsEarned })}
             </p>
             <button
               onClick={fetchSession}
-              className="bg-white text-orange-600 font-bold text-xl px-8 py-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-extrabold"
+              style={{ background: "#fff", color: "var(--ca-coral)" }}
             >
               {t("done.again")}
             </button>

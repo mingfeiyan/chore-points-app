@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useTranslations } from "next-intl";
 import confetti from "canvas-confetti";
+import { PartyPopper, Trophy } from "lucide-react";
 
 type Question = {
   index: number;
@@ -152,34 +153,36 @@ export default function MathModule({ kidId, onComplete }: Props) {
     }
   };
 
-  // Loading state
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-8">
+      <div className="flex items-center justify-center py-8 font-[family-name:var(--font-nunito)]">
         <div className="animate-pulse">
-          <div className="w-64 h-48 bg-gray-200 rounded-3xl" />
+          <div className="w-64 h-48 bg-[rgba(26,24,19,0.06)] rounded-3xl" />
         </div>
       </div>
     );
   }
 
-  // No data state (API error)
   if (!data) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <div className="text-gray-500">Failed to load math problems</div>
+      <div className="flex items-center justify-center py-8 text-ca-muted font-[family-name:var(--font-nunito)]">
+        Failed to load math problems
       </div>
     );
   }
 
-  // All complete state
   if (allComplete) {
     return (
-      <div className="text-center py-8">
-        <div className="bg-gradient-to-br from-green-400 to-teal-500 rounded-3xl p-8">
-          <span className="text-6xl mb-4 block">🎉</span>
-          <h2 className="text-2xl font-bold text-white">{t("mathComplete")}</h2>
-          <p className="text-white/80 mt-2">
+      <div className="text-center py-4 font-[family-name:var(--font-nunito)]">
+        <div
+          className="rounded-3xl p-6 text-white shadow-xl"
+          style={{ background: "linear-gradient(160deg, var(--ca-coral) 0%, var(--ca-gold) 100%)" }}
+        >
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/15 mb-3">
+            <Trophy size={44} className="text-white" />
+          </div>
+          <h2 className="text-2xl font-black font-[family-name:var(--font-baloo-2)]">{t("mathComplete")}</h2>
+          <p className="text-white/90 mt-2">
             +{data.questionsTarget} {data.questionsTarget === 1 ? "point" : "points"} earned!
           </p>
         </div>
@@ -187,47 +190,42 @@ export default function MathModule({ kidId, onComplete }: Props) {
     );
   }
 
-  // No current question (shouldn't happen if not complete)
   if (!currentQuestion) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <div className="text-gray-500">No questions available</div>
+      <div className="flex items-center justify-center py-8 text-ca-muted font-[family-name:var(--font-nunito)]">
+        No questions available
       </div>
     );
   }
 
-  // Active problem state
   const operator = operatorMap[currentQuestion.type] || "+";
   const typeLabel = data?.source === "custom" ? t("customPractice") : t(currentQuestion.type);
+  const cardGradient = "linear-gradient(160deg, var(--ca-cobalt) 0%, var(--ca-cobalt-deep) 70%, #0d2480 100%)";
 
   return (
-    <div className="text-center">
-      <h2 className="text-lg font-semibold text-gray-600 mb-4">{typeLabel}</h2>
+    <div className="text-center font-[family-name:var(--font-nunito)]">
+      <h2 className="text-sm font-bold uppercase tracking-wider text-ca-muted mb-2">{typeLabel}</h2>
 
       <div
-        className={`bg-gradient-to-br from-orange-400 to-yellow-500 rounded-3xl p-8 shadow-2xl ${
-          shake ? "animate-shake" : ""
-        }`}
+        className={`rounded-3xl p-6 text-white shadow-xl ${shake ? "animate-shake" : ""}`}
+        style={{ background: cardGradient }}
       >
-        {/* Problem Display */}
-        <div className="text-white mb-6">
+        <div className="mb-5">
           {data?.source === "custom" ? (
-            <span className="text-4xl sm:text-5xl font-bold tracking-wide">
+            <span className="text-4xl sm:text-5xl font-black tracking-wide font-[family-name:var(--font-baloo-2)]">
               {currentQuestion.question} = ?
             </span>
           ) : (
-            <span className="text-6xl sm:text-7xl font-bold tracking-wide">
+            <span className="text-5xl sm:text-6xl font-black tracking-wide font-[family-name:var(--font-baloo-2)]">
               {currentQuestion.a} {operator} {currentQuestion.b} = ?
             </span>
           )}
         </div>
 
-        {/* Result feedback */}
         {result && !result.correct && (
-          <div className="mb-4 text-white/90 text-lg">{t("incorrect")}</div>
+          <div className="mb-3 text-white/90 text-base">{t("incorrect")}</div>
         )}
 
-        {/* Input Form */}
         <form onSubmit={handleSubmit}>
           <input
             type="number"
@@ -236,7 +234,7 @@ export default function MathModule({ kidId, onComplete }: Props) {
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
             placeholder={t("typeMathAnswer")}
-            className="w-full max-w-[240px] text-center text-4xl font-bold py-4 px-6 rounded-2xl border-4 border-white/30 bg-white/90 text-gray-800 placeholder:text-xl placeholder:font-normal placeholder-gray-400 focus:outline-none focus:border-white mb-6"
+            className="w-full max-w-[220px] text-center text-4xl font-black py-3 px-5 rounded-2xl border-4 border-white/20 bg-white text-ca-ink placeholder:text-base placeholder:font-medium placeholder-ca-muted focus:outline-none focus:border-white mb-5 font-[family-name:var(--font-baloo-2)]"
             autoComplete="off"
             autoFocus
           />
@@ -244,7 +242,8 @@ export default function MathModule({ kidId, onComplete }: Props) {
             <button
               type="submit"
               disabled={submitting || !answer.trim()}
-              className="bg-white text-orange-600 font-bold px-8 py-3 rounded-full shadow-lg hover:shadow-xl disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-extrabold disabled:opacity-50"
+              style={{ background: "var(--ca-gold)", color: "var(--ca-gold-deep)" }}
             >
               {submitting ? "..." : t("submit")}
             </button>
@@ -252,15 +251,13 @@ export default function MathModule({ kidId, onComplete }: Props) {
         </form>
       </div>
 
-      {/* Step indicator */}
-      <div className="mt-4 text-sm text-gray-500">
+      <div className="mt-3 text-sm font-bold text-ca-muted">
         {t("step")} {currentIndex + 1} {t("of")} {data.questionsTarget}
       </div>
 
-      {/* Point flash for custom questions */}
       {pointFlash && (
-        <div className="mt-3 text-green-600 font-bold text-lg animate-bounce">
-          +1 ⭐
+        <div className="mt-3 inline-flex items-center gap-1.5 text-ca-mint font-extrabold text-base animate-bounce">
+          <PartyPopper size={18} /> +1
         </div>
       )}
     </div>
