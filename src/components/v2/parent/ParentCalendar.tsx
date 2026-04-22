@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Pencil, Trash2 } from "lucide-react";
 import ParentTabBar from "@/components/v2/ParentTabBar";
 import CalendarEventForm from "@/components/calendar/CalendarEventForm";
 
@@ -86,7 +86,33 @@ export default function ParentCalendar() {
   const [calendarSettings, setCalendarSettings] = useState<CalendarSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [showEventForm, setShowEventForm] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [selectedDay, setSelectedDay] = useState<DayCell | null>(null);
+
+  const handleEditEvent = (event: CalendarEvent) => {
+    setEditingEvent(event);
+    setShowEventForm(true);
+    setSelectedDay(null);
+  };
+
+  const handleDeleteEvent = async (event: CalendarEvent) => {
+    if (!confirm(`Delete "${event.summary}"?`)) return;
+    try {
+      const res = await fetch(`/api/calendar/events/${event.id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || "Failed to delete event");
+        return;
+      }
+      setSelectedDay(null);
+      loadCalendarEvents();
+    } catch (err) {
+      console.error("Failed to delete event:", err);
+      alert("Failed to delete event");
+    }
+  };
 
   const monthStart = getMonthStart(viewYear, viewMonth);
   const monthName = monthStart.toLocaleDateString("en-US", { month: "long", year: "numeric" });
@@ -380,11 +406,28 @@ export default function ParentCalendar() {
                 return (
                   <div
                     key={ev.id}
-                    className="rounded-lg border-l-3 px-3 py-2"
+                    className="rounded-lg border-l-3 px-3 py-2 flex items-start gap-2"
                     style={{ backgroundColor: colors.bg, borderLeftColor: colors.border, borderLeftWidth: 3 }}
                   >
-                    <p className="text-sm font-medium" style={{ color: colors.text }}>{ev.summary}</p>
-                    <p className="text-xs mt-0.5" style={{ color: colors.text, opacity: 0.7 }}>{time}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium" style={{ color: colors.text }}>{ev.summary}</p>
+                      <p className="text-xs mt-0.5" style={{ color: colors.text, opacity: 0.7 }}>{time}</p>
+                    </div>
+                    <button
+                      onClick={() => handleEditEvent(ev)}
+                      aria-label="Edit event"
+                      className="p-1.5 rounded-md hover:bg-black/5 transition"
+                      style={{ color: colors.text }}
+                    >
+                      <Pencil size={14} />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteEvent(ev)}
+                      aria-label="Delete event"
+                      className="p-1.5 rounded-md hover:bg-red-500/10 transition text-[#c5543d]"
+                    >
+                      <Trash2 size={14} />
+                    </button>
                   </div>
                 );
               })}
@@ -396,14 +439,17 @@ export default function ParentCalendar() {
         </div>
       )}
 
-      {/* Add event form */}
       {showEventForm && calendarSettings?.isConnected && (
         <CalendarEventForm
-          event={null}
+          event={editingEvent}
           selectedDate={new Date()}
-          onClose={() => setShowEventForm(false)}
+          onClose={() => {
+            setShowEventForm(false);
+            setEditingEvent(null);
+          }}
           onSave={() => {
             setShowEventForm(false);
+            setEditingEvent(null);
             loadCalendarEvents();
           }}
         />
