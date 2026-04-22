@@ -17,7 +17,7 @@ type SessionResponse = {
   progress: { current: number; total: number };
 };
 
-type Phase = "intro" | "study" | "quiz" | "done";
+type Phase = "study" | "quiz" | "done";
 
 type QuizItem = {
   word: SightWord;
@@ -74,7 +74,7 @@ function shuffle<T>(arr: T[]): T[] {
 export default function LearnView({ kidId, onComplete }: Props) {
   const [data, setData] = useState<SessionResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [phase, setPhase] = useState<Phase>("intro");
+  const [phase, setPhase] = useState<Phase>("study");
   const [studyIndex, setStudyIndex] = useState(0);
   const [quizIndex, setQuizIndex] = useState(0);
   const [quizItems, setQuizItems] = useState<QuizItem[]>([]);
@@ -104,7 +104,7 @@ export default function LearnView({ kidId, onComplete }: Props) {
         setPhase(
           result.message === "alreadyDoneToday" || result.message === "noWords"
             ? "done"
-            : "intro"
+            : "study"
         );
         setStudyIndex(0);
         setQuizIndex(0);
@@ -135,11 +135,6 @@ export default function LearnView({ kidId, onComplete }: Props) {
     const timeout = setTimeout(() => speak(activeWord), 200);
     return () => clearTimeout(timeout);
   }, [activeWord]);
-
-  const handleStartStudy = () => {
-    setPhase("study");
-    setStudyIndex(0);
-  };
 
   const handleNextStudy = () => {
     if (!data) return;
@@ -284,31 +279,6 @@ export default function LearnView({ kidId, onComplete }: Props) {
           />
         </div>
       </div>
-
-      {phase === "intro" && (
-        <div className="text-center">
-          {isReview && (
-            <div className="mb-4">
-              <span className="inline-flex items-center px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">
-                🔄 {t("reviewWord")}
-              </span>
-            </div>
-          )}
-          <div className="bg-gradient-to-br from-blue-400 to-purple-500 rounded-3xl p-8 shadow-2xl">
-            <span className="text-8xl block mb-4">📚</span>
-            <h2 className="text-3xl font-bold text-white mb-2">
-              {t("intro.title", { count: words.length })}
-            </h2>
-            <p className="text-white/90 mb-6">{t("intro.subtitle")}</p>
-            <button
-              onClick={handleStartStudy}
-              className="bg-white text-purple-600 font-bold text-xl px-8 py-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
-            >
-              {t("intro.start")} ✨
-            </button>
-          </div>
-        </div>
-      )}
 
       {phase === "study" && words[studyIndex] && (
         <div className="text-center">
