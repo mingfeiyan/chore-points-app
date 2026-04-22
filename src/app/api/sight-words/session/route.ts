@@ -59,15 +59,20 @@ export async function GET(req: Request) {
       }
     }
 
+    // First pass (allowReviewCycle=false) picks only never-completed words so
+    // the kid advances past what they already learned. Review-cycle pass is
+    // only used as a fallback once every word has been completed at least
+    // once.
     const pickEligible = (allowReviewCycle: boolean) => {
       const picked: typeof allWords = [];
       for (const word of allWords) {
         if (picked.length >= SESSION_SIZE) break;
         const wp = progressMap.get(word.id);
         if (wp?.quizPassedAt) {
+          if (!allowReviewCycle) continue;
           const passedDate = getLocalDateString(new Date(wp.quizPassedAt), timezone);
           if (passedDate === today) continue;
-          if (!wp.pointAwarded && !allowReviewCycle) continue;
+          if (!wp.pointAwarded) continue;
         }
         picked.push(word);
       }
