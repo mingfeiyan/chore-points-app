@@ -406,7 +406,7 @@ export default function ParentCalendar() {
                 return (
                   <div
                     key={ev.id}
-                    className="rounded-lg border-l-3 px-3 py-2 flex items-start gap-2"
+                    className="rounded-lg border-l-3 px-3 py-2 flex items-start gap-1"
                     style={{ backgroundColor: colors.bg, borderLeftColor: colors.border, borderLeftWidth: 3 }}
                   >
                     <div className="flex-1 min-w-0">
@@ -415,16 +415,15 @@ export default function ParentCalendar() {
                     </div>
                     <button
                       onClick={() => handleEditEvent(ev)}
-                      aria-label="Edit event"
-                      className="p-1.5 rounded-md hover:bg-black/5 transition"
-                      style={{ color: colors.text }}
+                      title="Edit"
+                      className="rounded-lg p-1.5 text-pg-muted hover:text-pg-accent-deep hover:bg-[rgba(107,142,78,0.08)] transition-colors"
                     >
                       <Pencil size={14} />
                     </button>
                     <button
                       onClick={() => handleDeleteEvent(ev)}
-                      aria-label="Delete event"
-                      className="p-1.5 rounded-md hover:bg-red-500/10 transition text-[#c5543d]"
+                      title="Delete"
+                      className="rounded-lg p-1.5 text-pg-muted hover:text-pg-coral hover:bg-[rgba(197,84,61,0.08)] transition-colors"
                     >
                       <Trash2 size={14} />
                     </button>
