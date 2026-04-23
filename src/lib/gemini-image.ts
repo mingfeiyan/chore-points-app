@@ -15,11 +15,11 @@ function sightWordPrompt(word: string): string {
 function badgePrompt(taskDescription: string): string {
   return [
     `Round circular achievement badge sticker illustration.`,
-    `The badge MUST have a bright cobalt blue circular border ring on the outside.`,
-    `The inside MUST be a soft blue gradient circular background.`,
+    `The badge has a thin cobalt blue outline ring — a slim uniform line around the circle, roughly 3-4% of the badge's diameter in width, never a thick frame.`,
+    `The inside is a soft light-blue gradient circular background.`,
     `In the center, show a cute cartoon illustration of: ${taskDescription}.`,
     `Cartoon style, bright cheerful colors, child-friendly for a 5-year-old.`,
-    `Match this exact style: circular blue-rimmed badge, centered subject, vibrant friendly cartoon art.`,
+    `Match this exact style: circular badge with a thin blue rim, centered subject, vibrant friendly cartoon art.`,
     `No text, no letters, no words, no numbers in the image.`,
   ].join(" ");
 }
