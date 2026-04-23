@@ -2,30 +2,96 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import Coin from "@/components/v2/Coin";
+import CoinSmall from "@/components/v2/CoinSmall";
 
 export default function HomeLanding() {
   const t = useTranslations("home");
   const tNav = useTranslations("nav");
 
+  const features = [
+    {
+      title: t("featureChoresTitle"),
+      desc: t("featureChoresDesc"),
+      emoji: "🧹",
+      bg: "var(--ca-tile-teal)",
+    },
+    {
+      title: t("featureLearnTitle"),
+      desc: t("featureLearnDesc"),
+      emoji: "📘",
+      bg: "var(--ca-tile-lavender)",
+    },
+    {
+      title: t("featureMealsTitle"),
+      desc: t("featureMealsDesc"),
+      emoji: "🥗",
+      bg: "var(--ca-tile-mint)",
+    },
+    {
+      title: t("featureCalendarTitle"),
+      desc: t("featureCalendarDesc"),
+      emoji: "📅",
+      bg: "var(--ca-tile-peach)",
+    },
+    {
+      title: t("featureRewardsTitle"),
+      desc: t("featureRewardsDesc"),
+      emoji: "🎁",
+      bg: "var(--ca-tile-pink)",
+    },
+    {
+      title: t("featureGalleryTitle"),
+      desc: t("featureGalleryDesc"),
+      emoji: "📸",
+      bg: "var(--ca-tile-butter)",
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-[#FFFEF9]">
+    <div
+      className="min-h-screen"
+      style={{
+        background: "var(--ca-cream)",
+        color: "var(--ca-ink)",
+        fontFamily: "var(--font-inter), system-ui, sans-serif",
+      }}
+    >
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 bg-[#FFFEF9]/95 backdrop-blur-sm border-b border-gray-100">
+      <nav
+        className="sticky top-0 z-50 backdrop-blur-md"
+        style={{
+          background: "rgba(255,254,249,0.9)",
+          borderBottom: "1px solid var(--ca-divider)",
+        }}
+      >
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">💎</span>
-            <span className="text-xl font-semibold text-gray-800">{tNav("appName")}</span>
-          </div>
-          <div className="flex items-center gap-4">
+          <Link href="/" className="flex items-center gap-2">
+            <CoinSmall size={28} />
+            <span
+              className="text-xl font-extrabold"
+              style={{ fontFamily: "var(--font-baloo-2), sans-serif", color: "var(--ca-ink)" }}
+            >
+              {tNav("appName")}
+            </span>
+          </Link>
+          <div className="flex items-center gap-3 sm:gap-5">
             <Link
               href="/login"
-              className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
+              className="text-sm sm:text-base font-semibold transition-colors"
+              style={{ color: "var(--ca-muted)" }}
             >
               {t("signIn")}
             </Link>
             <Link
               href="/signup"
-              className="px-6 py-2.5 bg-[#f66951] hover:bg-[#e55a43] text-white font-medium rounded-full transition-colors"
+              className="px-5 py-2.5 text-sm sm:text-base font-extrabold rounded-full transition-transform hover:scale-[1.03]"
+              style={{
+                background: "linear-gradient(180deg, var(--ca-gold) 0%, #e5ad0a 100%)",
+                color: "var(--ca-ink)",
+                boxShadow: "0 4px 0 var(--ca-gold-deep), 0 8px 18px rgba(178,123,0,0.25)",
+                fontFamily: "var(--font-baloo-2), sans-serif",
+              }}
             >
               {t("getStarted")}
             </Link>
@@ -33,160 +99,392 @@ export default function HomeLanding() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="py-16 sm:py-24 px-6">
-        <div className="max-w-6xl mx-auto">
+      {/* Hero */}
+      <section className="relative overflow-hidden px-6 pt-16 pb-20 sm:pt-24 sm:pb-28">
+        {/* Soft backdrop orbs */}
+        <div
+          aria-hidden
+          className="absolute -top-24 -right-24 w-96 h-96 rounded-full blur-3xl opacity-60"
+          style={{ background: "radial-gradient(circle, var(--ca-gold-glow), transparent 70%)" }}
+        />
+        <div
+          aria-hidden
+          className="absolute -bottom-32 -left-24 w-[28rem] h-[28rem] rounded-full blur-3xl opacity-50"
+          style={{ background: "radial-gradient(circle, var(--ca-sky), transparent 70%)" }}
+        />
+
+        <div className="relative max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Left content */}
             <div className="order-2 lg:order-1">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-light text-gray-900 leading-tight mb-6">
+              <span
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs sm:text-sm font-bold mb-6"
+                style={{
+                  background: "rgba(47,98,245,0.1)",
+                  color: "var(--ca-cobalt-deep)",
+                  fontFamily: "var(--font-nunito), sans-serif",
+                }}
+              >
+                <CoinSmall size={16} />
+                {t("tagline")}
+              </span>
+              <h1
+                className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.05] mb-6"
+                style={{
+                  fontFamily: "var(--font-baloo-2), sans-serif",
+                  color: "var(--ca-ink)",
+                  letterSpacing: "-0.02em",
+                }}
+              >
                 {t("heroTitle")}
               </h1>
-              <p className="text-lg sm:text-xl text-gray-600 leading-relaxed mb-8">
+              <p
+                className="text-lg sm:text-xl leading-relaxed mb-8 max-w-xl"
+                style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
+              >
                 {t("heroSubtitle")}
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/signup"
-                  className="inline-flex justify-center px-8 py-4 bg-[#f66951] hover:bg-[#e55a43] text-white font-medium rounded-full transition-colors text-lg"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 text-lg font-extrabold rounded-full transition-transform hover:scale-[1.03]"
+                  style={{
+                    background: "linear-gradient(180deg, var(--ca-gold) 0%, #e5ad0a 100%)",
+                    color: "var(--ca-ink)",
+                    boxShadow: "0 6px 0 var(--ca-gold-deep), 0 12px 24px rgba(178,123,0,0.3)",
+                    fontFamily: "var(--font-baloo-2), sans-serif",
+                  }}
                 >
                   {t("getStarted")}
                 </Link>
                 <Link
                   href="/login"
-                  className="inline-flex justify-center px-8 py-4 border-2 border-gray-300 hover:border-gray-400 text-gray-700 font-medium rounded-full transition-colors text-lg"
+                  className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-full transition-colors"
+                  style={{
+                    background: "white",
+                    color: "var(--ca-cobalt-deep)",
+                    border: "2px solid var(--ca-cobalt)",
+                    fontFamily: "var(--font-baloo-2), sans-serif",
+                  }}
                 >
                   {t("signIn")}
                 </Link>
               </div>
             </div>
 
-            {/* Right - Hero visual */}
+            {/* Hero visual: coin card */}
             <div className="order-1 lg:order-2 flex justify-center">
               <div className="relative">
-                <div className="w-72 h-72 sm:w-80 sm:h-80 lg:w-96 lg:h-96 bg-[#dcf1f3] rounded-3xl flex items-center justify-center">
-                  <div className="text-center p-8">
-                    <div className="text-7xl sm:text-8xl mb-4">💎</div>
-                    <div className="text-2xl sm:text-3xl font-light text-gray-700">
-                      {tNav("appName")}
+                <div
+                  className="relative w-72 h-72 sm:w-80 sm:h-80 lg:w-[22rem] lg:h-[22rem] rounded-[36px] flex items-center justify-center"
+                  style={{
+                    background:
+                      "linear-gradient(160deg, var(--ca-cobalt) 0%, var(--ca-cobalt-deep) 70%, #0d2480 100%)",
+                    boxShadow: "0 20px 60px rgba(26,63,179,0.35)",
+                  }}
+                >
+                  <div className="text-center">
+                    <div className="flex items-center justify-center mb-3">
+                      <Coin size={160} spin />
+                    </div>
+                    <div
+                      className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full"
+                      style={{
+                        background: "rgba(255,255,255,0.15)",
+                        color: "white",
+                        fontFamily: "var(--font-baloo-2), sans-serif",
+                        fontWeight: 800,
+                      }}
+                    >
+                      <CoinSmall size={18} />
+                      <span>×128 · 🔥7 day streak</span>
                     </div>
                   </div>
                 </div>
-                {/* Floating elements */}
-                <div className="absolute -top-4 -right-4 text-4xl animate-bounce" style={{ animationDuration: "3s" }}>⭐</div>
-                <div className="absolute -bottom-4 -left-4 text-4xl animate-bounce" style={{ animationDuration: "2.5s", animationDelay: "0.5s" }}>🎁</div>
+                {/* Floating chips */}
+                <div
+                  className="absolute -top-5 -right-5 px-4 py-2 rounded-2xl text-sm font-extrabold rotate-6"
+                  style={{
+                    background: "var(--ca-tile-peach)",
+                    color: "var(--ca-ink)",
+                    boxShadow: "0 6px 16px rgba(0,0,0,0.08)",
+                    fontFamily: "var(--font-baloo-2), sans-serif",
+                  }}
+                >
+                  ⭐ Chores done!
+                </div>
+                <div
+                  className="absolute -bottom-5 -left-6 px-4 py-2 rounded-2xl text-sm font-extrabold -rotate-6"
+                  style={{
+                    background: "var(--ca-tile-mint)",
+                    color: "var(--ca-ink)",
+                    boxShadow: "0 6px 16px rgba(0,0,0,0.08)",
+                    fontFamily: "var(--font-baloo-2), sans-serif",
+                  }}
+                >
+                  📘 Math +5
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-16 sm:py-24 px-6 bg-white">
+      {/* How it works */}
+      <section className="py-20 sm:py-24 px-6" style={{ background: "white" }}>
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-light text-gray-900 text-center mb-4">
-            {t("howItWorks")}
-          </h2>
-          <p className="text-lg text-gray-600 text-center mb-16 max-w-2xl mx-auto">
-            {t("howItWorksSubtitle")}
-          </p>
+          <div className="text-center mb-16">
+            <h2
+              className="text-3xl sm:text-4xl font-extrabold mb-4"
+              style={{ fontFamily: "var(--font-baloo-2), sans-serif", color: "var(--ca-ink)" }}
+            >
+              {t("howItWorks")}
+            </h2>
+            <p
+              className="text-lg max-w-2xl mx-auto"
+              style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
+            >
+              {t("howItWorksSubtitle")}
+            </p>
+          </div>
 
           <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
-            {/* Step 1 */}
-            <div className="text-center">
-              <div className="w-20 h-20 mx-auto mb-6 bg-[#dcf1f3] rounded-2xl flex items-center justify-center">
-                <span className="text-4xl">📋</span>
+            {[
+              { n: 1, title: t("step1Title"), desc: t("step1Desc"), bg: "var(--ca-tile-teal)", emoji: "📋" },
+              { n: 2, title: t("step2Title"), desc: t("step2Desc"), bg: "var(--ca-tile-butter)", emoji: "🪙" },
+              { n: 3, title: t("step3Title"), desc: t("step3Desc"), bg: "var(--ca-tile-pink)", emoji: "🎉" },
+            ].map((step) => (
+              <div key={step.n} className="text-center">
+                <div
+                  className="relative w-24 h-24 mx-auto mb-6 rounded-[24px] flex items-center justify-center"
+                  style={{ background: step.bg }}
+                >
+                  <span className="text-5xl">{step.emoji}</span>
+                  <span
+                    className="absolute -top-2 -right-2 w-9 h-9 rounded-full flex items-center justify-center text-sm font-extrabold"
+                    style={{
+                      background: "var(--ca-ink)",
+                      color: "var(--ca-gold)",
+                      fontFamily: "var(--font-baloo-2), sans-serif",
+                    }}
+                  >
+                    {step.n}
+                  </span>
+                </div>
+                <h3
+                  className="text-xl font-extrabold mb-3"
+                  style={{ fontFamily: "var(--font-baloo-2), sans-serif", color: "var(--ca-ink)" }}
+                >
+                  {step.title}
+                </h3>
+                <p
+                  className="leading-relaxed"
+                  style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
+                >
+                  {step.desc}
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">{t("step1Title")}</h3>
-              <p className="text-gray-600 leading-relaxed">{t("step1Desc")}</p>
-            </div>
-
-            {/* Step 2 */}
-            <div className="text-center">
-              <div className="w-20 h-20 mx-auto mb-6 bg-[#fff4e6] rounded-2xl flex items-center justify-center">
-                <span className="text-4xl">⭐</span>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">{t("step2Title")}</h3>
-              <p className="text-gray-600 leading-relaxed">{t("step2Desc")}</p>
-            </div>
-
-            {/* Step 3 */}
-            <div className="text-center">
-              <div className="w-20 h-20 mx-auto mb-6 bg-[#fce4ec] rounded-2xl flex items-center justify-center">
-                <span className="text-4xl">🎉</span>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">{t("step3Title")}</h3>
-              <p className="text-gray-600 leading-relaxed">{t("step3Desc")}</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Benefits Section */}
-      <section className="py-16 sm:py-24 px-6 bg-[#FFFEF9]">
+      {/* Features grid */}
+      <section className="py-20 sm:py-24 px-6" style={{ background: "var(--ca-cream)" }}>
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-14">
+            <h2
+              className="text-3xl sm:text-4xl font-extrabold mb-4"
+              style={{ fontFamily: "var(--font-baloo-2), sans-serif", color: "var(--ca-ink)" }}
+            >
+              {t("featuresTitle")}
+            </h2>
+            <p
+              className="text-lg max-w-2xl mx-auto"
+              style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
+            >
+              {t("featuresSubtitle")}
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {features.map((f) => (
+              <div
+                key={f.title}
+                className="rounded-3xl p-6 transition-transform hover:-translate-y-1"
+                style={{
+                  background: "white",
+                  border: "1px solid var(--ca-divider)",
+                  boxShadow: "0 2px 0 rgba(0,0,0,0.03)",
+                }}
+              >
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 text-3xl"
+                  style={{ background: f.bg }}
+                >
+                  {f.emoji}
+                </div>
+                <h3
+                  className="text-lg font-extrabold mb-2"
+                  style={{ fontFamily: "var(--font-baloo-2), sans-serif", color: "var(--ca-ink)" }}
+                >
+                  {f.title}
+                </h3>
+                <p
+                  className="leading-relaxed text-sm"
+                  style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
+                >
+                  {f.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits */}
+      <section className="py-20 sm:py-24 px-6" style={{ background: "white" }}>
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Left - Visual */}
-            <div className="flex justify-center">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-[#dcf1f3] rounded-2xl p-6 flex flex-col items-center justify-center h-40">
-                  <span className="text-4xl mb-2">✅</span>
-                  <span className="text-gray-700 font-medium">{t("featureChores")}</span>
-                </div>
-                <div className="bg-[#fff4e6] rounded-2xl p-6 flex flex-col items-center justify-center h-40">
-                  <span className="text-4xl mb-2">💎</span>
-                  <span className="text-gray-700 font-medium">{t("featurePoints")}</span>
-                </div>
-                <div className="bg-[#fce4ec] rounded-2xl p-6 flex flex-col items-center justify-center h-40">
-                  <span className="text-4xl mb-2">🎁</span>
-                  <span className="text-gray-700 font-medium">{t("featureRewards")}</span>
-                </div>
-                <div className="bg-[#e8f5e9] rounded-2xl p-6 flex flex-col items-center justify-center h-40">
-                  <span className="text-4xl mb-2">👨‍👩‍👧‍👦</span>
-                  <span className="text-gray-700 font-medium">{t("featureFamily")}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Right - Content */}
             <div>
-              <h2 className="text-3xl sm:text-4xl font-light text-gray-900 leading-tight mb-6">
+              <h2
+                className="text-3xl sm:text-4xl font-extrabold mb-6 leading-tight"
+                style={{ fontFamily: "var(--font-baloo-2), sans-serif", color: "var(--ca-ink)" }}
+              >
                 {t("benefitsTitle")}
               </h2>
-              <p className="text-lg text-gray-600 leading-relaxed mb-6">
+              <p
+                className="text-lg leading-relaxed mb-6"
+                style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
+              >
                 {t("benefitsDesc")}
               </p>
               <ul className="space-y-4">
-                <li className="flex items-start gap-3">
-                  <span className="text-[#f66951] mt-1">✓</span>
-                  <span className="text-gray-600">{t("benefit1")}</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-[#f66951] mt-1">✓</span>
-                  <span className="text-gray-600">{t("benefit2")}</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-[#f66951] mt-1">✓</span>
-                  <span className="text-gray-600">{t("benefit3")}</span>
-                </li>
+                {[t("benefit1"), t("benefit2"), t("benefit3")].map((b, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <span
+                      className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-extrabold mt-0.5"
+                      style={{
+                        background: "var(--ca-gold)",
+                        color: "var(--ca-ink)",
+                      }}
+                    >
+                      ✓
+                    </span>
+                    <span
+                      className="text-base"
+                      style={{ color: "var(--ca-ink)", fontFamily: "var(--font-nunito), sans-serif" }}
+                    >
+                      {b}
+                    </span>
+                  </li>
+                ))}
               </ul>
+            </div>
+
+            {/* Showcase card */}
+            <div className="flex justify-center">
+              <div
+                className="w-full max-w-md rounded-[28px] p-6"
+                style={{
+                  background: "var(--ca-paper)",
+                  border: "1px solid var(--ca-divider)",
+                  boxShadow: "0 12px 40px rgba(26,24,19,0.06)",
+                }}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div
+                    className="text-sm font-extrabold"
+                    style={{ color: "var(--ca-muted)", fontFamily: "var(--font-baloo-2), sans-serif" }}
+                  >
+                    This week
+                  </div>
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full" style={{ background: "rgba(56,192,127,0.15)", color: "#1f7a4a", fontFamily: "var(--font-nunito), sans-serif", fontWeight: 800, fontSize: 12 }}>
+                    🔥 7-day streak
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="rounded-2xl p-4" style={{ background: "var(--ca-tile-teal)" }}>
+                    <div className="text-xs font-bold mb-1" style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}>Chores</div>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-2xl font-extrabold" style={{ fontFamily: "var(--font-baloo-2), sans-serif", color: "var(--ca-ink)" }}>12</span>
+                      <span className="text-xs" style={{ color: "var(--ca-muted)" }}>done</span>
+                    </div>
+                  </div>
+                  <div className="rounded-2xl p-4" style={{ background: "var(--ca-tile-lavender)" }}>
+                    <div className="text-xs font-bold mb-1" style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}>Math</div>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-2xl font-extrabold" style={{ fontFamily: "var(--font-baloo-2), sans-serif", color: "var(--ca-ink)" }}>48</span>
+                      <span className="text-xs" style={{ color: "var(--ca-muted)" }}>correct</span>
+                    </div>
+                  </div>
+                  <div className="rounded-2xl p-4" style={{ background: "var(--ca-tile-peach)" }}>
+                    <div className="text-xs font-bold mb-1" style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}>Meals planned</div>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-2xl font-extrabold" style={{ fontFamily: "var(--font-baloo-2), sans-serif", color: "var(--ca-ink)" }}>5</span>
+                      <span className="text-xs" style={{ color: "var(--ca-muted)" }}>this week</span>
+                    </div>
+                  </div>
+                  <div className="rounded-2xl p-4" style={{ background: "var(--ca-tile-pink)" }}>
+                    <div className="text-xs font-bold mb-1" style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}>Rewards ready</div>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-2xl font-extrabold" style={{ fontFamily: "var(--font-baloo-2), sans-serif", color: "var(--ca-ink)" }}>2</span>
+                      <span className="text-xs" style={{ color: "var(--ca-muted)" }}>to redeem</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  className="flex items-center justify-between rounded-2xl p-4"
+                  style={{
+                    background: "linear-gradient(160deg, var(--ca-cobalt) 0%, var(--ca-cobalt-deep) 100%)",
+                    color: "white",
+                  }}
+                >
+                  <div>
+                    <div className="text-xs font-bold opacity-80" style={{ fontFamily: "var(--font-nunito), sans-serif" }}>Total coins</div>
+                    <div className="text-3xl font-extrabold" style={{ fontFamily: "var(--font-baloo-2), sans-serif", letterSpacing: "-1px" }}>×312</div>
+                  </div>
+                  <Coin size={56} />
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 sm:py-24 px-6 bg-[#dcf1f3]">
+      {/* CTA */}
+      <section
+        className="py-20 sm:py-24 px-6"
+        style={{
+          background: "linear-gradient(160deg, var(--ca-gold-glow) 0%, var(--ca-tile-peach) 100%)",
+        }}
+      >
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl font-light text-gray-900 mb-6">
+          <div className="inline-flex mb-6">
+            <Coin size={72} />
+          </div>
+          <h2
+            className="text-3xl sm:text-4xl font-extrabold mb-4"
+            style={{ fontFamily: "var(--font-baloo-2), sans-serif", color: "var(--ca-ink)" }}
+          >
             {t("ctaTitle")}
           </h2>
-          <p className="text-lg text-gray-600 mb-8">
+          <p
+            className="text-lg mb-8"
+            style={{ color: "var(--ca-ink)", opacity: 0.75, fontFamily: "var(--font-nunito), sans-serif" }}
+          >
             {t("ctaSubtitle")}
           </p>
           <Link
             href="/signup"
-            className="inline-flex px-10 py-4 bg-[#f66951] hover:bg-[#e55a43] text-white font-medium rounded-full transition-colors text-lg"
+            className="inline-flex items-center justify-center gap-2 px-10 py-4 text-lg font-extrabold rounded-full transition-transform hover:scale-[1.03]"
+            style={{
+              background: "var(--ca-ink)",
+              color: "var(--ca-gold)",
+              boxShadow: "0 6px 0 #000, 0 12px 24px rgba(0,0,0,0.2)",
+              fontFamily: "var(--font-baloo-2), sans-serif",
+            }}
           >
             {t("getStarted")}
           </Link>
@@ -194,14 +492,39 @@ export default function HomeLanding() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-6 bg-[#FFFEF9] border-t border-gray-100">
+      <footer
+        className="py-10 px-6"
+        style={{ background: "var(--ca-cream)", borderTop: "1px solid var(--ca-divider)" }}
+      >
         <div className="max-w-6xl mx-auto text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <span className="text-xl">💎</span>
-            <span className="text-lg font-semibold text-gray-800">{tNav("appName")}</span>
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <CoinSmall size={22} />
+            <span
+              className="text-lg font-extrabold"
+              style={{ fontFamily: "var(--font-baloo-2), sans-serif", color: "var(--ca-ink)" }}
+            >
+              {tNav("appName")}
+            </span>
           </div>
-          <p className="text-gray-500 text-sm">
+          <p
+            className="text-sm mb-4"
+            style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
+          >
             {t("footerTagline")}
+          </p>
+          <div
+            className="flex items-center justify-center gap-5 text-sm font-bold"
+            style={{ color: "var(--ca-cobalt-deep)", fontFamily: "var(--font-nunito), sans-serif" }}
+          >
+            <Link href="/privacy">{t("footerPrivacy")}</Link>
+            <span style={{ color: "var(--ca-muted)" }}>·</span>
+            <Link href="/terms">{t("footerTerms")}</Link>
+          </div>
+          <p
+            className="mt-3 text-xs"
+            style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
+          >
+            {t("footerCopyright", { year: new Date().getFullYear() })}
           </p>
         </div>
       </footer>

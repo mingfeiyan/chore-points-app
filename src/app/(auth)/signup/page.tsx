@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import Coin from "@/components/v2/Coin";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -21,6 +22,21 @@ export default function SignupPage() {
   const t = useTranslations("auth");
   const tNav = useTranslations("nav");
   const tCommon = useTranslations("common");
+  const tHome = useTranslations("home");
+
+  const renderAgreeNotice = () =>
+    tHome.rich("agreeNotice", {
+      terms: (chunks) => (
+        <Link href="/terms" className="font-bold" style={{ color: "var(--ca-cobalt-deep)" }}>
+          {chunks}
+        </Link>
+      ),
+      privacy: (chunks) => (
+        <Link href="/privacy" className="font-bold" style={{ color: "var(--ca-cobalt-deep)" }}>
+          {chunks}
+        </Link>
+      ),
+    });
 
   const handleGoogleSignUp = async () => {
     setGoogleLoading(true);
@@ -102,27 +118,66 @@ export default function SignupPage() {
     }
   };
 
+  const pageBg: React.CSSProperties = {
+    background:
+      "radial-gradient(ellipse at top, var(--ca-gold-glow) 0%, transparent 55%), var(--ca-cream)",
+    fontFamily: "var(--font-inter), system-ui, sans-serif",
+  };
+  const cardStyle: React.CSSProperties = {
+    background: "white",
+    border: "1px solid var(--ca-divider)",
+    boxShadow: "0 20px 60px rgba(26,24,19,0.08)",
+  };
+
+  const inputClass =
+    "mt-1 block w-full px-4 py-3 rounded-2xl text-base focus:outline-none transition-shadow";
+  const inputStyle = (accent: "gold" | "cobalt"): React.CSSProperties => ({
+    background: "white",
+    border: `1px solid var(--ca-divider)`,
+    color: "var(--ca-ink)",
+    fontFamily: accent === "cobalt" ? "var(--font-nunito), sans-serif" : "var(--font-nunito), sans-serif",
+    boxShadow: "inset 0 1px 0 rgba(0,0,0,0.02)",
+  });
+  const labelStyle: React.CSSProperties = {
+    color: "var(--ca-ink)",
+    fontFamily: "var(--font-nunito), sans-serif",
+  };
+
   // Choose mode screen
   if (mode === "choose") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow">
-          <div>
-            <h2 className="text-center text-3xl font-bold text-gray-900">
-              {tNav("appName")}
-            </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
+      <div className="min-h-screen flex items-center justify-center px-4 py-10" style={pageBg}>
+        <div className="w-full max-w-md rounded-[28px] p-8 sm:p-10" style={cardStyle}>
+          <div className="text-center">
+            <Link href="/" className="inline-flex flex-col items-center">
+              <Coin size={64} />
+              <span
+                className="mt-3 text-2xl font-extrabold"
+                style={{ fontFamily: "var(--font-baloo-2), sans-serif", color: "var(--ca-ink)" }}
+              >
+                {tNav("appName")}
+              </span>
+            </Link>
+            <p
+              className="mt-2 text-sm"
+              style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
+            >
               {t("howSignUp")}
             </p>
           </div>
 
           <div className="mt-8 space-y-4">
-            {/* Google Sign-Up for Parents */}
             <button
               type="button"
               onClick={handleGoogleSignUp}
               disabled={googleLoading}
-              className="w-full flex items-center justify-center gap-3 py-3 px-4 border-2 border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:border-blue-500 hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-2xl text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                background: "white",
+                border: "1.5px solid var(--ca-divider)",
+                color: "var(--ca-ink)",
+                fontFamily: "var(--font-nunito), sans-serif",
+              }}
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -145,69 +200,105 @@ export default function SignupPage() {
               {googleLoading ? t("signingIn") : t("continueWithGoogle")}
             </button>
 
-            <div className="relative">
+            <div className="relative py-1">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
+                <div className="w-full" style={{ borderTop: "1px solid var(--ca-divider)" }} />
               </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">{t("orContinueWith")}</span>
+              <div className="relative flex justify-center text-xs">
+                <span
+                  className="px-3"
+                  style={{
+                    background: "white",
+                    color: "var(--ca-muted)",
+                    fontFamily: "var(--font-nunito), sans-serif",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                  }}
+                >
+                  {t("orContinueWith")}
+                </span>
               </div>
             </div>
 
             <button
               onClick={() => setMode("parent")}
-              className="w-full flex flex-col items-center p-6 border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
+              className="w-full flex items-center gap-4 p-5 rounded-2xl text-left transition-colors"
+              style={{
+                background: "var(--ca-tile-teal)",
+                border: "1.5px solid transparent",
+              }}
             >
-              <svg
-                className="w-12 h-12 text-blue-600 mb-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
+                style={{ background: "white" }}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                />
-              </svg>
-              <span className="text-lg font-medium text-gray-900">
-                {t("imParent")}
-              </span>
-              <span className="text-sm text-gray-500 mt-1">
-                {t("createFamily")}
-              </span>
+                👨‍👩‍👧
+              </div>
+              <div>
+                <div
+                  className="text-base font-extrabold"
+                  style={{ fontFamily: "var(--font-baloo-2), sans-serif", color: "var(--ca-ink)" }}
+                >
+                  {t("imParent")}
+                </div>
+                <div
+                  className="text-sm mt-0.5"
+                  style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
+                >
+                  {t("createFamily")}
+                </div>
+              </div>
             </button>
 
             <button
               onClick={() => setMode("kid")}
-              className="w-full flex flex-col items-center p-6 border-2 border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors"
+              className="w-full flex items-center gap-4 p-5 rounded-2xl text-left transition-colors"
+              style={{
+                background: "var(--ca-tile-butter)",
+                border: "1.5px solid transparent",
+              }}
             >
-              <svg
-                className="w-12 h-12 text-green-600 mb-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
+                style={{ background: "white" }}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span className="text-lg font-medium text-gray-900">
-                {t("imKid")}
-              </span>
-              <span className="text-sm text-gray-500 mt-1">
-                {t("joinWithCode")}
-              </span>
+                🧒
+              </div>
+              <div>
+                <div
+                  className="text-base font-extrabold"
+                  style={{ fontFamily: "var(--font-baloo-2), sans-serif", color: "var(--ca-ink)" }}
+                >
+                  {t("imKid")}
+                </div>
+                <div
+                  className="text-sm mt-0.5"
+                  style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
+                >
+                  {t("joinWithCode")}
+                </div>
+              </div>
             </button>
           </div>
 
-          <div className="text-center text-sm">
-            <span className="text-gray-600">{t("alreadyHaveAccount")} </span>
-            <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
+          <p
+            className="text-center text-xs mt-6"
+            style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
+          >
+            {renderAgreeNotice()}
+          </p>
+
+          <div
+            className="text-center text-sm mt-3"
+            style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
+          >
+            <span>{t("alreadyHaveAccount")} </span>
+            <Link
+              href="/login"
+              className="font-extrabold"
+              style={{ color: "var(--ca-cobalt-deep)" }}
+            >
               {t("signIn")}
             </Link>
           </div>
@@ -216,171 +307,216 @@ export default function SignupPage() {
     );
   }
 
-  // Parent or Kid signup form
+  const isKid = mode === "kid";
+  const primaryBg = isKid
+    ? "linear-gradient(180deg, var(--ca-mint) 0%, #2ca46a 100%)"
+    : "linear-gradient(180deg, var(--ca-gold) 0%, #e5ad0a 100%)";
+  const primaryShadow = isKid
+    ? "0 5px 0 #1f7a4a, 0 10px 20px rgba(31,122,74,0.25)"
+    : "0 5px 0 var(--ca-gold-deep), 0 10px 20px rgba(178,123,0,0.25)";
+  const primaryTextColor = isKid ? "white" : "var(--ca-ink)";
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow">
-        <div>
-          <button
-            onClick={() => {
-              setMode("choose");
-              setError("");
-            }}
-            className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
+    <div className="min-h-screen flex items-center justify-center px-4 py-10" style={pageBg}>
+      <div className="w-full max-w-md rounded-[28px] p-8 sm:p-10" style={cardStyle}>
+        <button
+          onClick={() => {
+            setMode("choose");
+            setError("");
+          }}
+          className="inline-flex items-center gap-1.5 text-sm font-bold"
+          style={{ color: "var(--ca-cobalt-deep)", fontFamily: "var(--font-nunito), sans-serif" }}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+          </svg>
+          {tCommon("back")}
+        </button>
+
+        <div className="mt-4 text-center">
+          <Coin size={56} />
+          <h2
+            className="mt-3 text-2xl font-extrabold"
+            style={{ fontFamily: "var(--font-baloo-2), sans-serif", color: "var(--ca-ink)" }}
           >
-            <svg
-              className="w-4 h-4 mr-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            {tCommon("back")}
-          </button>
-          <h2 className="mt-4 text-center text-3xl font-bold text-gray-900">
-            {mode === "parent" ? t("parentSignUp") : t("kidSignUp")}
+            {isKid ? t("kidSignUp") : t("parentSignUp")}
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            {mode === "parent"
-              ? t("createAccount")
-              : t("joinFamily")}
+          <p
+            className="mt-1 text-sm"
+            style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
+          >
+            {isKid ? t("joinFamily") : t("createAccount")}
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-7 space-y-5" onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            <div
+              className="px-4 py-3 rounded-2xl text-sm font-semibold"
+              style={{
+                background: "rgba(246,105,81,0.1)",
+                border: "1px solid rgba(246,105,81,0.25)",
+                color: "#b23a25",
+                fontFamily: "var(--font-nunito), sans-serif",
+              }}
+            >
               {error}
             </div>
           )}
 
-          <div className="space-y-4">
-            {/* Invite code field - required for kids, optional for parents */}
+          <div>
+            <label htmlFor="inviteCode" className="block text-sm font-bold" style={labelStyle}>
+              {t("inviteCode")}{" "}
+              {isKid && <span style={{ color: "var(--ca-coral)" }}>*</span>}
+              {!isKid && (
+                <span
+                  className="ml-1 text-xs"
+                  style={{ color: "var(--ca-muted)", fontWeight: 600 }}
+                >
+                  (optional)
+                </span>
+              )}
+            </label>
+            <input
+              id="inviteCode"
+              type="text"
+              required={isKid}
+              value={inviteCode}
+              onChange={(e) => setInviteCode(e.target.value)}
+              placeholder={t("inviteCodeHelper")}
+              className={`${inputClass} font-mono tracking-wider`}
+              style={inputStyle(isKid ? "cobalt" : "gold")}
+            />
+            <p
+              className="mt-1.5 text-xs"
+              style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
+            >
+              {t("inviteCodeHelper")}
+            </p>
+          </div>
+
+          {!isKid && !inviteCode.trim() && (
             <div>
-              <label htmlFor="inviteCode" className="block text-sm font-medium text-gray-700">
-                {t("inviteCode")} {mode === "kid" && <span className="text-red-500">*</span>}
-                {mode === "parent" && <span className="text-gray-400 text-xs ml-1">(optional)</span>}
+              <label
+                htmlFor="registrationSecret"
+                className="block text-sm font-bold"
+                style={labelStyle}
+              >
+                {t("registrationCode")} <span style={{ color: "var(--ca-coral)" }}>*</span>
               </label>
               <input
-                id="inviteCode"
-                type="text"
-                required={mode === "kid"}
-                value={inviteCode}
-                onChange={(e) => setInviteCode(e.target.value)}
-                placeholder={t("inviteCodeHelper")}
-                className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none font-mono ${
-                  mode === "kid"
-                    ? "focus:ring-green-500 focus:border-green-500"
-                    : "focus:ring-blue-500 focus:border-blue-500"
-                }`}
+                id="registrationSecret"
+                type="password"
+                required
+                value={registrationSecret}
+                onChange={(e) => setRegistrationSecret(e.target.value)}
+                placeholder={t("registrationCode")}
+                className={inputClass}
+                style={inputStyle("gold")}
               />
-              <p className="mt-1 text-xs text-gray-500">
-                {t("inviteCodeHelper")}
+              <p
+                className="mt-1.5 text-xs"
+                style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
+              >
+                {t("registrationCodeHelper")}
               </p>
             </div>
+          )}
 
-            {/* Registration code - only for parents without invite code */}
-            {mode === "parent" && !inviteCode.trim() && (
-              <div>
-                <label htmlFor="registrationSecret" className="block text-sm font-medium text-gray-700">
-                  {t("registrationCode")} <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="registrationSecret"
-                  type="password"
-                  required
-                  value={registrationSecret}
-                  onChange={(e) => setRegistrationSecret(e.target.value)}
-                  placeholder={t("registrationCode")}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  {t("registrationCodeHelper")}
-                </p>
-              </div>
-            )}
+          <div>
+            <label htmlFor="name" className="block text-sm font-bold" style={labelStyle}>
+              {t("name")}
+            </label>
+            <input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className={inputClass}
+              style={inputStyle("gold")}
+            />
+          </div>
 
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                {t("name")}
-              </label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
+          <div>
+            <label htmlFor="email" className="block text-sm font-bold" style={labelStyle}>
+              {t("email")} <span style={{ color: "var(--ca-coral)" }}>*</span>
+            </label>
+            <input
+              id="email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={inputClass}
+              style={inputStyle("gold")}
+            />
+          </div>
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                {t("email")} <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
+          <div>
+            <label htmlFor="password" className="block text-sm font-bold" style={labelStyle}>
+              {t("password")} <span style={{ color: "var(--ca-coral)" }}>*</span>
+            </label>
+            <input
+              id="password"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={inputClass}
+              style={inputStyle("gold")}
+            />
+          </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                {t("password")} <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                {t("confirmPassword")} <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
+          <div>
+            <label
+              htmlFor="confirmPassword"
+              className="block text-sm font-bold"
+              style={labelStyle}
+            >
+              {t("confirmPassword")} <span style={{ color: "var(--ca-coral)" }}>*</span>
+            </label>
+            <input
+              id="confirmPassword"
+              type="password"
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className={inputClass}
+              style={inputStyle("gold")}
+            />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
-              mode === "kid"
-                ? "bg-green-600 hover:bg-green-700 focus:ring-green-500"
-                : "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
-            }`}
+            className="w-full flex justify-center items-center py-3.5 px-4 rounded-2xl text-base font-extrabold transition-transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            style={{
+              background: primaryBg,
+              color: primaryTextColor,
+              boxShadow: primaryShadow,
+              fontFamily: "var(--font-baloo-2), sans-serif",
+            }}
           >
-            {loading
-              ? t("creatingAccount")
-              : mode === "kid"
-              ? t("joinFamilyButton")
-              : t("signUp")}
+            {loading ? t("creatingAccount") : isKid ? t("joinFamilyButton") : t("signUp")}
           </button>
 
-          <div className="text-center text-sm">
-            <span className="text-gray-600">{t("alreadyHaveAccount")} </span>
-            <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
+          <p
+            className="text-center text-xs pt-1"
+            style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
+          >
+            {renderAgreeNotice()}
+          </p>
+
+          <div
+            className="text-center text-sm pt-1"
+            style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
+          >
+            <span>{t("alreadyHaveAccount")} </span>
+            <Link
+              href="/login"
+              className="font-extrabold"
+              style={{ color: "var(--ca-cobalt-deep)" }}
+            >
               {t("signIn")}
             </Link>
           </div>
