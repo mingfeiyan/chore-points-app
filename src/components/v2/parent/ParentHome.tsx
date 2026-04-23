@@ -230,6 +230,13 @@ export default function ParentHome({ userName }: ParentHomeProps) {
 
   // Compute stats for the first kid (primary child)
   const primaryKid = kids[0];
+  const localTimezone =
+    typeof Intl !== "undefined"
+      ? Intl.DateTimeFormat().resolvedOptions().timeZone
+      : "UTC";
+  const toLocalDay = (date: Date) =>
+    date.toLocaleDateString("en-CA", { timeZone: localTimezone });
+
   const weekTotal = primaryKid
     ? primaryKid.allEntries
         .filter((e) => {
@@ -242,22 +249,21 @@ export default function ParentHome({ userName }: ParentHomeProps) {
         .reduce((s, e) => s + e.points, 0)
     : 0;
 
-  // Streak calculation
   const streakCount = (() => {
     if (!primaryKid) return 0;
     const dayTotals: Record<string, number> = {};
     for (const e of primaryKid.allEntries) {
       if (e.points > 0) {
-        const ds = new Date(e.date).toISOString().split("T")[0];
+        const ds = toLocalDay(new Date(e.date || e.createdAt));
         dayTotals[ds] = (dayTotals[ds] || 0) + e.points;
       }
     }
     let streak = 0;
     const d = new Date();
     for (let i = 0; i < 60; i++) {
-      const ds = d.toISOString().split("T")[0];
+      const ds = toLocalDay(d);
       if (dayTotals[ds]) streak++;
-      else if (i > 0) break; // allow today to be 0
+      else if (i > 0) break;
       d.setDate(d.getDate() - 1);
     }
     return streak;
