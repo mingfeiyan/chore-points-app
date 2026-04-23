@@ -14,10 +14,11 @@ function sightWordPrompt(word: string): string {
 
 function badgePrompt(taskDescription: string): string {
   return [
-    `Cute children's cartoon sticker illustration, circular composition.`,
-    `The subject fills the whole frame edge-to-edge: ${taskDescription}.`,
-    `Soft light-blue background behind the subject. Bright cheerful colors, friendly style for a 5-year-old.`,
-    `Do not draw any border, ring, rim, outline, frame, or circle around the edge — the illustration runs clean to the image edge.`,
+    `Circular children's achievement sticker.`,
+    `The circle is bordered by a single thin solid cobalt blue line — a narrow clean stroke, no double rings, no thick frames, no gradient rims.`,
+    `Inside the circle: soft light-blue gradient background with a few small decorative sparkles or bubbles scattered around.`,
+    `Centered subject: cute kawaii cartoon illustration of ${taskDescription}, smiling and friendly when it's a character, polished digital cartoon art.`,
+    `Bright cheerful colors, child-friendly style for a 5-year-old.`,
     `No text, no letters, no words, no numbers anywhere in the image.`,
   ].join(" ");
 }
