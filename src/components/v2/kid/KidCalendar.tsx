@@ -49,9 +49,18 @@ export default function KidCalendar() {
   };
 
   const dayTotals = useMemo(() => {
+    // Bucket by local-timezone date. entry.date is a full UTC timestamp,
+    // so slicing the ISO string misattributes late-evening points to the
+    // next UTC day (e.g., 10pm PT -> 05:00Z next day -> wrong cell).
+    const timeZone =
+      typeof Intl !== "undefined"
+        ? Intl.DateTimeFormat().resolvedOptions().timeZone
+        : "UTC";
+    const toLocalDay = (iso: string) =>
+      new Date(iso).toLocaleDateString("en-CA", { timeZone });
     const map: Record<string, number> = {};
     for (const entry of entries) {
-      const dateStr = entry.date.slice(0, 10);
+      const dateStr = toLocalDay(entry.date);
       map[dateStr] = (map[dateStr] || 0) + entry.points;
     }
     return map;

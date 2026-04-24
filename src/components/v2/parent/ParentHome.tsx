@@ -77,6 +77,14 @@ function isToday(dateStr: string): boolean {
 // ------- Sparkline -------
 
 function getLast7DaysPoints(entries: PointEntry[]): number[] {
+  // Bucket by local-timezone date so evening entries don't get attributed
+  // to the next UTC day and produce mismatched keys.
+  const timeZone =
+    typeof Intl !== "undefined"
+      ? Intl.DateTimeFormat().resolvedOptions().timeZone
+      : "UTC";
+  const toLocalDay = (d: Date) => d.toLocaleDateString("en-CA", { timeZone });
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const result: number[] = [];
@@ -84,11 +92,11 @@ function getLast7DaysPoints(entries: PointEntry[]): number[] {
   for (let i = 6; i >= 0; i--) {
     const date = new Date(today);
     date.setDate(today.getDate() - i);
-    const dateStr = date.toISOString().split("T")[0];
+    const dateStr = toLocalDay(date);
 
     const dayTotal = entries
       .filter((e) => {
-        const entryDate = new Date(e.date).toISOString().split("T")[0];
+        const entryDate = toLocalDay(new Date(e.date));
         return entryDate === dateStr && e.points > 0;
       })
       .reduce((sum, e) => sum + e.points, 0);

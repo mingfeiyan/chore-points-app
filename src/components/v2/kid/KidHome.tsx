@@ -182,11 +182,18 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
       });
   }, [kidId]);
 
-  // Day totals for calendar
+  // Day totals for calendar. Bucket by local timezone so late-evening
+  // points don't spill onto the next UTC day.
   const dayTotals = useMemo(() => {
+    const timeZone =
+      typeof Intl !== "undefined"
+        ? Intl.DateTimeFormat().resolvedOptions().timeZone
+        : "UTC";
+    const toLocalDay = (iso: string) =>
+      new Date(iso).toLocaleDateString("en-CA", { timeZone });
     const map: Record<string, number> = {};
     for (const e of data?.entries || []) {
-      const ds = new Date(e.date).toISOString().split("T")[0];
+      const ds = toLocalDay(e.date);
       if (e.points > 0) map[ds] = (map[ds] || 0) + e.points;
     }
     return map;
@@ -221,8 +228,14 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
     );
   }
 
+  const localTimezone =
+    typeof Intl !== "undefined"
+      ? Intl.DateTimeFormat().resolvedOptions().timeZone
+      : "UTC";
   const todayEntries = data.entries.filter((e) => {
-    const entryDate = new Date(e.date).toISOString().split("T")[0];
+    const entryDate = new Date(e.date).toLocaleDateString("en-CA", {
+      timeZone: localTimezone,
+    });
     return entryDate === todayStr && e.points > 0;
   });
   const todayDelta = todayEntries.reduce((sum, e) => sum + e.points, 0);
