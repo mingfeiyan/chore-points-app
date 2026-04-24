@@ -36,3 +36,17 @@ export async function requireParentInFamily() {
   }
   return session;
 }
+
+export async function requireAdmin() {
+  const session = await requireAuth();
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail || session.user.email !== adminEmail) {
+    throw new Error("Forbidden: Admin access required");
+  }
+  return session;
+}
+
+export function isAdmin(email: string | null | undefined): boolean {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  return !!adminEmail && email === adminEmail;
+}
