@@ -2,46 +2,38 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 
 type PhotoProvider = "NONE" | "VERCEL_BLOB" | "GOOGLE_DRIVE";
-
-interface FamilyPhotoState {
-  photoProvider: PhotoProvider;
-  googleDriveFolderId: string | null;
-  googleDriveConnectedAt: string | null;
-}
 
 export default function PhotoStorageCard() {
   const t = useTranslations("settings.photoStorage");
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [state, setState] = useState<FamilyPhotoState | null>(null);
+  const { data: session, update } = useSession();
+  const photoProvider: PhotoProvider =
+    (session?.user?.photoProvider as PhotoProvider) ?? "NONE";
+  const [connectedAt, setConnectedAt] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const load = async () => {
+  // Only the "connected on" timestamp needs a network call — the provider
+  // itself comes from the session. When the family is disconnected we
+  // don't bother fetching.
+  const loadConnectedAt = async () => {
     const res = await fetch("/api/family");
+    if (!res.ok) return;
     const data = await res.json();
-    if (res.ok && data.family) {
-      setState({
-        photoProvider: data.family.photoProvider,
-        googleDriveFolderId: data.family.googleDriveFolderId,
-        googleDriveConnectedAt: data.family.googleDriveConnectedAt,
-      });
-    }
+    setConnectedAt(data?.family?.googleDriveConnectedAt ?? null);
   };
 
-  // Returning from Google re-consent lands us back with ?pendingDrive=1;
-  // skip the initial load() in that case and let handleConnect's own load
-  // update the state once the connect call finishes.
   useEffect(() => {
     if (searchParams.get("pendingDrive") === "1") {
       handleConnect(true);
       router.replace("/settings");
-    } else {
-      load();
+    } else if (photoProvider === "GOOGLE_DRIVE") {
+      loadConnectedAt();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -66,7 +58,8 @@ export default function PhotoStorageCard() {
         setBusy(false);
         return;
       }
-      await load();
+      await update({ photoProvider: data.photoProvider });
+      await loadConnectedAt();
     } catch {
       setError(t("connectFailed"));
     } finally {
@@ -79,12 +72,13 @@ export default function PhotoStorageCard() {
     setError(null);
     try {
       const res = await fetch("/api/drive/disconnect", { method: "POST" });
+      const data = await res.json();
       if (!res.ok) {
-        const data = await res.json();
         setError(data.error || t("disconnectFailed"));
         return;
       }
-      await load();
+      await update({ photoProvider: data.photoProvider });
+      setConnectedAt(null);
     } catch {
       setError(t("disconnectFailed"));
     } finally {
@@ -92,7 +86,7 @@ export default function PhotoStorageCard() {
     }
   };
 
-  if (!state) {
+  if (!session) {
     return (
       <div className="bg-white rounded-[14px] border border-[rgba(68,55,32,0.14)] p-5">
         <div className="h-5 w-40 bg-pg-cream rounded animate-pulse" />
@@ -100,9 +94,9 @@ export default function PhotoStorageCard() {
     );
   }
 
-  const isDrive = state.photoProvider === "GOOGLE_DRIVE";
-  const isBlob = state.photoProvider === "VERCEL_BLOB";
-  const isNone = state.photoProvider === "NONE";
+  const isDrive = photoProvider === "GOOGLE_DRIVE";
+  const isBlob = photoProvider === "VERCEL_BLOB";
+  const isNone = photoProvider === "NONE";
 
   return (
     <div className="bg-white rounded-[14px] border border-[rgba(68,55,32,0.14)] p-5">
@@ -118,10 +112,10 @@ export default function PhotoStorageCard() {
           {isBlob && t("providerBlob")}
           {isNone && t("providerNone")}
         </div>
-        {isDrive && state.googleDriveConnectedAt && (
+        {isDrive && connectedAt && (
           <div className="text-xs text-pg-muted mt-1">
             {t("connectedAt", {
-              date: new Date(state.googleDriveConnectedAt).toLocaleDateString(),
+              date: new Date(connectedAt).toLocaleDateString(),
             })}
           </div>
         )}

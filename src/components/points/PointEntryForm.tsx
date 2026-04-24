@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 
 type Chore = {
@@ -81,7 +82,8 @@ export default function PointEntryForm({
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [generateBadge, setGenerateBadge] = useState(!entry);
-  const [photosDisabled, setPhotosDisabled] = useState(false);
+  const { data: session } = useSession();
+  const photosDisabled = (session?.user?.photoProvider ?? "NONE") === "NONE";
   const t = useTranslations("parent");
   const tCommon = useTranslations("common");
   const tPhotos = useTranslations("photos");
@@ -111,12 +113,6 @@ export default function PointEntryForm({
 
   useEffect(() => {
     fetchChores();
-    fetch("/api/family")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.family?.photoProvider === "NONE") setPhotosDisabled(true);
-      })
-      .catch(() => {});
   }, []);
 
   useEffect(() => {

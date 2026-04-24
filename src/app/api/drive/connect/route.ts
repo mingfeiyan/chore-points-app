@@ -70,7 +70,11 @@ export async function POST() {
       },
     });
 
-    return NextResponse.json({ folderId, folderName });
+    return NextResponse.json({
+      folderId,
+      folderName,
+      photoProvider: "GOOGLE_DRIVE",
+    });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Something went wrong";
     const status = message.includes("Forbidden") || message.includes("Unauthorized") ? 403 : 500;

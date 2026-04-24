@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       pointEntryWhereClause.kidId = kidIdParam;
     }
 
-    const [photos, legacyPhotos, family] = await Promise.all([
+    const [photos, legacyPhotos] = await Promise.all([
       prisma.photo.findMany({
         where: photoWhereClause,
         select: {
@@ -81,10 +81,6 @@ export async function GET(request: NextRequest) {
         },
         orderBy: { createdAt: "desc" },
       }),
-      prisma.family.findUnique({
-        where: { id: session.user.familyId },
-        select: { photoProvider: true },
-      }),
     ]);
 
     // Combine and format
@@ -111,10 +107,7 @@ export async function GET(request: NextRequest) {
       })),
     ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-    return NextResponse.json({
-      photos: allPhotos,
-      photoProvider: family?.photoProvider ?? "NONE",
-    });
+    return NextResponse.json({ photos: allPhotos });
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "Something went wrong";

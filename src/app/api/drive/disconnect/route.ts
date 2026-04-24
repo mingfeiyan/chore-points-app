@@ -17,7 +17,7 @@ export async function POST() {
         googleDriveConnectedById: null,
       },
     });
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, photoProvider: "NONE" });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Something went wrong";
     const status = message.includes("Forbidden") || message.includes("Unauthorized") ? 403 : 500;

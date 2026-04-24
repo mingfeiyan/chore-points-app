@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import PhotoUploadForm from "./PhotoUploadForm";
 import OptimizedImage from "@/components/ui/OptimizedImage";
@@ -29,13 +30,14 @@ type PhotoGalleryProps = {
 };
 
 export default function PhotoGallery({ kidId, showKidFilter = true, showUpload = false }: PhotoGalleryProps) {
+  const { data: session } = useSession();
+  const photoProvider = session?.user?.photoProvider ?? "NONE";
   const [photos, setPhotos] = useState<PhotoEntry[]>([]);
   const [kids, setKids] = useState<Kid[]>([]);
   const [selectedKidId, setSelectedKidId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [viewingPhoto, setViewingPhoto] = useState<PhotoEntry | null>(null);
   const [showUploadForm, setShowUploadForm] = useState(false);
-  const [photoProvider, setPhotoProvider] = useState<"NONE" | "VERCEL_BLOB" | "GOOGLE_DRIVE">("NONE");
   const t = useTranslations("photos");
   const tCommon = useTranslations("common");
 
@@ -65,7 +67,6 @@ export default function PhotoGallery({ kidId, showKidFilter = true, showUpload =
       const data = await response.json();
       if (response.ok) {
         setPhotos(data.photos);
-        if (data.photoProvider) setPhotoProvider(data.photoProvider);
       }
     } catch (error) {
       console.error("Failed to fetch photos:", error);

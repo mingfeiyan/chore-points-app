@@ -7,6 +7,7 @@ import { prisma } from "@/lib/db";
 import { compare } from "bcryptjs";
 
 type Role = "PARENT" | "KID";
+type PhotoProvider = "NONE" | "VERCEL_BLOB" | "GOOGLE_DRIVE";
 
 declare module "next-auth" {
   interface Session {
@@ -17,12 +18,14 @@ declare module "next-auth" {
       image?: string | null;
       role: Role;
       familyId?: string | null;
+      photoProvider?: PhotoProvider | null;
     };
   }
 
   interface User {
     role: Role;
     familyId?: string | null;
+    photoProvider?: PhotoProvider | null;
   }
 }
 
@@ -30,6 +33,7 @@ declare module "@auth/core/jwt" {
   interface JWT {
     role: Role;
     familyId?: string | null;
+    photoProvider?: PhotoProvider | null;
   }
 }
 
@@ -96,12 +100,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.role = user.role;
         token.familyId = user.familyId;
+        // Populate photoProvider once, so UI can branch on it via
+        // useSession without fetching /api/family on every page load.
+        if (user.familyId) {
+          const family = await prisma.family.findUnique({
+            where: { id: user.familyId },
+            select: { photoProvider: true },
+          });
+          token.photoProvider = family?.photoProvider ?? "NONE";
+        } else {
+          token.photoProvider = "NONE";
+        }
       }
 
-      // Handle session updates
       if (trigger === "update" && session) {
-        token.familyId = session.familyId;
-        token.role = session.role;
+        if (session.familyId !== undefined) token.familyId = session.familyId;
+        if (session.role !== undefined) token.role = session.role;
+        if (session.photoProvider !== undefined) {
+          token.photoProvider = session.photoProvider;
+        }
       }
 
       return token;
@@ -111,6 +128,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.sub!;
         session.user.role = token.role;
         session.user.familyId = token.familyId;
+        session.user.photoProvider = token.photoProvider ?? "NONE";
       }
       return session;
     },
