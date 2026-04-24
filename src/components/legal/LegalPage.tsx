@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ReactNode } from "react";
 import { useTranslations } from "next-intl";
+import { ChevronLeft } from "lucide-react";
 import CoinSmall from "@/components/v2/CoinSmall";
 
 interface LegalPageProps {
@@ -15,7 +15,6 @@ interface LegalPageProps {
 export default function LegalPage({ title, lastUpdated, intro, sections }: LegalPageProps) {
   const tLegal = useTranslations("legal");
   const tNav = useTranslations("nav");
-  const tHome = useTranslations("home");
 
   return (
     <div
@@ -26,7 +25,6 @@ export default function LegalPage({ title, lastUpdated, intro, sections }: Legal
         fontFamily: "var(--font-inter), system-ui, sans-serif",
       }}
     >
-      {/* Top nav */}
       <nav
         className="sticky top-0 z-50 backdrop-blur-md"
         style={{
@@ -49,14 +47,7 @@ export default function LegalPage({ title, lastUpdated, intro, sections }: Legal
             className="inline-flex items-center gap-1.5 text-sm font-bold"
             style={{ color: "var(--ca-cobalt-deep)", fontFamily: "var(--font-nunito), sans-serif" }}
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2.5}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
+            <ChevronLeft size={16} />
             {tLegal("backHome")}
           </Link>
         </div>
@@ -66,10 +57,7 @@ export default function LegalPage({ title, lastUpdated, intro, sections }: Legal
         <header className="mb-8">
           <h1
             className="text-4xl sm:text-5xl font-extrabold leading-tight"
-            style={{
-              fontFamily: "var(--font-baloo-2), sans-serif",
-              letterSpacing: "-0.02em",
-            }}
+            style={{ fontFamily: "var(--font-baloo-2), sans-serif", letterSpacing: "-0.02em" }}
           >
             {title}
           </h1>
@@ -103,10 +91,7 @@ export default function LegalPage({ title, lastUpdated, intro, sections }: Legal
         >
           <p
             className="text-base leading-relaxed"
-            style={{
-              color: "var(--ca-ink)",
-              fontFamily: "var(--font-nunito), sans-serif",
-            }}
+            style={{ color: "var(--ca-ink)", fontFamily: "var(--font-nunito), sans-serif" }}
           >
             {intro}
           </p>
@@ -122,32 +107,24 @@ export default function LegalPage({ title, lastUpdated, intro, sections }: Legal
               >
                 {section.title}
               </h2>
-              <SectionBody body={section.body} />
+              <p
+                className="text-base leading-relaxed"
+                style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
+              >
+                {section.body}
+              </p>
             </section>
           ))}
         </div>
 
-        <FooterLinks tHome={tHome} />
+        <LegalFooter />
       </main>
     </div>
   );
 }
 
-function SectionBody({ body }: { body: ReactNode }) {
-  return (
-    <p
-      className="text-base leading-relaxed"
-      style={{
-        color: "var(--ca-muted)",
-        fontFamily: "var(--font-nunito), sans-serif",
-      }}
-    >
-      {body}
-    </p>
-  );
-}
-
-function FooterLinks({ tHome }: { tHome: ReturnType<typeof useTranslations> }) {
+function LegalFooter() {
+  const tHome = useTranslations("home");
   const year = new Date().getFullYear();
   return (
     <footer className="mt-10 text-center">

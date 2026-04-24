@@ -57,7 +57,6 @@ export default function HomeLanding() {
         fontFamily: "var(--font-inter), system-ui, sans-serif",
       }}
     >
-      {/* Navigation */}
       <nav
         className="sticky top-0 z-50 backdrop-blur-md"
         style={{
@@ -98,10 +97,7 @@ export default function HomeLanding() {
           </div>
         </div>
       </nav>
-
-      {/* Hero */}
       <section className="relative overflow-hidden px-6 pt-16 pb-20 sm:pt-24 sm:pb-28">
-        {/* Soft backdrop orbs */}
         <div
           aria-hidden
           className="absolute -top-24 -right-24 w-96 h-96 rounded-full blur-3xl opacity-60"
@@ -170,8 +166,6 @@ export default function HomeLanding() {
                 </Link>
               </div>
             </div>
-
-            {/* Hero visual: coin card */}
             <div className="order-1 lg:order-2 flex justify-center">
               <div className="relative">
                 <div
@@ -200,7 +194,6 @@ export default function HomeLanding() {
                     </div>
                   </div>
                 </div>
-                {/* Floating chips */}
                 <div
                   className="absolute -top-5 -right-5 px-4 py-2 rounded-2xl text-sm font-extrabold rotate-6"
                   style={{
@@ -228,8 +221,6 @@ export default function HomeLanding() {
           </div>
         </div>
       </section>
-
-      {/* How it works */}
       <section className="py-20 sm:py-24 px-6" style={{ background: "white" }}>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
@@ -287,8 +278,6 @@ export default function HomeLanding() {
           </div>
         </div>
       </section>
-
-      {/* Features grid */}
       <section className="py-20 sm:py-24 px-6" style={{ background: "var(--ca-cream)" }}>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
@@ -340,8 +329,6 @@ export default function HomeLanding() {
           </div>
         </div>
       </section>
-
-      {/* Benefits */}
       <section className="py-20 sm:py-24 px-6" style={{ background: "white" }}>
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -380,8 +367,6 @@ export default function HomeLanding() {
                 ))}
               </ul>
             </div>
-
-            {/* Showcase card */}
             <div className="flex justify-center">
               <div
                 className="w-full max-w-md rounded-[28px] p-6"
@@ -452,8 +437,6 @@ export default function HomeLanding() {
           </div>
         </div>
       </section>
-
-      {/* CTA */}
       <section
         className="py-20 sm:py-24 px-6"
         style={{
@@ -490,8 +473,6 @@ export default function HomeLanding() {
           </Link>
         </div>
       </section>
-
-      {/* Footer */}
       <footer
         className="py-10 px-6"
         style={{ background: "var(--ca-cream)", borderTop: "1px solid var(--ca-divider)" }}

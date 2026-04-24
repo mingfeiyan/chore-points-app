@@ -5,20 +5,13 @@ import { useSession } from "next-auth/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import KidHeaderBG from "@/components/v2/KidHeaderBG";
 import KidTabBar from "@/components/v2/KidTabBar";
+import { toLocalDay, buildMonthCells } from "@/lib/date-utils";
 
 type PointEntry = {
   id: string;
   points: number;
   date: string;
 };
-
-function getDaysInMonth(year: number, month: number) {
-  return new Date(year, month + 1, 0).getDate();
-}
-
-function getFirstDayOfWeek(year: number, month: number) {
-  return new Date(year, month, 1).getDay();
-}
 
 export default function KidCalendar() {
   const { data: session } = useSession();
@@ -49,15 +42,6 @@ export default function KidCalendar() {
   };
 
   const dayTotals = useMemo(() => {
-    // Bucket by local-timezone date. entry.date is a full UTC timestamp,
-    // so slicing the ISO string misattributes late-evening points to the
-    // next UTC day (e.g., 10pm PT -> 05:00Z next day -> wrong cell).
-    const timeZone =
-      typeof Intl !== "undefined"
-        ? Intl.DateTimeFormat().resolvedOptions().timeZone
-        : "UTC";
-    const toLocalDay = (iso: string) =>
-      new Date(iso).toLocaleDateString("en-CA", { timeZone });
     const map: Record<string, number> = {};
     for (const entry of entries) {
       const dateStr = toLocalDay(entry.date);
@@ -66,47 +50,7 @@ export default function KidCalendar() {
     return map;
   }, [entries]);
 
-  const monthData = useMemo(() => {
-    const daysInMonth = getDaysInMonth(year, month);
-    const firstDay = getFirstDayOfWeek(year, month);
-    const cells: Array<{ day: number; inMonth: boolean; dateStr: string }> = [];
-
-    // Previous month padding
-    const prevMonthDays = getDaysInMonth(year, month - 1);
-    for (let i = firstDay - 1; i >= 0; i--) {
-      const d = prevMonthDays - i;
-      const m = month === 0 ? 11 : month - 1;
-      const y = month === 0 ? year - 1 : year;
-      cells.push({
-        day: d,
-        inMonth: false,
-        dateStr: `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`,
-      });
-    }
-
-    // Current month days
-    for (let d = 1; d <= daysInMonth; d++) {
-      cells.push({
-        day: d,
-        inMonth: true,
-        dateStr: `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`,
-      });
-    }
-
-    // Next month padding to fill 42 cells
-    const remaining = 42 - cells.length;
-    for (let d = 1; d <= remaining; d++) {
-      const m = month === 11 ? 0 : month + 1;
-      const y = month === 11 ? year + 1 : year;
-      cells.push({
-        day: d,
-        inMonth: false,
-        dateStr: `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`,
-      });
-    }
-
-    return cells;
-  }, [year, month]);
+  const monthData = useMemo(() => buildMonthCells(year, month), [year, month]);
 
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;

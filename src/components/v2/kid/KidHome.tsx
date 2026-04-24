@@ -9,6 +9,7 @@ import CoinSmall from "@/components/v2/CoinSmall";
 import FlameIcon from "@/components/v2/FlameIcon";
 import BadgeShowcase from "@/components/badges/BadgeShowcase";
 import PointsCelebrationWrapper from "@/components/points/PointsCelebrationWrapper";
+import { toLocalDay, buildMonthCells } from "@/lib/date-utils";
 
 // ------- Types -------
 
@@ -30,34 +31,6 @@ interface KidHomeProps {
 }
 
 // ------- Helpers -------
-
-// ------- Month calendar helpers -------
-
-function buildMonthCells(year: number, month: number) {
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const prevDays = new Date(year, month, 0).getDate();
-  const cells: Array<{ day: number; inMonth: boolean; dateStr: string }> = [];
-
-  for (let i = firstDay - 1; i >= 0; i--) {
-    const d = prevDays - i;
-    const m = month === 0 ? 11 : month - 1;
-    const y = month === 0 ? year - 1 : year;
-    cells.push({ day: d, inMonth: false, dateStr: `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}` });
-  }
-  for (let d = 1; d <= daysInMonth; d++) {
-    cells.push({ day: d, inMonth: true, dateStr: `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}` });
-  }
-  while (cells.length < 42) {
-    const d = cells.length - firstDay - daysInMonth + 1;
-    const m = month === 11 ? 0 : month + 1;
-    const y = month === 11 ? year + 1 : year;
-    cells.push({ day: d, inMonth: false, dateStr: `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}` });
-  }
-  // Trim last row if entirely next month
-  if (cells.slice(35).every((c) => !c.inMonth)) return cells.slice(0, 35);
-  return cells;
-}
 
 // ------- Tile colors for chore cards -------
 
@@ -182,15 +155,7 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
       });
   }, [kidId]);
 
-  // Day totals for calendar. Bucket by local timezone so late-evening
-  // points don't spill onto the next UTC day.
   const dayTotals = useMemo(() => {
-    const timeZone =
-      typeof Intl !== "undefined"
-        ? Intl.DateTimeFormat().resolvedOptions().timeZone
-        : "UTC";
-    const toLocalDay = (iso: string) =>
-      new Date(iso).toLocaleDateString("en-CA", { timeZone });
     const map: Record<string, number> = {};
     for (const e of data?.entries || []) {
       const ds = toLocalDay(e.date);
@@ -228,16 +193,9 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
     );
   }
 
-  const localTimezone =
-    typeof Intl !== "undefined"
-      ? Intl.DateTimeFormat().resolvedOptions().timeZone
-      : "UTC";
-  const todayEntries = data.entries.filter((e) => {
-    const entryDate = new Date(e.date).toLocaleDateString("en-CA", {
-      timeZone: localTimezone,
-    });
-    return entryDate === todayStr && e.points > 0;
-  });
+  const todayEntries = data.entries.filter(
+    (e) => toLocalDay(e.date) === todayStr && e.points > 0
+  );
   const todayDelta = todayEntries.reduce((sum, e) => sum + e.points, 0);
   const previousPoints = data.totalPoints - todayDelta;
 

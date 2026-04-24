@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import PhotoUploadForm from "./PhotoUploadForm";
 import OptimizedImage from "@/components/ui/OptimizedImage";
+import { toLocalDay } from "@/lib/date-utils";
 
 type Kid = {
   id: string;
@@ -91,15 +92,8 @@ export default function PhotoGallery({ kidId, showKidFilter = true, showUpload =
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      // Create filename from kid name and local date (avoid UTC shifting an
-      // evening photo's filename onto the next day).
       const kidName = photo.kid.name || "photo";
-      const timeZone =
-        typeof Intl !== "undefined"
-          ? Intl.DateTimeFormat().resolvedOptions().timeZone
-          : "UTC";
-      const date = new Date(photo.date).toLocaleDateString("en-CA", { timeZone });
-      link.download = `${kidName}-${date}.jpg`;
+      link.download = `${kidName}-${toLocalDay(photo.date)}.jpg`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

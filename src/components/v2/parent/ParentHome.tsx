@@ -9,6 +9,7 @@ import CoinSmall from "@/components/v2/CoinSmall";
 import WeeklyCalendarView from "@/components/calendar/WeeklyCalendarView";
 import PhotoCarousel from "@/components/dashboard/PhotoCarousel";
 import { useKidMode } from "@/components/providers/KidModeProvider";
+import { toLocalDay } from "@/lib/date-utils";
 
 // ------- Types -------
 
@@ -71,77 +72,6 @@ function isToday(dateStr: string): boolean {
     d.getFullYear() === now.getFullYear() &&
     d.getMonth() === now.getMonth() &&
     d.getDate() === now.getDate()
-  );
-}
-
-// ------- Sparkline -------
-
-function getLast7DaysPoints(entries: PointEntry[]): number[] {
-  // Bucket by local-timezone date so evening entries don't get attributed
-  // to the next UTC day and produce mismatched keys.
-  const timeZone =
-    typeof Intl !== "undefined"
-      ? Intl.DateTimeFormat().resolvedOptions().timeZone
-      : "UTC";
-  const toLocalDay = (d: Date) => d.toLocaleDateString("en-CA", { timeZone });
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const result: number[] = [];
-
-  for (let i = 6; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(today.getDate() - i);
-    const dateStr = toLocalDay(date);
-
-    const dayTotal = entries
-      .filter((e) => {
-        const entryDate = toLocalDay(new Date(e.date));
-        return entryDate === dateStr && e.points > 0;
-      })
-      .reduce((sum, e) => sum + e.points, 0);
-
-    result.push(dayTotal);
-  }
-
-  return result;
-}
-
-function Sparkline({ data }: { data: number[] }) {
-  const width = 80;
-  const height = 24;
-  const padding = 2;
-
-  const max = Math.max(...data, 1); // avoid division by zero
-  const stepX = (width - padding * 2) / (data.length - 1);
-
-  const points = data
-    .map((val, i) => {
-      const x = padding + i * stepX;
-      // Invert Y: SVG y=0 is top, so higher values should be lower y
-      const y = padding + (height - padding * 2) * (1 - val / max);
-      return `${x},${y}`;
-    })
-    .join(" ");
-
-  return (
-    <svg
-      width={width}
-      height={height}
-      viewBox={`0 0 ${width} ${height}`}
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-label="7-day points sparkline"
-    >
-      <polyline
-        points={points}
-        stroke="#6b8e4e"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-      />
-    </svg>
   );
 }
 
@@ -236,14 +166,7 @@ export default function ParentHome({ userName }: ParentHomeProps) {
     router.push("/view-as/points");
   };
 
-  // Compute stats for the first kid (primary child)
   const primaryKid = kids[0];
-  const localTimezone =
-    typeof Intl !== "undefined"
-      ? Intl.DateTimeFormat().resolvedOptions().timeZone
-      : "UTC";
-  const toLocalDay = (date: Date) =>
-    date.toLocaleDateString("en-CA", { timeZone: localTimezone });
 
   const weekTotal = primaryKid
     ? primaryKid.allEntries
