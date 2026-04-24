@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo, useRef, useCallback } from "react";
-import { ChevronLeft, ChevronRight, PartyPopper, Trophy } from "lucide-react";
+import { ChevronLeft, ChevronRight, PartyPopper, Trophy, X } from "lucide-react";
 import KidHeaderBG from "@/components/v2/KidHeaderBG";
 import KidTabBar from "@/components/v2/KidTabBar";
 import CoinCounter from "@/components/v2/CoinCounter";
@@ -17,7 +17,10 @@ interface PointEntry {
   id: string;
   points: number;
   date: string;
+  createdAt?: string;
+  note?: string | null;
   chore?: { title: string } | null;
+  redemption?: { reward?: { title: string } | null } | null;
 }
 
 interface PointsResponse {
@@ -142,6 +145,7 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
   const today = new Date();
   const [calYear, setCalYear] = useState(today.getFullYear());
   const [calMonth, setCalMonth] = useState(today.getMonth());
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(`/api/points?kidId=${kidId}`)
@@ -165,6 +169,17 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
   }, [data?.entries]);
 
   const monthCells = useMemo(() => buildMonthCells(calYear, calMonth), [calYear, calMonth]);
+
+  const selectedDayEntries = useMemo(() => {
+    if (!selectedDay || !data?.entries) return [];
+    return data.entries
+      .filter((e) => toLocalDay(e.date) === selectedDay)
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt || b.date).getTime() -
+          new Date(a.createdAt || a.date).getTime()
+      );
+  }, [selectedDay, data?.entries]);
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
   const monthName = new Date(calYear, calMonth).toLocaleDateString("en-US", { month: "long", year: "numeric" });
 
@@ -284,6 +299,7 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
                 const isFire = pts >= 10;
                 const isGem = pts > 0 && pts < 10;
                 const isToday = cell.dateStr === todayStr && cell.inMonth;
+                const hasActivity = cell.inMonth && pts > 0;
 
                 let bg = "#f7f3e6";
                 if (!cell.inMonth) bg = "transparent";
@@ -291,9 +307,19 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
                 else if (isGem) bg = "#d7eaf8";
 
                 return (
-                  <div
+                  <button
                     key={i}
-                    className="rounded-xl flex flex-col items-center justify-center py-2"
+                    type="button"
+                    onClick={() => hasActivity && setSelectedDay(cell.dateStr)}
+                    disabled={!hasActivity}
+                    aria-label={
+                      hasActivity
+                        ? `${cell.day}: ${pts} gem${pts === 1 ? "" : "s"} earned — tap for details`
+                        : undefined
+                    }
+                    className={`rounded-xl flex flex-col items-center justify-center py-2 transition-transform ${
+                      hasActivity ? "cursor-pointer hover:scale-[1.04] active:scale-95" : "cursor-default"
+                    }`}
                     style={{
                       backgroundColor: bg,
                       border: isToday ? "2.5px solid var(--ca-cobalt)" : "1px solid transparent",
@@ -314,7 +340,7 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
                         )}
                       </>
                     )}
-                  </div>
+                  </button>
                 );
               })}
             </div>
@@ -344,8 +370,117 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
 
       {/* Tab Bar */}
       <KidTabBar />
+
+      {selectedDay && (
+        <DayDetailModal
+          dateStr={selectedDay}
+          entries={selectedDayEntries}
+          onClose={() => setSelectedDay(null)}
+        />
+      )}
     </div>
       )}
     </PointsCelebrationWrapper>
+  );
+}
+
+function DayDetailModal({
+  dateStr,
+  entries,
+  onClose,
+}: {
+  dateStr: string;
+  entries: PointEntry[];
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  const total = entries.reduce((sum, e) => sum + e.points, 0);
+  const displayDate = new Date(`${dateStr}T00:00:00`).toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Gems earned on ${displayDate}`}
+    >
+      <div
+        className="w-full max-w-md rounded-2xl bg-white overflow-hidden shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="bg-ca-cream px-5 py-4 flex items-center justify-between border-b border-[rgba(26,24,19,0.08)]">
+          <div>
+            <h3 className="text-lg font-extrabold text-ca-ink font-[family-name:var(--font-baloo-2)]">
+              {displayDate}
+            </h3>
+            <p className="text-sm font-bold text-ca-muted flex items-center gap-1 mt-0.5">
+              <CoinSmall size={14} /> {total} gem{total === 1 ? "" : "s"}
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="w-8 h-8 rounded-full hover:bg-white flex items-center justify-center text-ca-muted hover:text-ca-ink transition-colors"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="max-h-[60vh] overflow-y-auto p-4 space-y-2">
+          {entries.map((entry) => {
+            const isPositive = entry.points > 0;
+            const label =
+              entry.chore?.title ||
+              (entry.redemption?.reward?.title
+                ? `Redeemed: ${entry.redemption.reward.title}`
+                : isPositive
+                ? "Bonus gems"
+                : "Gems spent");
+            const time = entry.createdAt
+              ? new Date(entry.createdAt).toLocaleTimeString([], {
+                  hour: "numeric",
+                  minute: "2-digit",
+                })
+              : null;
+            return (
+              <div
+                key={entry.id}
+                className="rounded-xl px-3 py-2.5 flex items-start gap-3"
+                style={{
+                  backgroundColor: isPositive ? "#d7eaf8" : "#ffe4d4",
+                }}
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-ca-ink truncate">{label}</p>
+                  {entry.note && (
+                    <p className="text-xs text-ca-muted mt-0.5 italic">{entry.note}</p>
+                  )}
+                  {time && <p className="text-[11px] text-ca-muted mt-0.5">{time}</p>}
+                </div>
+                <span
+                  className="text-sm font-extrabold font-[family-name:var(--font-baloo-2)] whitespace-nowrap"
+                  style={{ color: isPositive ? "var(--ca-cobalt-deep)" : "var(--ca-coral)" }}
+                >
+                  {isPositive ? "+" : ""}
+                  {entry.points}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 }
