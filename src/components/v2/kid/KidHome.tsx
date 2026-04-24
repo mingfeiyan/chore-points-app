@@ -306,40 +306,46 @@ export default function KidHome({ kidId, kidName }: KidHomeProps) {
                 else if (isFire) bg = "#ffe4d4";
                 else if (isGem) bg = "#d7eaf8";
 
+                const baseClass =
+                  "rounded-xl flex flex-col items-center justify-center py-2";
+                const baseStyle: React.CSSProperties = {
+                  backgroundColor: bg,
+                  border: isToday ? "2.5px solid var(--ca-cobalt)" : "1px solid transparent",
+                  opacity: cell.inMonth ? 1 : 0.25,
+                  minHeight: 48,
+                };
+                const cellContent = cell.inMonth && (
+                  <>
+                    <span className="text-sm font-extrabold text-ca-ink leading-none">{cell.day}</span>
+                    <span className="leading-none mt-0.5 flex items-center justify-center">
+                      {isFire ? <FlameIcon size={16} /> : isGem ? <CoinSmall size={16} /> : null}
+                    </span>
+                    {(isFire || isGem) && (
+                      <span className="text-[10px] font-bold text-ca-muted leading-none mt-0.5">
+                        {pts}
+                      </span>
+                    )}
+                  </>
+                );
+
+                if (!hasActivity) {
+                  return (
+                    <div key={i} className={baseClass} style={baseStyle} aria-hidden={!cell.inMonth}>
+                      {cellContent}
+                    </div>
+                  );
+                }
+
                 return (
                   <button
                     key={i}
                     type="button"
-                    onClick={() => hasActivity && setSelectedDay(cell.dateStr)}
-                    disabled={!hasActivity}
-                    aria-label={
-                      hasActivity
-                        ? `${cell.day}: ${pts} gem${pts === 1 ? "" : "s"} earned — tap for details`
-                        : undefined
-                    }
-                    className={`rounded-xl flex flex-col items-center justify-center py-2 transition-transform ${
-                      hasActivity ? "cursor-pointer hover:scale-[1.04] active:scale-95" : "cursor-default"
-                    }`}
-                    style={{
-                      backgroundColor: bg,
-                      border: isToday ? "2.5px solid var(--ca-cobalt)" : "1px solid transparent",
-                      opacity: cell.inMonth ? 1 : 0.25,
-                      minHeight: 48,
-                    }}
+                    onClick={() => setSelectedDay(cell.dateStr)}
+                    aria-label={`${cell.day}: ${pts} gem${pts === 1 ? "" : "s"} earned — tap for details`}
+                    className={`${baseClass} transition-transform hover:scale-[1.04] active:scale-95`}
+                    style={baseStyle}
                   >
-                    {cell.inMonth && (
-                      <>
-                        <span className="text-sm font-extrabold text-ca-ink leading-none">{cell.day}</span>
-                        <span className="leading-none mt-0.5 flex items-center justify-center">
-                          {isFire ? <FlameIcon size={16} /> : isGem ? <CoinSmall size={16} /> : null}
-                        </span>
-                        {(isFire || isGem) && (
-                          <span className="text-[10px] font-bold text-ca-muted leading-none mt-0.5">
-                            {pts}
-                          </span>
-                        )}
-                      </>
-                    )}
+                    {cellContent}
                   </button>
                 );
               })}
