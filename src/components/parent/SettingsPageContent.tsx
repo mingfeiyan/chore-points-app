@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import FamilyInviteCode from "@/components/family/FamilyInviteCode";
 import BadgeManagementTabs from "@/components/settings/BadgeManagementTabs";
+import PhotoStorageCard from "@/components/settings/PhotoStorageCard";
 import ParentTabBar from "@/components/v2/ParentTabBar";
 
 type Kid = {
@@ -81,6 +82,8 @@ export default function SettingsPageContent({ familyName, inviteCode, kids }: Pr
             </div>
           </div>
         </div>
+
+        <PhotoStorageCard />
 
         {/* Badge Management */}
         <div className="bg-white rounded-[14px] border border-[rgba(68,55,32,0.14)] p-5">

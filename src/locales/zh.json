@@ -143,7 +143,25 @@
     "inviteCodeHint": "分享此邀请码让家庭成员加入",
     "smartHome": "智能家居",
     "newDesignToggle": "试用新设计（测试版）",
-    "newDesignDesc": "切换到新的 Coin Arcade / Paper Garden 设计风格"
+    "newDesignDesc": "切换到新的 Coin Arcade / Paper Garden 设计风格",
+    "photoStorage": {
+      "title": "照片存储",
+      "description": "选择家庭照片的存储位置。连接你的 Google Drive 后，照片会存到你自己 Drive 的文件夹里，不经过 GemSteps 服务器。",
+      "currentLabel": "当前存储方式",
+      "providerDrive": "Google Drive（你的 Drive）",
+      "providerBlob": "GemSteps 默认存储",
+      "providerNone": "未开启",
+      "connectedAt": "{date} 已连接",
+      "connectDrive": "连接 Google Drive",
+      "connecting": "连接中…",
+      "connectHint": "你将重新授权 Google（应用需要 Drive 权限），我们会在你的 Drive 中创建一个 \"GemSteps - <家庭>\" 文件夹。",
+      "disconnectDrive": "断开 Google Drive",
+      "disconnecting": "断开中…",
+      "disconnectHint": "你 Drive 中的文件夹和照片会保留，GemSteps 只是不再用它来保存新上传。",
+      "connectFailed": "连接 Google Drive 失败，请重试。",
+      "disconnectFailed": "断开失败，请重试。",
+      "reauthorizeFailed": "Google 未授予 Drive 权限，请重试并同意 Drive 访问请求。"
+    }
   },
   "chores": {
     "noChoresYet": "还没有家务任务",

@@ -467,7 +467,25 @@
     "inviteCodeHint": "Share this code with family members to let them join your family",
     "smartHome": "Smart Home",
     "newDesignToggle": "Try new design (beta)",
-    "newDesignDesc": "Switches the entire UI to the new Coin Arcade / Paper Garden design"
+    "newDesignDesc": "Switches the entire UI to the new Coin Arcade / Paper Garden design",
+    "photoStorage": {
+      "title": "Photo storage",
+      "description": "Choose where your family's photos are stored. Connect your Google Drive and photos go into a folder in your own Drive — they never touch GemSteps' servers.",
+      "currentLabel": "Current storage",
+      "providerDrive": "Google Drive (your Drive)",
+      "providerBlob": "GemSteps default storage",
+      "providerNone": "Not enabled",
+      "connectedAt": "Connected {date}",
+      "connectDrive": "Connect Google Drive",
+      "connecting": "Connecting…",
+      "connectHint": "You'll re-authorize Google (the app needs the Drive permission) and we'll create a \"GemSteps - <family>\" folder inside your Drive.",
+      "disconnectDrive": "Disconnect Google Drive",
+      "disconnecting": "Disconnecting…",
+      "disconnectHint": "Your existing Drive folder and photos stay in your Drive; GemSteps just stops using them for new uploads.",
+      "connectFailed": "Couldn't connect to Google Drive. Please try again.",
+      "disconnectFailed": "Couldn't disconnect. Please try again.",
+      "reauthorizeFailed": "Google didn't grant the Drive permission. Please try again and accept the Drive access request."
+    }
   },
   "todos": {
     "title": "Family To-Do",
