@@ -19,10 +19,8 @@
  */
 
 import "dotenv/config";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../src/lib/db";
 import { uploadFileToFolder } from "../src/lib/google-drive";
-
-const prisma = new PrismaClient();
 
 interface FamilyContext {
   id: string;
