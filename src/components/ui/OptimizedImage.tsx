@@ -51,6 +51,15 @@ export default function OptimizedImage({
   const [error, setError] = useState(false);
   const config = SIZES[variant];
 
+  // Drive proxy URLs: ask the server for a size-matched thumbnail. Cuts
+  // gallery bandwidth ~50× compared to streaming the full 5MB original
+  // for every tile. Vercel Blob URLs are unaffected — next/image's
+  // remotePatterns config handles their optimization already.
+  const isDriveProxy = src.startsWith("/api/drive/");
+  const resolvedSrc = isDriveProxy
+    ? `${src}${src.includes("?") ? "&" : "?"}thumb=${config.width}`
+    : src;
+
   if (error) {
     return (
       <div className={`bg-gray-200 flex items-center justify-center ${className}`}>
@@ -74,14 +83,14 @@ export default function OptimizedImage({
       )}
 
       <Image
-        src={src}
+        src={resolvedSrc}
         alt={alt}
         width={config.width}
         height={config.height}
         sizes={config.sizes}
         priority={priority}
         quality={config.quality}
-        unoptimized={src.startsWith("/api/drive/")}
+        unoptimized={isDriveProxy}
         className={`object-cover transition-opacity duration-300 ${
           isLoading ? "opacity-0" : "opacity-100"
         }`}

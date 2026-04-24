@@ -1,14 +1,24 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireFamily } from "@/lib/permissions";
-import { classifyDriveError, downloadFile } from "@/lib/google-drive";
+import {
+  classifyDriveError,
+  downloadFile,
+  getFileMetadata,
+} from "@/lib/google-drive";
+
+// Clamp to Drive's documented thumbnail max (1600px) and a reasonable floor.
+const MIN_THUMB = 64;
+const MAX_THUMB = 1600;
 
 // GET /api/drive/file/:id — stream a Drive-hosted photo to the browser.
+// Optional ?thumb=<size> returns a 302 to Drive's pre-generated thumbnail,
+// which cuts bandwidth ~50× on gallery loads vs. serving the full image.
 // Works for any member of the family that owns the photo (parents and
 // kids). We use the family's connected-parent OAuth token regardless of
 // who is requesting, because kids don't have Google sign-in.
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -20,6 +30,10 @@ export async function GET(
     const session = await requireFamily();
     const familyId = session.user.familyId!;
     const isKid = session.user.role === "KID";
+    const thumbParam = new URL(req.url).searchParams.get("thumb");
+    const thumbSize = thumbParam
+      ? Math.min(MAX_THUMB, Math.max(MIN_THUMB, parseInt(thumbParam, 10) || 0))
+      : null;
 
     // Single query proves four things at once:
     //   1. Photo or PointEntry in this family references this file (authz)
@@ -58,6 +72,26 @@ export async function GET(
     }
 
     try {
+      if (thumbSize) {
+        // Fetch metadata to get a fresh short-lived thumbnailLink. Drive's
+        // CDN URL already embeds a default size (e.g. `=s220`) which we
+        // overwrite with the caller's requested size. If Drive hasn't
+        // generated a thumbnail yet (it can lag a few seconds after
+        // upload), fall through to the full-image path below.
+        const meta = await getFileMetadata(family.googleDriveConnectedById, driveFileId);
+        if (meta.thumbnailLink) {
+          const resized = meta.thumbnailLink.replace(/=s\d+(-c)?$/, `=s${thumbSize}`);
+          return NextResponse.redirect(resized, {
+            status: 302,
+            headers: {
+              // Shorter than Drive's ~1h URL lifetime so the browser
+              // re-requests before the signed URL expires.
+              "Cache-Control": "private, max-age=1500",
+            },
+          });
+        }
+      }
+
       const { stream, contentType } = await downloadFile(
         family.googleDriveConnectedById,
         driveFileId
@@ -65,7 +99,6 @@ export async function GET(
       return new NextResponse(stream, {
         headers: {
           "Content-Type": contentType,
-          // Private per-user image; browser cache only, no shared/CDN.
           "Cache-Control": "private, max-age=3600",
         },
       });
