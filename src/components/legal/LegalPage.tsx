@@ -70,18 +70,6 @@ export default function LegalPage({ title, lastUpdated, intro, sections }: Legal
         </header>
 
         <div
-          className="mb-8 rounded-2xl p-4 text-sm"
-          style={{
-            background: "var(--ca-tile-butter)",
-            color: "var(--ca-ink)",
-            fontFamily: "var(--font-nunito), sans-serif",
-          }}
-        >
-          <strong className="font-extrabold">ℹ️ </strong>
-          {tLegal("templateDisclaimer")}
-        </div>
-
-        <div
           className="rounded-[20px] p-6 sm:p-8 space-y-6"
           style={{
             background: "white",

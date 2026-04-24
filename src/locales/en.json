@@ -208,7 +208,6 @@
   "legal": {
     "backHome": "Back to home",
     "lastUpdated": "Last updated: {date}",
-    "templateDisclaimer": "This is a template starting point. Please have your own legal counsel review before launch.",
     "privacyTitle": "Privacy Policy",
     "privacyIntro": "GemSteps (\"we\", \"our\", or \"us\") helps families track chores, learning, meals, and rewards. This policy explains what personal information we collect from parents and kids, how we use it, and the choices you have.",
     "privacySection1Title": "1. Information we collect",
@@ -228,7 +227,7 @@
     "privacySection8Title": "8. Changes to this policy",
     "privacySection8": "We may update this policy from time to time. When we make material changes we will post the new version here and update the \"last updated\" date.",
     "privacySection9Title": "9. Contact",
-    "privacySection9": "Questions? Email us at [CONTACT_EMAIL] and we will get back to you.",
+    "privacySection9": "Questions? Email us at mingfeiy@gmail.com and we will get back to you.",
     "termsTitle": "Terms of Service",
     "termsIntro": "Welcome to GemSteps. By creating an account or using the app you agree to these terms. Please read them carefully.",
     "termsSection1Title": "1. Your account",
@@ -248,7 +247,7 @@
     "termsSection8Title": "8. Changes to these terms",
     "termsSection8": "We may update these terms from time to time. Material changes will be posted here with an updated date. Continuing to use the service means you accept the updated terms.",
     "termsSection9Title": "9. Contact",
-    "termsSection9": "Questions about these terms? Email [CONTACT_EMAIL]."
+    "termsSection9": "Questions about these terms? Email mingfeiy@gmail.com."
   },
   "parent": {
     "dashboard": "Parent Dashboard",

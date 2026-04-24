@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import LegalPage from "@/components/legal/LegalPage";
 
-const LAST_UPDATED = "April 23, 2026";
+const LAST_UPDATED = "April 24, 2026";
 
 export default function TermsPage() {
   const t = useTranslations("legal");

@@ -220,7 +220,6 @@
   "legal": {
     "backHome": "返回首页",
     "lastUpdated": "最后更新：{date}",
-    "templateDisclaimer": "本页为模板起点。正式上线前请由法律顾问审阅。",
     "privacyTitle": "隐私政策",
     "privacyIntro": "GemSteps（\"我们\"）帮助家庭管理家务、学习、餐食和奖励。本政策说明我们从家长和孩子处收集哪些个人信息、如何使用以及你的选择。",
     "privacySection1Title": "1. 我们收集的信息",
@@ -240,7 +239,7 @@
     "privacySection8Title": "8. 政策变更",
     "privacySection8": "我们可能会不定期更新本政策。发生重大变更时，我们会在此页面发布新版本并更新\"最后更新\"日期。",
     "privacySection9Title": "9. 联系我们",
-    "privacySection9": "如有疑问，请邮件联系 [CONTACT_EMAIL]，我们会尽快回复。",
+    "privacySection9": "如有疑问，请邮件联系 mingfeiy@gmail.com，我们会尽快回复。",
     "termsTitle": "服务条款",
     "termsIntro": "欢迎使用 GemSteps。创建账户或使用本应用即表示你同意以下条款。请仔细阅读。",
     "termsSection1Title": "1. 你的账户",
@@ -260,7 +259,7 @@
     "termsSection8Title": "8. 条款变更",
     "termsSection8": "我们可能会不定期更新本条款。重大变更会在此页面更新并标注日期。继续使用服务即视为接受更新后的条款。",
     "termsSection9Title": "9. 联系",
-    "termsSection9": "关于本条款的问题，请邮件联系 [CONTACT_EMAIL]。"
+    "termsSection9": "关于本条款的问题，请邮件联系 mingfeiy@gmail.com。"
   },
   "parent": {
     "dashboard": "家长控制台",
