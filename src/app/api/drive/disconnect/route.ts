@@ -14,6 +14,7 @@ export async function POST() {
         photoProvider: "NONE",
         googleDriveFolderId: null,
         googleDriveConnectedAt: null,
+        googleDriveConnectedById: null,
       },
     });
     return NextResponse.json({ ok: true });

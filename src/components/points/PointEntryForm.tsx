@@ -521,7 +521,6 @@ export default function PointEntryForm({
             />
           </div>
 
-          {/* Photo Upload — hidden when the family's photoProvider is NONE */}
           {!photosDisabled && (
           <div>
             <label className="block text-sm font-medium ${theme.label} mb-1">

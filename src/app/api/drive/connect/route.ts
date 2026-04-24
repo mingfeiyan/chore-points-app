@@ -1,15 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireParentInFamily } from "@/lib/permissions";
-import { findOrCreateFolder } from "@/lib/google-drive";
+import { classifyDriveError, findOrCreateFolder } from "@/lib/google-drive";
 
 export async function POST() {
   try {
     const session = await requireParentInFamily();
 
-    // The existing Google OAuth was only requesting the `calendar` scope
-    // until Phase 2a — users whose Account record predates the scope
-    // expansion need to re-consent before we can call the Drive API.
+    // Users whose Google Account record predates the Drive scope expansion
+    // need to re-consent before we can call the Drive API.
     const account = await prisma.account.findFirst({
       where: { userId: session.user.id, provider: "google" },
     });
@@ -30,26 +29,31 @@ export async function POST() {
       return NextResponse.json({ error: "Family not found" }, { status: 404 });
     }
 
-    // Drive folder names can contain any string, but slashes render
-    // confusingly in the Drive UI. Hyphen keeps the brand prefix clear.
+    // If another parent already owns the connection, refuse silently
+    // overwriting them — that parent's Drive holds existing photos and
+    // switching owners would orphan the OAuth token the proxy needs.
+    if (
+      family.googleDriveConnectedById &&
+      family.googleDriveConnectedById !== session.user.id
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Google Drive is already connected by another parent. They should disconnect first.",
+        },
+        { status: 409 }
+      );
+    }
+
+    // Drive folder names are plain strings; hyphen keeps the brand prefix
+    // readable in the Drive UI (a slash would look like a sub-path).
     const folderName = `GemSteps - ${family.name}`;
     let folderId: string;
     try {
       folderId = await findOrCreateFolder(session.user.id, folderName);
     } catch (driveErr: unknown) {
-      const raw = driveErr instanceof Error ? driveErr.message : String(driveErr);
-      // Common operator-side failure: Drive API not enabled on the Google
-      // Cloud project that owns the OAuth client. Surface a clean message
-      // instead of Google's raw JSON blob.
-      if (raw.includes("accessNotConfigured") || raw.includes("SERVICE_DISABLED")) {
-        return NextResponse.json(
-          {
-            error:
-              "Google Drive API isn't enabled on the GemSteps Google Cloud project. Ask the operator to enable it and try again.",
-          },
-          { status: 503 }
-        );
-      }
+      const classified = classifyDriveError(driveErr);
+      if (classified) return NextResponse.json(classified.body, { status: classified.status });
       return NextResponse.json(
         { error: "Couldn't reach Google Drive. Please try again in a moment." },
         { status: 502 }

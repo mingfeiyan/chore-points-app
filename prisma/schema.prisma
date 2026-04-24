@@ -324,6 +324,7 @@ model Photo {
   @@index([familyId])
   @@index([kidId])
   @@index([familyId, kidId])
+  @@index([familyId, driveFileId])
 }
 
 model Badge {

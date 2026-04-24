@@ -2,13 +2,11 @@ import { NextResponse } from "next/server";
 import { put, del } from "@vercel/blob";
 import { prisma } from "@/lib/db";
 import { requireParentInFamily } from "@/lib/permissions";
-import { uploadFileToFolder } from "@/lib/google-drive";
+import { classifyDriveError, uploadFileToFolder } from "@/lib/google-drive";
 
 const MAX_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
-// POST /api/upload - Upload a photo. Routes to Vercel Blob or Google Drive
-// depending on the family's photoProvider setting.
 export async function POST(req: Request) {
   try {
     const session = await requireParentInFamily();
@@ -70,16 +68,8 @@ export async function POST(req: Request) {
           { status: 201 }
         );
       } catch (err) {
-        const raw = err instanceof Error ? err.message : String(err);
-        if (raw.includes("accessNotConfigured") || raw.includes("SERVICE_DISABLED")) {
-          return NextResponse.json(
-            {
-              error:
-                "Google Drive API isn't enabled on the GemSteps Google Cloud project. Ask the operator to enable it.",
-            },
-            { status: 503 }
-          );
-        }
+        const classified = classifyDriveError(err);
+        if (classified) return NextResponse.json(classified.body, { status: classified.status });
         return NextResponse.json(
           { error: "Couldn't upload to Google Drive. Please try again." },
           { status: 502 }
@@ -87,7 +77,6 @@ export async function POST(req: Request) {
       }
     }
 
-    // VERCEL_BLOB path (default for the operator's own family)
     const timestamp = Date.now();
     const extension = file.name.split(".").pop() || "jpg";
     const filename = `families/${session.user.familyId}/points/${timestamp}.${extension}`;
@@ -107,9 +96,7 @@ export async function POST(req: Request) {
   }
 }
 
-// DELETE /api/upload - Delete a photo. Only supported for Vercel Blob URLs;
-// Drive files are owned by the family and stay in their Drive when we
-// unlink — callers should use Drive's own UI to delete those.
+// DELETE is Vercel-Blob-only; Drive files stay in the family's Drive.
 export async function DELETE(req: Request) {
   try {
     await requireParentInFamily();

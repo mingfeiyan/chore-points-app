@@ -3,6 +3,30 @@ import { getValidAccessToken } from "./google-calendar";
 const DRIVE_API = "https://www.googleapis.com/drive/v3";
 const DRIVE_UPLOAD_API = "https://www.googleapis.com/upload/drive/v3";
 
+export type DriveErrorResponse = { status: number; body: { error: string } };
+
+export function classifyDriveError(err: unknown): DriveErrorResponse | null {
+  const raw = err instanceof Error ? err.message : String(err);
+  if (raw.includes("accessNotConfigured") || raw.includes("SERVICE_DISABLED")) {
+    return {
+      status: 503,
+      body: {
+        error:
+          "Google Drive API isn't enabled on the GemSteps Google Cloud project. Ask the app administrator to enable it.",
+      },
+    };
+  }
+  if (raw.includes("No Google account") || raw.includes("No refresh token")) {
+    return {
+      status: 502,
+      body: {
+        error: "Google Drive connection has expired. Reconnect in settings.",
+      },
+    };
+  }
+  return null;
+}
+
 interface DriveFile {
   id: string;
   name: string;
@@ -38,8 +62,10 @@ export async function findOrCreateFolder(
   userId: string,
   folderName: string
 ): Promise<string> {
+  // Drive's `q` parameter uses backslash-escaping; escape `\` before `'`.
+  const escaped = folderName.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
   const query = encodeURIComponent(
-    `name='${folderName.replace(/'/g, "\\'")}' and mimeType='application/vnd.google-apps.folder' and trashed=false`
+    `name='${escaped}' and mimeType='application/vnd.google-apps.folder' and trashed=false`
   );
   const searchRes = await driveFetch(
     userId,
@@ -73,28 +99,21 @@ export async function uploadFileToFolder(
   mimeType: string,
   body: Blob | ArrayBuffer
 ): Promise<DriveUploadResult> {
-  // Multipart upload: one request containing both metadata and bytes.
-  // Keeps things simple for small files (<5MB, matches our existing cap).
+  // Multipart upload keeps things simple for small files (<5MB). Build
+  // the multipart envelope as a Blob so fetch can stream it without
+  // copying the image bytes into a combined buffer.
   const boundary = "gemsteps-" + Math.random().toString(36).slice(2);
   const metadata = { name: filename, parents: [folderId], mimeType };
-  const bodyBytes =
-    body instanceof Blob ? new Uint8Array(await body.arrayBuffer()) : new Uint8Array(body);
-
-  const parts = [
-    `--${boundary}\r\n`,
-    `Content-Type: application/json; charset=UTF-8\r\n\r\n`,
-    `${JSON.stringify(metadata)}\r\n`,
-    `--${boundary}\r\n`,
-    `Content-Type: ${mimeType}\r\n\r\n`,
-  ];
-  const headerBytes = new TextEncoder().encode(parts.join(""));
-  const footerBytes = new TextEncoder().encode(`\r\n--${boundary}--`);
-  const multipart = new Uint8Array(
-    headerBytes.length + bodyBytes.length + footerBytes.length
-  );
-  multipart.set(headerBytes, 0);
-  multipart.set(bodyBytes, headerBytes.length);
-  multipart.set(footerBytes, headerBytes.length + bodyBytes.length);
+  const header =
+    `--${boundary}\r\n` +
+    `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
+    `${JSON.stringify(metadata)}\r\n` +
+    `--${boundary}\r\n` +
+    `Content-Type: ${mimeType}\r\n\r\n`;
+  const footer = `\r\n--${boundary}--`;
+  const multipart = new Blob([header, body, footer], {
+    type: `multipart/related; boundary=${boundary}`,
+  });
 
   const res = await driveFetch(
     userId,

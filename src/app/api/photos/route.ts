@@ -48,41 +48,44 @@ export async function GET(request: NextRequest) {
       pointEntryWhereClause.kidId = kidIdParam;
     }
 
-    // Fetch from Photo model
-    const photos = await prisma.photo.findMany({
-      where: photoWhereClause,
-      select: {
-        id: true,
-        photoUrl: true,
-        caption: true,
-        date: true,
-        createdAt: true,
-        kid: {
-          select: { id: true, name: true, email: true },
+    const [photos, legacyPhotos, family] = await Promise.all([
+      prisma.photo.findMany({
+        where: photoWhereClause,
+        select: {
+          id: true,
+          photoUrl: true,
+          caption: true,
+          date: true,
+          createdAt: true,
+          kid: {
+            select: { id: true, name: true, email: true },
+          },
         },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-
-    // Fetch photos from PointEntry (includes photos attached to point awards)
-    const legacyPhotos = await prisma.pointEntry.findMany({
-      where: pointEntryWhereClause,
-      select: {
-        id: true,
-        photoUrl: true,
-        points: true,
-        note: true,
-        date: true,
-        createdAt: true,
-        chore: {
-          select: { title: true },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.pointEntry.findMany({
+        where: pointEntryWhereClause,
+        select: {
+          id: true,
+          photoUrl: true,
+          points: true,
+          note: true,
+          date: true,
+          createdAt: true,
+          chore: {
+            select: { title: true },
+          },
+          kid: {
+            select: { id: true, name: true, email: true },
+          },
         },
-        kid: {
-          select: { id: true, name: true, email: true },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.family.findUnique({
+        where: { id: session.user.familyId },
+        select: { photoProvider: true },
+      }),
+    ]);
 
     // Combine and format
     const allPhotos = [
@@ -107,11 +110,6 @@ export async function GET(request: NextRequest) {
         chore: p.chore,
       })),
     ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-    const family = await prisma.family.findUnique({
-      where: { id: session.user.familyId },
-      select: { photoProvider: true },
-    });
 
     return NextResponse.json({
       photos: allPhotos,

@@ -33,16 +33,15 @@ export default function PhotoStorageCard() {
     }
   };
 
-  useEffect(() => {
-    load();
-  }, []);
-
   // Returning from Google re-consent lands us back with ?pendingDrive=1;
-  // finish the connect call the user kicked off before reauthorizing.
+  // skip the initial load() in that case and let handleConnect's own load
+  // update the state once the connect call finishes.
   useEffect(() => {
     if (searchParams.get("pendingDrive") === "1") {
       handleConnect(true);
       router.replace("/settings");
+    } else {
+      load();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
