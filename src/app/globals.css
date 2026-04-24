@@ -103,6 +103,19 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* iOS Safari gives native date/time inputs a content-based min-width
+   (roughly placeholder text + chevron), which overflows narrow flex/grid
+   parents even with w-full set. Force them to obey the parent width. */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="week"] {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 /* Hide scrollbar for horizontal scroll containers on mobile */
 .scrollbar-hide {
   -ms-overflow-style: none;
