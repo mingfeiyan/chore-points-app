@@ -41,7 +41,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       authorization: {
         params: {
-          scope: "openid email profile https://www.googleapis.com/auth/calendar",
+          // drive.file is narrow — only files the app creates or that the
+          // user explicitly opens with us. We never see the rest of the
+          // user's Drive. Added alongside existing Calendar scope so a
+          // single re-consent brings both under one OAuth session.
+          scope:
+            "openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/drive.file",
           access_type: "offline",
           prompt: "consent",
         },
