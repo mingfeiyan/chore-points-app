@@ -81,7 +81,8 @@ describe('POST /api/auth/signup', () => {
       expect(data).toHaveProperty('error', 'User with this email already exists')
     })
 
-    it('should create a new parent user without family', async () => {
+    it('should create a new parent user without family when registration secret is valid', async () => {
+      process.env.REGISTRATION_SECRET = 'secret123'
       mockPrisma.user.findUnique.mockResolvedValue(null)
       mockPrisma.user.create.mockResolvedValue({
         id: 'new-user-id',
@@ -95,6 +96,7 @@ describe('POST /api/auth/signup', () => {
         email: 'newuser@example.com',
         password: 'password123',
         name: 'New User',
+        registrationSecret: 'secret123',
       })
       const response = await POST(request)
       const { status, data } = await parseResponse<{ user: { id: string; email: string } }>(response)
@@ -225,6 +227,23 @@ describe('POST /api/auth/signup', () => {
       const { status } = await parseResponse(response)
 
       expect(status).toBe(201)
+    })
+
+    it('should fail closed when REGISTRATION_SECRET is not configured', async () => {
+      // No process.env.REGISTRATION_SECRET set — previously this allowed
+      // open signups. Verify it now rejects instead.
+      mockPrisma.user.findUnique.mockResolvedValue(null)
+
+      const request = createMockRequest('POST', {
+        email: 'newuser@example.com',
+        password: 'password123',
+        registrationSecret: 'any-value',
+      })
+      const response = await POST(request)
+      const { status, data } = await parseResponse(response)
+
+      expect(status).toBe(400)
+      expect(data).toHaveProperty('error', 'Invalid registration code')
     })
   })
 

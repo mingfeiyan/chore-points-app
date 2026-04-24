@@ -51,9 +51,11 @@ export async function POST(req: Request) {
 
       familyId = family.id;
     } else if (role === "PARENT") {
-      // Parent signup without invite code - validate registration secret
+      // Parent signup without invite code must present a valid REGISTRATION_SECRET.
+      // Fail closed: if the env var is missing in the current deployment, reject —
+      // otherwise a misconfigured env would silently allow open signups.
       const expectedSecret = process.env.REGISTRATION_SECRET;
-      if (expectedSecret && registrationSecret !== expectedSecret) {
+      if (!expectedSecret || registrationSecret !== expectedSecret) {
         return NextResponse.json(
           { error: "Invalid registration code" },
           { status: 400 }
