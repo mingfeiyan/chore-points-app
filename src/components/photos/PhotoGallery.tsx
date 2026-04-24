@@ -30,7 +30,7 @@ type PhotoGalleryProps = {
 };
 
 export default function PhotoGallery({ kidId, showKidFilter = true, showUpload = false }: PhotoGalleryProps) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const photoProvider = session?.user?.photoProvider ?? "NONE";
   const [photos, setPhotos] = useState<PhotoEntry[]>([]);
   const [kids, setKids] = useState<Kid[]>([]);
@@ -75,7 +75,9 @@ export default function PhotoGallery({ kidId, showKidFilter = true, showUpload =
     }
   };
 
-  const uploadsDisabled = photoProvider === "NONE";
+  // Treat still-loading sessions as "unknown yet" — don't flash the
+  // disabled state while the JWT claim is still in flight.
+  const uploadsDisabled = status !== "loading" && photoProvider === "NONE";
 
   const filteredPhotos = selectedKidId
     ? photos.filter((p) => p.kid.id === selectedKidId)

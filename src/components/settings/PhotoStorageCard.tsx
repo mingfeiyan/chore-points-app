@@ -4,23 +4,18 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-
-type PhotoProvider = "NONE" | "VERCEL_BLOB" | "GOOGLE_DRIVE";
+import { PhotoProvider } from "@prisma/client";
 
 export default function PhotoStorageCard() {
   const t = useTranslations("settings.photoStorage");
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, update } = useSession();
-  const photoProvider: PhotoProvider =
-    (session?.user?.photoProvider as PhotoProvider) ?? "NONE";
+  const photoProvider = session?.user?.photoProvider ?? PhotoProvider.NONE;
   const [connectedAt, setConnectedAt] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Only the "connected on" timestamp needs a network call — the provider
-  // itself comes from the session. When the family is disconnected we
-  // don't bother fetching.
   const loadConnectedAt = async () => {
     const res = await fetch("/api/family");
     if (!res.ok) return;
@@ -32,11 +27,20 @@ export default function PhotoStorageCard() {
     if (searchParams.get("pendingDrive") === "1") {
       handleConnect(true);
       router.replace("/settings");
-    } else if (photoProvider === "GOOGLE_DRIVE") {
-      loadConnectedAt();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Reload the connected-on date when provider changes — covers cross-tab
+  // changes where a disconnect in another tab revokes our session's Drive
+  // state via refetchOnWindowFocus.
+  useEffect(() => {
+    if (photoProvider === PhotoProvider.GOOGLE_DRIVE) {
+      loadConnectedAt();
+    } else {
+      setConnectedAt(null);
+    }
+  }, [photoProvider]);
 
   const handleConnect = async (fromReauthorize = false) => {
     setBusy(true);
@@ -94,9 +98,9 @@ export default function PhotoStorageCard() {
     );
   }
 
-  const isDrive = photoProvider === "GOOGLE_DRIVE";
-  const isBlob = photoProvider === "VERCEL_BLOB";
-  const isNone = photoProvider === "NONE";
+  const isDrive = photoProvider === PhotoProvider.GOOGLE_DRIVE;
+  const isBlob = photoProvider === PhotoProvider.VERCEL_BLOB;
+  const isNone = photoProvider === PhotoProvider.NONE;
 
   return (
     <div className="bg-white rounded-[14px] border border-[rgba(68,55,32,0.14)] p-5">

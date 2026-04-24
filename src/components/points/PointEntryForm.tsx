@@ -82,8 +82,9 @@ export default function PointEntryForm({
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [generateBadge, setGenerateBadge] = useState(!entry);
-  const { data: session } = useSession();
-  const photosDisabled = (session?.user?.photoProvider ?? "NONE") === "NONE";
+  const { data: session, status } = useSession();
+  const photosDisabled =
+    status !== "loading" && (session?.user?.photoProvider ?? "NONE") === "NONE";
   const t = useTranslations("parent");
   const tCommon = useTranslations("common");
   const tPhotos = useTranslations("photos");

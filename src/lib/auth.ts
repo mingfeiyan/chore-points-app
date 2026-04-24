@@ -3,11 +3,11 @@ import type { Adapter } from "next-auth/adapters";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
+import { PhotoProvider } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { compare } from "bcryptjs";
 
 type Role = "PARENT" | "KID";
-type PhotoProvider = "NONE" | "VERCEL_BLOB" | "GOOGLE_DRIVE";
 
 declare module "next-auth" {
   interface Session {
@@ -100,11 +100,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.role = user.role;
         token.familyId = user.familyId;
-        // Populate photoProvider once, so UI can branch on it via
-        // useSession without fetching /api/family on every page load.
-        if (user.familyId) {
+      }
+
+      // Hydrate photoProvider if missing — covers both initial sign-in
+      // and JWTs minted before this claim existed (otherwise those users
+      // would see photo UI as disabled until they signed out and back in).
+      if (token.photoProvider === undefined) {
+        if (token.familyId) {
           const family = await prisma.family.findUnique({
-            where: { id: user.familyId },
+            where: { id: token.familyId },
             select: { photoProvider: true },
           });
           token.photoProvider = family?.photoProvider ?? "NONE";

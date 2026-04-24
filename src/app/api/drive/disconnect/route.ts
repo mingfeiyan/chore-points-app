@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { PhotoProvider } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { requireParentInFamily } from "@/lib/permissions";
 
@@ -11,13 +12,13 @@ export async function POST() {
     await prisma.family.update({
       where: { id: session.user.familyId! },
       data: {
-        photoProvider: "NONE",
+        photoProvider: PhotoProvider.NONE,
         googleDriveFolderId: null,
         googleDriveConnectedAt: null,
         googleDriveConnectedById: null,
       },
     });
-    return NextResponse.json({ ok: true, photoProvider: "NONE" });
+    return NextResponse.json({ ok: true, photoProvider: PhotoProvider.NONE });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Something went wrong";
     const status = message.includes("Forbidden") || message.includes("Unauthorized") ? 403 : 500;

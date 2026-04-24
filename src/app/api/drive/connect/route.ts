@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { PhotoProvider } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { requireParentInFamily } from "@/lib/permissions";
 import { classifyDriveError, findOrCreateFolder } from "@/lib/google-drive";
@@ -63,7 +64,7 @@ export async function POST() {
     await prisma.family.update({
       where: { id: family.id },
       data: {
-        photoProvider: "GOOGLE_DRIVE",
+        photoProvider: PhotoProvider.GOOGLE_DRIVE,
         googleDriveFolderId: folderId,
         googleDriveConnectedAt: new Date(),
         googleDriveConnectedById: session.user.id,
@@ -73,7 +74,7 @@ export async function POST() {
     return NextResponse.json({
       folderId,
       folderName,
-      photoProvider: "GOOGLE_DRIVE",
+      photoProvider: PhotoProvider.GOOGLE_DRIVE,
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Something went wrong";
