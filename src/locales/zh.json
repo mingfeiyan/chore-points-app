@@ -144,6 +144,13 @@
     "smartHome": "智能家居",
     "newDesignToggle": "试用新设计（测试版）",
     "newDesignDesc": "切换到新的 Coin Arcade / Paper Garden 设计风格",
+    "account": {
+      "title": "账号",
+      "description": "管理你的 GemSteps 账号。",
+      "signedInAs": "当前登录",
+      "signOut": "退出登录",
+      "signingOut": "退出中…"
+    },
     "photoStorage": {
       "title": "照片存储",
       "description": "选择家庭照片的存储位置。连接你的 Google Drive 后，照片会存到你自己 Drive 的文件夹里，不经过 GemSteps 服务器。",

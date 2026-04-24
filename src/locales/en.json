@@ -468,6 +468,13 @@
     "smartHome": "Smart Home",
     "newDesignToggle": "Try new design (beta)",
     "newDesignDesc": "Switches the entire UI to the new Coin Arcade / Paper Garden design",
+    "account": {
+      "title": "Account",
+      "description": "Manage your GemSteps account.",
+      "signedInAs": "Signed in as",
+      "signOut": "Sign out",
+      "signingOut": "Signing out…"
+    },
     "photoStorage": {
       "title": "Photo storage",
       "description": "Choose where your family's photos are stored. Connect your Google Drive and photos go into a folder in your own Drive — they never touch GemSteps' servers.",
