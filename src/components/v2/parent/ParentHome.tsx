@@ -10,6 +10,7 @@ import WeeklyCalendarView from "@/components/calendar/WeeklyCalendarView";
 import PhotoCarousel from "@/components/dashboard/PhotoCarousel";
 import { useKidMode } from "@/components/providers/KidModeProvider";
 import { toLocalDay } from "@/lib/date-utils";
+import { getSundayWeekStart } from "@/lib/week-utils";
 
 // ------- Types -------
 
@@ -168,14 +169,12 @@ export default function ParentHome({ userName }: ParentHomeProps) {
 
   const primaryKid = kids[0];
 
+  const weekStart = getSundayWeekStart(new Date());
   const weekTotal = primaryKid
     ? primaryKid.allEntries
         .filter((e) => {
           const d = new Date(e.date || e.createdAt);
-          const now = new Date();
-          const weekAgo = new Date(now);
-          weekAgo.setDate(now.getDate() - 7);
-          return d >= weekAgo && e.points > 0;
+          return d >= weekStart && e.points > 0;
         })
         .reduce((s, e) => s + e.points, 0)
     : 0;

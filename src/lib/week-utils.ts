@@ -21,3 +21,16 @@ export function isSameWeek(date1: Date, date2: Date): boolean {
   const week2 = getWeekStart(date2)
   return week1.getTime() === week2.getTime()
 }
+
+/**
+ * Get the Sunday 00:00:00 of the calendar week containing the given date.
+ * Used for the parent weekly-points total (distinct from the Saturday-
+ * anchored meal-planning week).
+ */
+export function getSundayWeekStart(date: Date): Date {
+  const d = new Date(date)
+  const daysSinceSunday = d.getDay()
+  d.setDate(d.getDate() - daysSinceSunday)
+  d.setHours(0, 0, 0, 0)
+  return d
+}
