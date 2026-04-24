@@ -26,6 +26,12 @@ enum MealType {
   DINNER
 }
 
+enum PhotoProvider {
+  NONE
+  VERCEL_BLOB
+  GOOGLE_DRIVE
+}
+
 model User {
   id               String    @id @default(cuid())
   email            String    @unique
@@ -80,9 +86,10 @@ model User {
 }
 
 model Family {
-  id         String @id @default(cuid())
-  name       String
-  inviteCode String @unique
+  id            String        @id @default(cuid())
+  name          String
+  inviteCode    String        @unique
+  photoProvider PhotoProvider @default(NONE)
 
   users             User[]
   chores            Chore[]

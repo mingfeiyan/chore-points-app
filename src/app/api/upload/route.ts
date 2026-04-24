@@ -1,11 +1,27 @@
 import { NextResponse } from "next/server";
 import { put, del } from "@vercel/blob";
+import { prisma } from "@/lib/db";
 import { requireParentInFamily } from "@/lib/permissions";
 
 // POST /api/upload - Upload a photo to Vercel Blob
 export async function POST(req: Request) {
   try {
     const session = await requireParentInFamily();
+
+    // Only families explicitly using VERCEL_BLOB storage may upload here.
+    // New families default to photoProvider = NONE until they configure a
+    // provider (Google Drive integration is planned); that keeps operator
+    // storage costs scoped to families that were explicitly enabled.
+    const family = await prisma.family.findUnique({
+      where: { id: session.user.familyId! },
+      select: { photoProvider: true },
+    });
+    if (family?.photoProvider !== "VERCEL_BLOB") {
+      return NextResponse.json(
+        { error: "Photo uploads are not enabled for your family." },
+        { status: 403 }
+      );
+    }
 
     const formData = await req.formData();
     const file = formData.get("file") as File | null;

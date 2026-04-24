@@ -430,6 +430,8 @@
     "uploadFailed": "Failed to upload photo",
     "noPhotosYet": "No photos yet",
     "addPhotosWhenAwarding": "Upload photos to capture daily moments",
+    "photosDisabledTitle": "Photos aren't enabled for your family yet",
+    "photosDisabledBody": "Google Drive integration is coming soon — you'll be able to store photos in your own Drive folder. Until then, photo uploads are disabled.",
     "filterByKid": "Filter by kid",
     "allKids": "All Kids",
     "pointAward": "Point Award",

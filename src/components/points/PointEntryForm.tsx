@@ -81,6 +81,7 @@ export default function PointEntryForm({
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [generateBadge, setGenerateBadge] = useState(!entry);
+  const [photosDisabled, setPhotosDisabled] = useState(false);
   const t = useTranslations("parent");
   const tCommon = useTranslations("common");
   const tPhotos = useTranslations("photos");
@@ -110,6 +111,12 @@ export default function PointEntryForm({
 
   useEffect(() => {
     fetchChores();
+    fetch("/api/family")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.family?.photoProvider === "NONE") setPhotosDisabled(true);
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -514,7 +521,8 @@ export default function PointEntryForm({
             />
           </div>
 
-          {/* Photo Upload */}
+          {/* Photo Upload — hidden when the family's photoProvider is NONE */}
+          {!photosDisabled && (
           <div>
             <label className="block text-sm font-medium ${theme.label} mb-1">
               {tPhotos("photo")} <span className="${theme.muted}">({tPhotos("optional")})</span>
@@ -561,6 +569,7 @@ export default function PointEntryForm({
             )}
             <p className="mt-1 text-xs text-gray-500">{tPhotos("photoHelp")}</p>
           </div>
+          )}
 
           <div className="flex space-x-3 pt-4">
             <button

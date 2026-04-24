@@ -442,6 +442,8 @@
     "uploadFailed": "上传照片失败",
     "noPhotosYet": "还没有照片",
     "addPhotosWhenAwarding": "上传照片记录日常精彩时刻",
+    "photosDisabledTitle": "你的家庭还没有开启照片功能",
+    "photosDisabledBody": "Google Drive 集成即将上线——届时你可以把照片存到自己的 Drive 文件夹。在此之前，照片上传暂不可用。",
     "filterByKid": "按孩子筛选",
     "allKids": "所有孩子",
     "pointAward": "积分奖励",

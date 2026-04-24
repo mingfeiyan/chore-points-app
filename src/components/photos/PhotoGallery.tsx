@@ -35,6 +35,7 @@ export default function PhotoGallery({ kidId, showKidFilter = true, showUpload =
   const [loading, setLoading] = useState(true);
   const [viewingPhoto, setViewingPhoto] = useState<PhotoEntry | null>(null);
   const [showUploadForm, setShowUploadForm] = useState(false);
+  const [photoProvider, setPhotoProvider] = useState<"NONE" | "VERCEL_BLOB" | "GOOGLE_DRIVE">("NONE");
   const t = useTranslations("photos");
   const tCommon = useTranslations("common");
 
@@ -64,6 +65,7 @@ export default function PhotoGallery({ kidId, showKidFilter = true, showUpload =
       const data = await response.json();
       if (response.ok) {
         setPhotos(data.photos);
+        if (data.photoProvider) setPhotoProvider(data.photoProvider);
       }
     } catch (error) {
       console.error("Failed to fetch photos:", error);
@@ -71,6 +73,8 @@ export default function PhotoGallery({ kidId, showKidFilter = true, showUpload =
       setLoading(false);
     }
   };
+
+  const uploadsDisabled = photoProvider === "NONE";
 
   const filteredPhotos = selectedKidId
     ? photos.filter((p) => p.kid.id === selectedKidId)
@@ -122,9 +126,13 @@ export default function PhotoGallery({ kidId, showKidFilter = true, showUpload =
               />
             </svg>
           </div>
-          <p className="text-[#2f2a1f] text-lg mb-2">{t("noPhotosYet")}</p>
-          <p className="text-[#857d68] text-sm mb-4">{t("addPhotosWhenAwarding")}</p>
-          {showUpload && kids.length > 0 && (
+          <p className="text-[#2f2a1f] text-lg mb-2">
+            {uploadsDisabled ? t("photosDisabledTitle") : t("noPhotosYet")}
+          </p>
+          <p className="text-[#857d68] text-sm mb-4">
+            {uploadsDisabled ? t("photosDisabledBody") : t("addPhotosWhenAwarding")}
+          </p>
+          {showUpload && kids.length > 0 && !uploadsDisabled && (
             <button
               onClick={() => setShowUploadForm(true)}
               className="inline-flex items-center gap-2 px-4 py-2 bg-[#4a6a32] text-white rounded-lg hover:bg-[#3d5a2a] transition"
@@ -178,7 +186,7 @@ export default function PhotoGallery({ kidId, showKidFilter = true, showUpload =
               {filteredPhotos.length !== 1 ? "s" : ""}
             </span>
           </div>
-          {showUpload && kids.length > 0 && (
+          {showUpload && kids.length > 0 && !uploadsDisabled && (
             <button
               onClick={() => setShowUploadForm(true)}
               className="inline-flex items-center gap-2 px-4 py-2 bg-[#4a6a32] text-white rounded-lg hover:bg-[#3d5a2a] transition"

@@ -108,7 +108,15 @@ export async function GET(request: NextRequest) {
       })),
     ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-    return NextResponse.json({ photos: allPhotos });
+    const family = await prisma.family.findUnique({
+      where: { id: session.user.familyId },
+      select: { photoProvider: true },
+    });
+
+    return NextResponse.json({
+      photos: allPhotos,
+      photoProvider: family?.photoProvider ?? "NONE",
+    });
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "Something went wrong";
@@ -127,6 +135,17 @@ export async function POST(request: NextRequest) {
     if (session.user.role !== "PARENT") {
       return NextResponse.json(
         { error: "Only parents can upload photos" },
+        { status: 403 }
+      );
+    }
+
+    const family = await prisma.family.findUnique({
+      where: { id: session.user.familyId! },
+      select: { photoProvider: true },
+    });
+    if (family?.photoProvider === "NONE") {
+      return NextResponse.json(
+        { error: "Photo uploads are not enabled for your family." },
         { status: 403 }
       );
     }
