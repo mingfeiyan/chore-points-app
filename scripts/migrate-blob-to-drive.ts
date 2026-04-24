@@ -52,13 +52,54 @@ async function migrateOne(
   return uploaded.id;
 }
 
+async function listFamilies() {
+  const fams = await prisma.family.findMany({
+    select: {
+      id: true,
+      name: true,
+      photoProvider: true,
+      googleDriveFolderId: true,
+    },
+    orderBy: { createdAt: "asc" },
+  });
+  for (const f of fams) {
+    const [photoBlobs, entryBlobs] = await Promise.all([
+      prisma.photo.count({
+        where: {
+          familyId: f.id,
+          NOT: { photoUrl: { startsWith: "/api/drive/" } },
+        },
+      }),
+      prisma.pointEntry.count({
+        where: {
+          familyId: f.id,
+          photoUrl: { not: null },
+          NOT: { photoUrl: { startsWith: "/api/drive/" } },
+        },
+      }),
+    ]);
+    const connected = f.googleDriveFolderId ? "drive✓" : "drive✗";
+    console.log(
+      `  ${f.id}  ${f.name.padEnd(24)}  ${f.photoProvider.padEnd(12)}  ${connected}  blob-photos=${photoBlobs}  blob-entries=${entryBlobs}`
+    );
+  }
+}
+
 async function main() {
+  if (process.argv.includes("--list")) {
+    await listFamilies();
+    return;
+  }
+
   const familyId = process.argv[2];
   const dryRun = process.argv.includes("--dry-run");
   const deleteBlob = process.argv.includes("--delete-blob");
 
   if (!familyId || familyId.startsWith("--")) {
-    console.error("Usage: npx tsx scripts/migrate-blob-to-drive.ts <familyId> [--dry-run] [--delete-blob]");
+    console.error(
+      "Usage: npx tsx scripts/migrate-blob-to-drive.ts <familyId> [--dry-run] [--delete-blob]\n" +
+        "       npx tsx scripts/migrate-blob-to-drive.ts --list"
+    );
     process.exit(1);
   }
 
