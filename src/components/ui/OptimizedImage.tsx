@@ -81,6 +81,7 @@ export default function OptimizedImage({
         sizes={config.sizes}
         priority={priority}
         quality={config.quality}
+        unoptimized={src.startsWith("/api/drive/")}
         className={`object-cover transition-opacity duration-300 ${
           isLoading ? "opacity-0" : "opacity-100"
         }`}

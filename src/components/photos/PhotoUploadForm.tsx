@@ -108,6 +108,7 @@ export default function PhotoUploadForm({
           kidId: selectedKidId,
           caption: note || null,
           photoUrl: uploadData.url,
+          driveFileId: uploadData.driveFileId ?? null,
           date,
         }),
       });

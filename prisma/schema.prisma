@@ -89,9 +89,10 @@ model Family {
   id                     String        @id @default(cuid())
   name                   String
   inviteCode             String        @unique
-  photoProvider          PhotoProvider @default(NONE)
-  googleDriveFolderId    String?
-  googleDriveConnectedAt DateTime?
+  photoProvider           PhotoProvider @default(NONE)
+  googleDriveFolderId     String?
+  googleDriveConnectedAt  DateTime?
+  googleDriveConnectedById String?
 
   users             User[]
   chores            Chore[]

@@ -132,3 +132,17 @@ export async function deleteFile(userId: string, fileId: string): Promise<void> 
     throw new Error(`Drive delete failed: ${await res.text()}`);
   }
 }
+
+export async function downloadFile(
+  userId: string,
+  fileId: string
+): Promise<{ stream: ReadableStream; contentType: string }> {
+  const res = await driveFetch(userId, `/files/${fileId}?alt=media`);
+  if (!res.ok) {
+    throw new Error(`Drive download failed: ${res.status} ${await res.text()}`);
+  }
+  return {
+    stream: res.body as ReadableStream,
+    contentType: res.headers.get("content-type") || "application/octet-stream",
+  };
+}

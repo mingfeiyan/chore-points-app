@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { kidId, photoUrl, caption, date } = await request.json();
+    const { kidId, photoUrl, driveFileId, caption, date } = await request.json();
 
     if (!kidId || !photoUrl) {
       return NextResponse.json(
@@ -173,6 +173,7 @@ export async function POST(request: NextRequest) {
         familyId: session.user.familyId!,
         kidId,
         photoUrl,
+        driveFileId: driveFileId || null,
         caption: caption || null,
         date: date ? new Date(date + "T12:00:00") : new Date(),
         createdById: session.user.id,

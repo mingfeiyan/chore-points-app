@@ -33,7 +33,28 @@ export async function POST() {
     // Drive folder names can contain any string, but slashes render
     // confusingly in the Drive UI. Hyphen keeps the brand prefix clear.
     const folderName = `GemSteps - ${family.name}`;
-    const folderId = await findOrCreateFolder(session.user.id, folderName);
+    let folderId: string;
+    try {
+      folderId = await findOrCreateFolder(session.user.id, folderName);
+    } catch (driveErr: unknown) {
+      const raw = driveErr instanceof Error ? driveErr.message : String(driveErr);
+      // Common operator-side failure: Drive API not enabled on the Google
+      // Cloud project that owns the OAuth client. Surface a clean message
+      // instead of Google's raw JSON blob.
+      if (raw.includes("accessNotConfigured") || raw.includes("SERVICE_DISABLED")) {
+        return NextResponse.json(
+          {
+            error:
+              "Google Drive API isn't enabled on the GemSteps Google Cloud project. Ask the operator to enable it and try again.",
+          },
+          { status: 503 }
+        );
+      }
+      return NextResponse.json(
+        { error: "Couldn't reach Google Drive. Please try again in a moment." },
+        { status: 502 }
+      );
+    }
 
     await prisma.family.update({
       where: { id: family.id },
@@ -41,6 +62,7 @@ export async function POST() {
         photoProvider: "GOOGLE_DRIVE",
         googleDriveFolderId: folderId,
         googleDriveConnectedAt: new Date(),
+        googleDriveConnectedById: session.user.id,
       },
     });
 
