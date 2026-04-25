@@ -72,7 +72,7 @@ export default function ParentLedger({ kids }: ParentLedgerProps) {
   const [selectedKidId, setSelectedKidId] = useState(kids[0]?.id || "");
   const [entries, setEntries] = useState<PointEntry[]>([]);
   const [totalPoints, setTotalPoints] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(kids.length > 0);
   const [showForm, setShowForm] = useState(false);
   const [editingEntry, setEditingEntry] = useState<PointEntry | null>(null);
   const [badgeLevelUp, setBadgeLevelUp] = useState<BadgeLevelUpInfo | null>(null);
