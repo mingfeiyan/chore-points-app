@@ -47,6 +47,7 @@ interface AchievementBadgeInfo {
   description: string;
   descriptionZh: string;
   icon: string;
+  customImageUrl?: string | null;
 }
 
 interface ParentLedgerProps {

@@ -119,7 +119,7 @@ export async function GET(req: Request) {
         description: template?.description || definition?.description || "",
         descriptionZh: template?.descriptionZh || definition?.descriptionZh || "",
         icon: template?.icon || definition?.icon || "🏅",
-        customImageUrl: template?.imageUrl || null,
+        customImageUrl: template?.imageUrl || definition?.imageUrl || null,
         isCustomAward: false,
       };
     });
@@ -134,7 +134,7 @@ export async function GET(req: Request) {
         description: template?.description || badge.description,
         descriptionZh: template?.descriptionZh || badge.descriptionZh,
         icon: template?.icon || badge.icon,
-        customImageUrl: template?.imageUrl || null,
+        customImageUrl: template?.imageUrl || badge.imageUrl || null,
       };
     });
 

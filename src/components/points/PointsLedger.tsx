@@ -42,6 +42,7 @@ type AchievementBadgeInfo = {
   description: string;
   descriptionZh: string;
   icon: string;
+  customImageUrl?: string | null;
 };
 
 export default function PointsLedger() {

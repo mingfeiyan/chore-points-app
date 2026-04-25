@@ -12,6 +12,7 @@ export type NewlyEarnedBadge = {
   description: string;
   descriptionZh: string;
   icon: string;
+  customImageUrl?: string | null;
   metadata?: Record<string, unknown>;
 };
 
@@ -73,6 +74,7 @@ export async function evaluateAndAwardBadges(
           description: badge.description,
           descriptionZh: badge.descriptionZh,
           icon: badge.icon,
+          customImageUrl: badge.imageUrl ?? null,
           metadata: result.metadata,
         });
       }

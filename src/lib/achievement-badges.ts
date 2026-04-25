@@ -27,6 +27,9 @@ export type AchievementBadgeDefinition = {
   description: string;
   descriptionZh: string; // Chinese description
   icon: string;
+  // Optional default image URL. If set, families without their own
+  // BadgeTemplate override see this image instead of the emoji icon.
+  imageUrl?: string;
   // Function to evaluate if the badge should be awarded
   evaluate: (ctx: BadgeEvaluationContext) => Promise<BadgeEvaluationResult>;
 };
@@ -47,6 +50,8 @@ export const ACHIEVEMENT_BADGES: AchievementBadgeDefinition[] = [
     description: "Earned 10+ points every day for 7 consecutive days",
     descriptionZh: "连续7天每天获得10分以上",
     icon: "🔥",
+    imageUrl:
+      "https://yk03gs3qzrtaag1r.public.blob.vercel-storage.com/families/cmk0dov3z0001aajp1mue9g2u/points/1768696474260-LYRVZnpuU5KZxAzhBS1jpK51aAmQMr.jpg",
     evaluate: async (ctx) => {
       return evaluateStreakBadge(ctx, 7, 10);
     },
@@ -58,6 +63,8 @@ export const ACHIEVEMENT_BADGES: AchievementBadgeDefinition[] = [
     description: "Earned 10+ points every day for 14 consecutive days",
     descriptionZh: "连续14天每天获得10分以上",
     icon: "⚡",
+    imageUrl:
+      "https://yk03gs3qzrtaag1r.public.blob.vercel-storage.com/families/cmk0dov3z0001aajp1mue9g2u/points/1768696241205-QaOsV5q38b5szec7YzPAPsEfNb2Sxq.jpg",
     evaluate: async (ctx) => {
       return evaluateStreakBadge(ctx, 14, 10);
     },
@@ -69,6 +76,8 @@ export const ACHIEVEMENT_BADGES: AchievementBadgeDefinition[] = [
     description: "Earned 10+ points every day for 30 consecutive days",
     descriptionZh: "连续30天每天获得10分以上",
     icon: "👑",
+    imageUrl:
+      "https://yk03gs3qzrtaag1r.public.blob.vercel-storage.com/families/cmk0dov3z0001aajp1mue9g2u/points/1768689303078-gYaHr2OI6Z631kdaxCbtkwmSn8s7RV.jpg",
     evaluate: async (ctx) => {
       return evaluateStreakBadge(ctx, 30, 10);
     },
@@ -84,6 +93,8 @@ export const ACHIEVEMENT_BADGES: AchievementBadgeDefinition[] = [
     description: "Earned a total of 100 points",
     descriptionZh: "累计获得100分",
     icon: "💯",
+    imageUrl:
+      "https://yk03gs3qzrtaag1r.public.blob.vercel-storage.com/families/cmk0dov3z0001aajp1mue9g2u/points/1768689167570-beYvnzb03UPIL6C3avYFovDnfB6A5o.jpg",
     evaluate: async (ctx) => {
       return evaluateTotalPointsMilestone(ctx, 100);
     },
@@ -95,6 +106,8 @@ export const ACHIEVEMENT_BADGES: AchievementBadgeDefinition[] = [
     description: "Earned a total of 500 points",
     descriptionZh: "累计获得500分",
     icon: "🌟",
+    imageUrl:
+      "https://yk03gs3qzrtaag1r.public.blob.vercel-storage.com/families/cmk0dov3z0001aajp1mue9g2u/points/1768689182893-1qUSVwDpXhme9BMFCr5WN4lLpfDOSR.jpg",
     evaluate: async (ctx) => {
       return evaluateTotalPointsMilestone(ctx, 500);
     },
@@ -106,6 +119,8 @@ export const ACHIEVEMENT_BADGES: AchievementBadgeDefinition[] = [
     description: "Earned a total of 1000 points",
     descriptionZh: "累计获得1000分",
     icon: "🏆",
+    imageUrl:
+      "https://yk03gs3qzrtaag1r.public.blob.vercel-storage.com/families/cmk0dov3z0001aajp1mue9g2u/points/1768696102331-znnM8AkESqqTMPUAbxJuQxLKKC7HsE.jpg",
     evaluate: async (ctx) => {
       return evaluateTotalPointsMilestone(ctx, 1000);
     },
@@ -117,6 +132,8 @@ export const ACHIEVEMENT_BADGES: AchievementBadgeDefinition[] = [
     description: "Earned a total of 1500 points",
     descriptionZh: "累计获得1500分",
     icon: "💎",
+    imageUrl:
+      "https://yk03gs3qzrtaag1r.public.blob.vercel-storage.com/families/cmk0dov3z0001aajp1mue9g2u/points/1769386960088-GXQ5vl4HjdwyZalDbieEJtMcR6uX5l.jpg",
     evaluate: async (ctx) => {
       return evaluateTotalPointsMilestone(ctx, 1500);
     },
@@ -128,6 +145,8 @@ export const ACHIEVEMENT_BADGES: AchievementBadgeDefinition[] = [
     description: "Earned a total of 2000 points",
     descriptionZh: "累计获得2000分",
     icon: "👑",
+    imageUrl:
+      "https://yk03gs3qzrtaag1r.public.blob.vercel-storage.com/families/cmk0dov3z0001aajp1mue9g2u/points/1769386980767-OiCtmYCgYOgmEQj3zvJJEB8F5y8deO.jpg",
     evaluate: async (ctx) => {
       return evaluateTotalPointsMilestone(ctx, 2000);
     },
@@ -143,6 +162,8 @@ export const ACHIEVEMENT_BADGES: AchievementBadgeDefinition[] = [
     description: "Completed 5 different types of chores",
     descriptionZh: "完成了5种不同的家务",
     icon: "🎭",
+    imageUrl:
+      "https://yk03gs3qzrtaag1r.public.blob.vercel-storage.com/families/cmk0dov3z0001aajp1mue9g2u/points/1768688876777-EnHhzceuWiaD2ryG1rQiaAi2CLnQQv.jpg",
     evaluate: async (ctx) => {
       return evaluateVarietyBadge(ctx, 5);
     },
@@ -154,6 +175,8 @@ export const ACHIEVEMENT_BADGES: AchievementBadgeDefinition[] = [
     description: "Completed 10 different types of chores",
     descriptionZh: "完成了10种不同的家务",
     icon: "🎪",
+    imageUrl:
+      "https://yk03gs3qzrtaag1r.public.blob.vercel-storage.com/families/cmk0dov3z0001aajp1mue9g2u/points/1768696730220-uAXstq5wio5dyl1eWWkYozG2JwC2Qa.jpg",
     evaluate: async (ctx) => {
       return evaluateVarietyBadge(ctx, 10);
     },
@@ -169,6 +192,8 @@ export const ACHIEVEMENT_BADGES: AchievementBadgeDefinition[] = [
     description: "Completed your very first chore",
     descriptionZh: "完成了第一个家务",
     icon: "🎉",
+    imageUrl:
+      "https://yk03gs3qzrtaag1r.public.blob.vercel-storage.com/families/cmk0dov3z0001aajp1mue9g2u/points/1768688347880-wip5Z6bbkGomMrSbuCR8VU096ScT57.jpg",
     evaluate: async (ctx) => {
       const count = await ctx.prisma.pointEntry.count({
         where: {
@@ -194,6 +219,8 @@ export const ACHIEVEMENT_BADGES: AchievementBadgeDefinition[] = [
     description: "Earned 50+ points in a single week",
     descriptionZh: "一周内获得50分以上",
     icon: "📅",
+    imageUrl:
+      "https://yk03gs3qzrtaag1r.public.blob.vercel-storage.com/families/cmk0dov3z0001aajp1mue9g2u/points/1768688729640-gkTozM38p4B4M7KlBQKnWj07BKqMvL.jpg",
     evaluate: async (ctx) => {
       return evaluateWeeklyPointsBadge(ctx, 50);
     },

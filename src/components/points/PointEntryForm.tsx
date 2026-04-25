@@ -37,6 +37,7 @@ type AchievementBadgeInfo = {
   description: string;
   descriptionZh: string;
   icon: string;
+  customImageUrl?: string | null;
 };
 
 type PointEntryFormProps = {
