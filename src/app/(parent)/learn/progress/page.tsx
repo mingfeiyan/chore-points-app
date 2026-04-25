@@ -20,7 +20,7 @@ export default async function MathProgressPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-[110px]">
+    <div className="min-h-screen bg-pg-cream pb-[110px] font-[family-name:var(--font-inter)]">
       <MathProgressContent kids={kids} />
       <ParentTabBar />
     </div>

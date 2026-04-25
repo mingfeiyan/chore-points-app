@@ -121,12 +121,12 @@ export default function MathSettingsForm() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-white rounded-[14px] border border-pg-line p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-          <div className="h-10 bg-gray-200 rounded"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-          <div className="h-10 bg-gray-200 rounded"></div>
+          <div className="h-4 bg-[rgba(68,55,32,0.06)] rounded w-1/4"></div>
+          <div className="h-10 bg-[rgba(68,55,32,0.06)] rounded"></div>
+          <div className="h-4 bg-[rgba(68,55,32,0.06)] rounded w-1/3"></div>
+          <div className="h-10 bg-[rgba(68,55,32,0.06)] rounded"></div>
         </div>
       </div>
     );
@@ -136,14 +136,19 @@ export default function MathSettingsForm() {
     <>
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">{t("mathSettings")}</h1>
-        <p className="text-gray-600 mt-1">{t("mathSettingsDesc")}</p>
+        <p className="text-[11px] font-bold uppercase tracking-wide text-pg-muted">
+          Learning Center
+        </p>
+        <h1 className="mt-1 font-[family-name:var(--font-fraunces)] text-2xl md:text-[32px] font-medium text-pg-ink leading-tight tracking-tight">
+          {t("mathSettings")}
+        </h1>
+        <p className="text-pg-muted mt-2">{t("mathSettingsDesc")}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
       {/* Daily Question Count */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+      <div className="bg-white rounded-[14px] border border-pg-line p-6">
+        <label className="block text-sm font-medium text-pg-ink mb-2">
           {t("dailyQuestionCount")}
         </label>
         <input
@@ -154,73 +159,73 @@ export default function MathSettingsForm() {
           onChange={(e) =>
             updateSetting("dailyQuestionCount", parseInt(e.target.value) || 1)
           }
-          className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-24 px-3 py-2 border border-pg-line rounded-[10px] bg-white text-pg-ink focus:outline-none focus:border-pg-accent transition-colors"
         />
-        <p className="text-sm text-gray-500 mt-1">1-20</p>
+        <p className="text-sm text-pg-muted mt-1">1-20</p>
       </div>
 
       {/* Question Types */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">
+      <div className="bg-white rounded-[14px] border border-pg-line p-6">
+        <h3 className="text-lg font-medium text-pg-ink mb-4">
           {t("questionTypes")}
         </h3>
         <div className="grid grid-cols-2 gap-4">
-          <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+          <label className="flex items-center gap-3 p-3 border border-pg-line rounded-lg hover:bg-pg-cream cursor-pointer">
             <input
               type="checkbox"
               checked={settings.additionEnabled}
               onChange={(e) =>
                 updateSetting("additionEnabled", e.target.checked)
               }
-              className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+              className="w-5 h-5 accent-[#6b8e4e] rounded"
             />
-            <span className="text-gray-700">{t("enableAddition")}</span>
+            <span className="text-pg-ink">{t("enableAddition")}</span>
           </label>
-          <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+          <label className="flex items-center gap-3 p-3 border border-pg-line rounded-lg hover:bg-pg-cream cursor-pointer">
             <input
               type="checkbox"
               checked={settings.subtractionEnabled}
               onChange={(e) =>
                 updateSetting("subtractionEnabled", e.target.checked)
               }
-              className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+              className="w-5 h-5 accent-[#6b8e4e] rounded"
             />
-            <span className="text-gray-700">{t("enableSubtraction")}</span>
+            <span className="text-pg-ink">{t("enableSubtraction")}</span>
           </label>
-          <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+          <label className="flex items-center gap-3 p-3 border border-pg-line rounded-lg hover:bg-pg-cream cursor-pointer">
             <input
               type="checkbox"
               checked={settings.multiplicationEnabled}
               onChange={(e) =>
                 updateSetting("multiplicationEnabled", e.target.checked)
               }
-              className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+              className="w-5 h-5 accent-[#6b8e4e] rounded"
             />
-            <span className="text-gray-700">{t("enableMultiplication")}</span>
+            <span className="text-pg-ink">{t("enableMultiplication")}</span>
           </label>
-          <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+          <label className="flex items-center gap-3 p-3 border border-pg-line rounded-lg hover:bg-pg-cream cursor-pointer">
             <input
               type="checkbox"
               checked={settings.divisionEnabled}
               onChange={(e) =>
                 updateSetting("divisionEnabled", e.target.checked)
               }
-              className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+              className="w-5 h-5 accent-[#6b8e4e] rounded"
             />
-            <span className="text-gray-700">{t("enableDivision")}</span>
+            <span className="text-pg-ink">{t("enableDivision")}</span>
           </label>
         </div>
       </div>
 
       {/* Addition Settings */}
       {settings.additionEnabled && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+        <div className="bg-white rounded-[14px] border border-pg-line p-6">
+          <h3 className="text-lg font-medium text-pg-ink mb-4">
             {t("addition")} - {t("numberRanges")}
           </h3>
           <div className="space-y-4">
             <div className="flex items-center gap-3 flex-wrap">
-              <span className="text-sm text-gray-600 w-28">
+              <span className="text-sm text-pg-muted w-28">
                 {t("firstNumber")}:
               </span>
               <input
@@ -230,9 +235,9 @@ export default function MathSettingsForm() {
                 onChange={(e) =>
                   updateSetting("additionMinA", parseInt(e.target.value) || 0)
                 }
-                className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-20 px-3 py-2 border border-pg-line rounded-lg focus:outline-none focus:border-pg-accent"
               />
-              <span className="text-gray-500">{t("to")}</span>
+              <span className="text-pg-muted">{t("to")}</span>
               <input
                 type="number"
                 min={0}
@@ -240,11 +245,11 @@ export default function MathSettingsForm() {
                 onChange={(e) =>
                   updateSetting("additionMaxA", parseInt(e.target.value) || 0)
                 }
-                className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-20 px-3 py-2 border border-pg-line rounded-lg focus:outline-none focus:border-pg-accent"
               />
             </div>
             <div className="flex items-center gap-3 flex-wrap">
-              <span className="text-sm text-gray-600 w-28">
+              <span className="text-sm text-pg-muted w-28">
                 {t("secondNumber")}:
               </span>
               <input
@@ -254,9 +259,9 @@ export default function MathSettingsForm() {
                 onChange={(e) =>
                   updateSetting("additionMinB", parseInt(e.target.value) || 0)
                 }
-                className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-20 px-3 py-2 border border-pg-line rounded-lg focus:outline-none focus:border-pg-accent"
               />
-              <span className="text-gray-500">{t("to")}</span>
+              <span className="text-pg-muted">{t("to")}</span>
               <input
                 type="number"
                 min={0}
@@ -264,7 +269,7 @@ export default function MathSettingsForm() {
                 onChange={(e) =>
                   updateSetting("additionMaxB", parseInt(e.target.value) || 0)
                 }
-                className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-20 px-3 py-2 border border-pg-line rounded-lg focus:outline-none focus:border-pg-accent"
               />
             </div>
             <label className="flex items-center gap-3 mt-2">
@@ -274,9 +279,9 @@ export default function MathSettingsForm() {
                 onChange={(e) =>
                   updateSetting("allowCarrying", e.target.checked)
                 }
-                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                className="w-5 h-5 accent-[#6b8e4e] rounded"
               />
-              <span className="text-sm text-gray-700">{t("allowCarrying")}</span>
+              <span className="text-sm text-pg-ink">{t("allowCarrying")}</span>
             </label>
           </div>
         </div>
@@ -284,13 +289,13 @@ export default function MathSettingsForm() {
 
       {/* Subtraction Settings */}
       {settings.subtractionEnabled && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+        <div className="bg-white rounded-[14px] border border-pg-line p-6">
+          <h3 className="text-lg font-medium text-pg-ink mb-4">
             {t("subtraction")} - {t("numberRanges")}
           </h3>
           <div className="space-y-4">
             <div className="flex items-center gap-3 flex-wrap">
-              <span className="text-sm text-gray-600 w-28">
+              <span className="text-sm text-pg-muted w-28">
                 {t("firstNumber")}:
               </span>
               <input
@@ -303,9 +308,9 @@ export default function MathSettingsForm() {
                     parseInt(e.target.value) || 0
                   )
                 }
-                className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-20 px-3 py-2 border border-pg-line rounded-lg focus:outline-none focus:border-pg-accent"
               />
-              <span className="text-gray-500">{t("to")}</span>
+              <span className="text-pg-muted">{t("to")}</span>
               <input
                 type="number"
                 min={0}
@@ -316,11 +321,11 @@ export default function MathSettingsForm() {
                     parseInt(e.target.value) || 0
                   )
                 }
-                className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-20 px-3 py-2 border border-pg-line rounded-lg focus:outline-none focus:border-pg-accent"
               />
             </div>
             <div className="flex items-center gap-3 flex-wrap">
-              <span className="text-sm text-gray-600 w-28">
+              <span className="text-sm text-pg-muted w-28">
                 {t("secondNumber")}:
               </span>
               <input
@@ -333,9 +338,9 @@ export default function MathSettingsForm() {
                     parseInt(e.target.value) || 0
                   )
                 }
-                className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-20 px-3 py-2 border border-pg-line rounded-lg focus:outline-none focus:border-pg-accent"
               />
-              <span className="text-gray-500">{t("to")}</span>
+              <span className="text-pg-muted">{t("to")}</span>
               <input
                 type="number"
                 min={0}
@@ -346,7 +351,7 @@ export default function MathSettingsForm() {
                     parseInt(e.target.value) || 0
                   )
                 }
-                className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-20 px-3 py-2 border border-pg-line rounded-lg focus:outline-none focus:border-pg-accent"
               />
             </div>
             <label className="flex items-center gap-3 mt-2">
@@ -356,9 +361,9 @@ export default function MathSettingsForm() {
                 onChange={(e) =>
                   updateSetting("allowBorrowing", e.target.checked)
                 }
-                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                className="w-5 h-5 accent-[#6b8e4e] rounded"
               />
-              <span className="text-sm text-gray-700">
+              <span className="text-sm text-pg-ink">
                 {t("allowBorrowing")}
               </span>
             </label>
@@ -368,13 +373,13 @@ export default function MathSettingsForm() {
 
       {/* Multiplication Settings */}
       {settings.multiplicationEnabled && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+        <div className="bg-white rounded-[14px] border border-pg-line p-6">
+          <h3 className="text-lg font-medium text-pg-ink mb-4">
             {t("multiplication")} - {t("numberRanges")}
           </h3>
           <div className="space-y-4">
             <div className="flex items-center gap-3 flex-wrap">
-              <span className="text-sm text-gray-600 w-28">
+              <span className="text-sm text-pg-muted w-28">
                 {t("firstNumber")}:
               </span>
               <input
@@ -387,9 +392,9 @@ export default function MathSettingsForm() {
                     parseInt(e.target.value) || 1
                   )
                 }
-                className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-20 px-3 py-2 border border-pg-line rounded-lg focus:outline-none focus:border-pg-accent"
               />
-              <span className="text-gray-500">{t("to")}</span>
+              <span className="text-pg-muted">{t("to")}</span>
               <input
                 type="number"
                 min={1}
@@ -400,11 +405,11 @@ export default function MathSettingsForm() {
                     parseInt(e.target.value) || 1
                   )
                 }
-                className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-20 px-3 py-2 border border-pg-line rounded-lg focus:outline-none focus:border-pg-accent"
               />
             </div>
             <div className="flex items-center gap-3 flex-wrap">
-              <span className="text-sm text-gray-600 w-28">
+              <span className="text-sm text-pg-muted w-28">
                 {t("secondNumber")}:
               </span>
               <input
@@ -417,9 +422,9 @@ export default function MathSettingsForm() {
                     parseInt(e.target.value) || 1
                   )
                 }
-                className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-20 px-3 py-2 border border-pg-line rounded-lg focus:outline-none focus:border-pg-accent"
               />
-              <span className="text-gray-500">{t("to")}</span>
+              <span className="text-pg-muted">{t("to")}</span>
               <input
                 type="number"
                 min={1}
@@ -430,7 +435,7 @@ export default function MathSettingsForm() {
                     parseInt(e.target.value) || 1
                   )
                 }
-                className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-20 px-3 py-2 border border-pg-line rounded-lg focus:outline-none focus:border-pg-accent"
               />
             </div>
           </div>
@@ -439,13 +444,13 @@ export default function MathSettingsForm() {
 
       {/* Division Settings */}
       {settings.divisionEnabled && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+        <div className="bg-white rounded-[14px] border border-pg-line p-6">
+          <h3 className="text-lg font-medium text-pg-ink mb-4">
             {t("division")} - {t("numberRanges")}
           </h3>
           <div className="space-y-4">
             <div className="flex items-center gap-3 flex-wrap">
-              <span className="text-sm text-gray-600 w-28">{t("dividend")}:</span>
+              <span className="text-sm text-pg-muted w-28">{t("dividend")}:</span>
               <input
                 type="number"
                 min={1}
@@ -456,9 +461,9 @@ export default function MathSettingsForm() {
                     parseInt(e.target.value) || 1
                   )
                 }
-                className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-20 px-3 py-2 border border-pg-line rounded-lg focus:outline-none focus:border-pg-accent"
               />
-              <span className="text-gray-500">{t("to")}</span>
+              <span className="text-pg-muted">{t("to")}</span>
               <input
                 type="number"
                 min={1}
@@ -469,11 +474,11 @@ export default function MathSettingsForm() {
                     parseInt(e.target.value) || 1
                   )
                 }
-                className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-20 px-3 py-2 border border-pg-line rounded-lg focus:outline-none focus:border-pg-accent"
               />
             </div>
             <div className="flex items-center gap-3 flex-wrap">
-              <span className="text-sm text-gray-600 w-28">{t("divisor")}:</span>
+              <span className="text-sm text-pg-muted w-28">{t("divisor")}:</span>
               <input
                 type="number"
                 min={1}
@@ -484,9 +489,9 @@ export default function MathSettingsForm() {
                     parseInt(e.target.value) || 1
                   )
                 }
-                className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-20 px-3 py-2 border border-pg-line rounded-lg focus:outline-none focus:border-pg-accent"
               />
-              <span className="text-gray-500">{t("to")}</span>
+              <span className="text-pg-muted">{t("to")}</span>
               <input
                 type="number"
                 min={1}
@@ -497,7 +502,7 @@ export default function MathSettingsForm() {
                     parseInt(e.target.value) || 1
                   )
                 }
-                className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-20 px-3 py-2 border border-pg-line rounded-lg focus:outline-none focus:border-pg-accent"
               />
             </div>
           </div>
@@ -505,8 +510,8 @@ export default function MathSettingsForm() {
       )}
 
       {/* Advanced Settings */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">
+      <div className="bg-white rounded-[14px] border border-pg-line p-6">
+        <h3 className="text-lg font-medium text-pg-ink mb-4">
           {t("advancedSettings")}
         </h3>
         <label className="flex items-start gap-3">
@@ -516,20 +521,20 @@ export default function MathSettingsForm() {
             onChange={(e) =>
               updateSetting("adaptiveDifficulty", e.target.checked)
             }
-            className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 mt-0.5"
+            className="w-5 h-5 accent-[#6b8e4e] rounded mt-0.5"
           />
           <div>
-            <span className="text-gray-700 font-medium">
+            <span className="text-pg-ink font-medium">
               {t("adaptiveDifficulty")}
             </span>
-            <p className="text-sm text-gray-500">{t("adaptiveDifficultyDesc")}</p>
+            <p className="text-sm text-pg-muted">{t("adaptiveDifficultyDesc")}</p>
           </div>
         </label>
       </div>
 
       {/* Error Display */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+        <div className="bg-[rgba(197,84,61,0.08)] border border-[rgba(197,84,61,0.25)] text-pg-coral rounded-[10px] p-4 text-sm font-medium">
           {error}
         </div>
       )}
@@ -539,25 +544,27 @@ export default function MathSettingsForm() {
         <button
           type="submit"
           disabled={saving}
-          className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          className="px-6 py-3 text-white font-semibold rounded-[10px] disabled:opacity-50 disabled:cursor-not-allowed transition-transform hover:scale-[1.01]"
+          style={{ background: "#4a6a32", boxShadow: "0 2px 0 rgba(74,106,50,0.3)" }}
         >
           {saving ? t("savingSettings") : t("saveSettings")}
         </button>
         {saved && (
-          <span className="text-green-600 font-medium">{t("settingsSaved")}</span>
+          <span className="text-pg-accent-deep font-semibold">{t("settingsSaved")}</span>
         )}
       </div>
     </form>
 
       {/* Custom Questions Link */}
-      <div className="mt-8 p-6 bg-white rounded-xl shadow-sm border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">{t("customQuestionsTitle")}</h3>
-        <p className="text-gray-600 mb-4">
+      <div className="mt-8 p-6 bg-white rounded-[14px] border border-pg-line">
+        <h3 className="text-lg font-semibold text-pg-ink mb-2">{t("customQuestionsTitle")}</h3>
+        <p className="text-pg-muted mb-4">
           {t("customQuestionsLinkDesc")}
         </p>
         <Link
           href="/learn/questions"
-          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+          className="inline-flex items-center px-4 py-2 text-white rounded-[10px] font-semibold transition-transform hover:scale-[1.01]"
+          style={{ background: "#4a6a32", boxShadow: "0 2px 0 rgba(74,106,50,0.3)" }}
         >
           {t("scheduleCustomQuestions")} →
         </Link>

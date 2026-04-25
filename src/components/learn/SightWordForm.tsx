@@ -206,28 +206,36 @@ export default function SightWordForm({
     }
   };
 
-  // Show cropper modal
+  const inputClass =
+    "w-full px-3 py-2 rounded-[10px] border border-pg-line bg-white text-pg-ink focus:outline-none focus:border-pg-accent transition-colors";
+  const labelClass = "block text-sm font-semibold text-pg-ink mb-1";
+  const errorClass =
+    "bg-[rgba(197,84,61,0.08)] border border-[rgba(197,84,61,0.25)] text-pg-coral px-4 py-3 rounded-[10px] text-sm font-medium";
+  const cancelClass =
+    "flex-1 px-4 py-2 min-h-[44px] border border-pg-line rounded-[10px] text-pg-ink hover:bg-pg-cream font-semibold text-sm";
+  const primaryBtn: React.CSSProperties = {
+    background: "#4a6a32",
+    boxShadow: "0 2px 0 rgba(74,106,50,0.3)",
+  };
+  const submitClass =
+    "flex-1 px-4 py-2 min-h-[44px] text-white rounded-[10px] font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-transform hover:scale-[1.01]";
+
   if (showCropper && imageSrc) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-auto">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 font-[family-name:var(--font-inter)]">
+        <div className="bg-white rounded-[14px] border border-pg-line p-6 w-full max-w-2xl max-h-[90dvh] overflow-auto">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-gray-900">Crop Image</h2>
-            <button
-              onClick={handleCancelCrop}
-              className="text-gray-400 hover:text-gray-600"
-            >
+            <h2 className="font-[family-name:var(--font-fraunces)] text-xl font-medium text-pg-ink">
+              Crop Image
+            </h2>
+            <button onClick={handleCancelCrop} className="text-pg-muted hover:text-pg-ink">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-              {error}
-            </div>
-          )}
+          {error && <div className={`${errorClass} mb-4`}>{error}</div>}
 
           <div className="flex justify-center mb-4">
             <ReactCrop
@@ -236,27 +244,24 @@ export default function SightWordForm({
               onComplete={(c) => setCompletedCrop(c)}
               aspect={1}
             >
-              <img ref={imgRef} src={imageSrc} alt="Crop preview" className="max-h-[50vh]" />
+              <img ref={imgRef} src={imageSrc} alt="Crop preview" className="max-h-[50dvh]" />
             </ReactCrop>
           </div>
 
-          <p className="text-sm text-gray-500 text-center mb-4">
+          <p className="text-sm text-pg-muted text-center mb-4">
             Drag to adjust the crop area. The image will be cropped to a square.
           </p>
 
           <div className="flex space-x-3">
-            <button
-              type="button"
-              onClick={handleCancelCrop}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium"
-            >
+            <button type="button" onClick={handleCancelCrop} className={cancelClass}>
               {tCommon("cancel")}
             </button>
             <button
               type="button"
               onClick={handleCropComplete}
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className={submitClass}
+              style={primaryBtn}
             >
               {loading ? "Uploading..." : "Apply Crop"}
             </button>
@@ -267,13 +272,13 @@ export default function SightWordForm({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 font-[family-name:var(--font-inter)]">
+      <div className="bg-white rounded-[14px] border border-pg-line p-6 w-full max-w-md max-h-[90dvh] overflow-auto">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-900">
+          <h2 className="font-[family-name:var(--font-fraunces)] text-xl font-medium text-pg-ink">
             {sightWord ? t("editWord") : t("addWord")}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button onClick={onClose} className="text-pg-muted hover:text-pg-ink">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -281,14 +286,10 @@ export default function SightWordForm({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
+          {error && <div className={errorClass}>{error}</div>}
 
           <div>
-            <label htmlFor="word" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="word" className={labelClass}>
               {t("word")}
             </label>
             <input
@@ -298,38 +299,36 @@ export default function SightWordForm({
               value={word}
               onChange={(e) => setWord(e.target.value)}
               placeholder={t("wordPlaceholder") || "e.g., the, and, cat"}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-lg"
+              className={`${inputClass} text-lg`}
               autoComplete="off"
               autoCapitalize="off"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t("image")}
-            </label>
+            <label className={labelClass}>{t("image")}</label>
 
             {imageUrl ? (
               <div className="relative inline-block">
                 <img
                   src={imageUrl}
                   alt="Word preview"
-                  className="w-32 h-32 object-cover rounded-lg border"
+                  className="w-32 h-32 object-cover rounded-[10px] border border-pg-line"
                 />
                 <button
                   type="button"
                   onClick={handleRemoveImage}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+                  className="absolute -top-2 -right-2 bg-pg-coral text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:opacity-90"
                 >
                   &times;
                 </button>
               </div>
             ) : (
-              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors">
-                <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-pg-line rounded-[10px] cursor-pointer hover:border-pg-accent hover:bg-[rgba(107,142,78,0.06)] transition-colors">
+                <svg className="w-10 h-10 text-pg-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <span className="mt-2 text-sm text-gray-500">Click to upload image</span>
+                <span className="mt-2 text-sm text-pg-muted">Click to upload image</span>
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -339,24 +338,16 @@ export default function SightWordForm({
                 />
               </label>
             )}
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-pg-muted">
               {t("imageHelp") || "Add an image to help with recognition"}
             </p>
           </div>
 
           <div className="flex space-x-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium"
-            >
+            <button type="button" onClick={onClose} className={cancelClass}>
               {tCommon("cancel")}
             </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+            <button type="submit" disabled={loading} className={submitClass} style={primaryBtn}>
               {loading ? tCommon("saving") : sightWord ? tCommon("update") : tCommon("add")}
             </button>
           </div>

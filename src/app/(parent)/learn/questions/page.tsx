@@ -33,7 +33,7 @@ export default async function ScheduleQuestionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-[110px]">
+    <div className="min-h-screen bg-pg-cream pb-[110px] font-[family-name:var(--font-inter)]">
       <div className="px-4 sm:px-6 lg:px-8 py-8">
         <ScheduleMathQuestions kids={kids} />
       </div>

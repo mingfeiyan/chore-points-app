@@ -218,19 +218,25 @@ export default function SightWordsList() {
   };
 
   if (loading) {
-    return <div className="text-center py-8">{tCommon("loading")}</div>;
+    return <div className="text-center py-8 text-pg-muted">{tCommon("loading")}</div>;
   }
+
+  const primaryBtn: React.CSSProperties = {
+    background: "#4a6a32",
+    boxShadow: "0 2px 0 rgba(74,106,50,0.3)",
+  };
+  const secondaryBtn =
+    "px-4 py-2 rounded-[10px] bg-white border border-pg-line text-pg-ink text-sm font-semibold hover:bg-pg-cream disabled:opacity-50 disabled:cursor-not-allowed";
 
   return (
     <div>
-      <div className="mb-6 flex justify-between items-center flex-wrap gap-2">
-        <h2 className="text-2xl font-bold text-gray-900">{t("pageTitle")}</h2>
+      <div className="mb-6 flex justify-end items-center flex-wrap gap-2">
         <div className="flex gap-2 flex-wrap">
           {sightWords.some((w) => !w.imageUrl && w.isActive) && (
             <button
               onClick={handleBackfillImages}
               disabled={backfillProgress !== null}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className={secondaryBtn}
             >
               {backfillProgress
                 ? t("backfillingImages", {
@@ -246,13 +252,14 @@ export default function SightWordsList() {
           <button
             onClick={handleImportPack}
             disabled={importing}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className={secondaryBtn}
           >
             {importing ? t("importing") : t("importKPack")}
           </button>
           <button
             onClick={() => setShowForm(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+            className="px-4 py-2 rounded-[10px] text-white text-sm font-semibold disabled:opacity-50 transition-transform hover:scale-[1.01]"
+            style={primaryBtn}
           >
             {t("addWord")}
           </button>
@@ -260,13 +267,13 @@ export default function SightWordsList() {
       </div>
 
       {sightWords.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-lg shadow">
+        <div className="text-center py-12 bg-white rounded-[14px] border border-pg-line">
           <span className="text-6xl mb-4 block">📚</span>
-          <p className="text-gray-500">{t("noWordsYet")}</p>
+          <p className="text-pg-muted">{t("noWordsYet")}</p>
         </div>
       ) : (
         <>
-          <p className="text-sm text-gray-500 mb-4">{t("dragToReorder")}</p>
+          <p className="text-sm text-pg-muted mb-4">{t("dragToReorder")}</p>
           <div className="space-y-2">
             {sightWords.map((word, index) => (
               <div
@@ -275,64 +282,57 @@ export default function SightWordsList() {
                 onDragStart={() => handleDragStart(index)}
                 onDragOver={(e) => handleDragOver(e, index)}
                 onDragEnd={handleDragEnd}
-                className={`bg-white rounded-lg shadow p-4 flex items-center cursor-move hover:shadow-md transition-shadow ${
+                className={`bg-white rounded-[14px] border border-pg-line p-4 flex items-center cursor-move hover:bg-pg-cream transition-colors ${
                   draggedIndex === index ? "opacity-50" : ""
                 } ${!word.isActive ? "opacity-60" : ""}`}
               >
-                {/* Drag handle */}
-                <div className="mr-3 text-gray-400">
+                <div className="mr-3 text-pg-muted">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z" />
                   </svg>
                 </div>
 
-                {/* Order number */}
-                <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold mr-4">
+                <div className="w-8 h-8 rounded-full bg-[rgba(107,142,78,0.15)] text-pg-accent-deep flex items-center justify-center font-bold mr-4">
                   {index + 1}
                 </div>
 
-                {/* Image thumbnail */}
                 {word.imageUrl ? (
                   <img
                     src={word.imageUrl}
                     alt={word.word}
-                    className="w-12 h-12 object-cover rounded-lg mr-4"
+                    className="w-12 h-12 object-cover rounded-[10px] mr-4"
                   />
                 ) : (
-                  <div className="w-12 h-12 bg-gray-100 rounded-lg mr-4 flex items-center justify-center">
-                    <span className="text-gray-400 text-xl">📖</span>
+                  <div className="w-12 h-12 bg-pg-cream border border-pg-line rounded-[10px] mr-4 flex items-center justify-center">
+                    <span className="text-pg-muted text-xl">📖</span>
                   </div>
                 )}
 
-                {/* Word */}
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold text-gray-900">{word.word}</h3>
-                  <p className="text-sm text-gray-500">
+                  <h3 className="font-[family-name:var(--font-fraunces)] text-xl font-medium text-pg-ink">
+                    {word.word}
+                  </h3>
+                  <p className="text-sm text-pg-muted">
                     {word.isActive ? t("active") : t("inactive")}
                   </p>
                 </div>
 
-                {/* Actions */}
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => handleToggleActive(word)}
-                    className={`px-3 py-1 rounded-md text-sm font-medium ${
-                      word.isActive
-                        ? "bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
-                        : "bg-green-100 text-green-700 hover:bg-green-200"
-                    }`}
+                    className="px-3 py-1.5 rounded-[8px] text-sm font-semibold text-pg-muted hover:text-pg-ink hover:bg-pg-cream"
                   >
                     {word.isActive ? "Pause" : "Activate"}
                   </button>
                   <button
                     onClick={() => handleEdit(word)}
-                    className="px-3 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 text-sm font-medium"
+                    className="px-3 py-1.5 rounded-[8px] text-sm font-semibold text-pg-accent-deep hover:bg-[rgba(107,142,78,0.08)]"
                   >
                     {tCommon("edit")}
                   </button>
                   <button
                     onClick={() => handleDelete(word.id)}
-                    className="px-3 py-1 bg-red-100 text-red-700 rounded-md hover:bg-red-200 text-sm font-medium"
+                    className="px-3 py-1.5 rounded-[8px] text-sm font-semibold text-pg-coral hover:bg-[rgba(197,84,61,0.08)]"
                   >
                     {tCommon("delete")}
                   </button>

@@ -19,7 +19,7 @@ export default async function MathSettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-[110px]">
+    <div className="min-h-screen bg-pg-cream pb-[110px] font-[family-name:var(--font-inter)]">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <MathSettingsForm />
       </div>

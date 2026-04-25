@@ -35,6 +35,15 @@ type Props = {
   defaultKidId: string;
 };
 
+const cardClass = "bg-white rounded-[14px] border border-pg-line p-4";
+const inputClass =
+  "block w-full rounded-[10px] border border-pg-line bg-white text-pg-ink px-3 py-2 focus:outline-none focus:border-pg-accent transition-colors";
+const labelClass = "block text-sm font-semibold text-pg-ink mb-1";
+const primaryBtn: React.CSSProperties = {
+  background: "#4a6a32",
+  boxShadow: "0 2px 0 rgba(74,106,50,0.3)",
+};
+
 export default function MathAnalytics({ kids, defaultKidId }: Props) {
   const [selectedKidId, setSelectedKidId] = useState(defaultKidId);
   const [days, setDays] = useState(30);
@@ -69,7 +78,7 @@ export default function MathAnalytics({ kids, defaultKidId }: Props) {
 
   useEffect(() => {
     fetchData();
-    setInsights([]); // Clear insights when changing kid/period
+    setInsights([]);
   }, [fetchData]);
 
   const handleAnalyze = async () => {
@@ -95,16 +104,13 @@ export default function MathAnalytics({ kids, defaultKidId }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* Filters */}
       <div className="flex flex-wrap gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("kid")}
-          </label>
+          <label className={labelClass}>{t("kid")}</label>
           <select
             value={selectedKidId}
             onChange={(e) => setSelectedKidId(e.target.value)}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className={inputClass}
           >
             {kids.map((kid) => (
               <option key={kid.id} value={kid.id}>
@@ -114,13 +120,11 @@ export default function MathAnalytics({ kids, defaultKidId }: Props) {
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("period")}
-          </label>
+          <label className={labelClass}>{t("period")}</label>
           <select
             value={days}
             onChange={(e) => setDays(Number(e.target.value))}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className={inputClass}
           >
             <option value={7}>{t("last7Days")}</option>
             <option value={30}>{t("last30Days")}</option>
@@ -131,51 +135,63 @@ export default function MathAnalytics({ kids, defaultKidId }: Props) {
 
       {loading ? (
         <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pg-accent-deep mx-auto"></div>
         </div>
       ) : stats ? (
         <>
-          {/* Summary Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white rounded-lg shadow p-4">
-              <div className="text-sm text-gray-500">{t("totalQuestions")}</div>
-              <div className="text-2xl font-bold">{stats.total}</div>
+            <div className={cardClass}>
+              <div className="text-xs font-semibold uppercase tracking-wide text-pg-muted">
+                {t("totalQuestions")}
+              </div>
+              <div className="font-[family-name:var(--font-fraunces)] text-2xl font-medium text-pg-ink mt-1">
+                {stats.total}
+              </div>
             </div>
-            <div className="bg-white rounded-lg shadow p-4">
-              <div className="text-sm text-gray-500">{t("accuracy")}</div>
-              <div className="text-2xl font-bold text-green-600">
+            <div className={cardClass}>
+              <div className="text-xs font-semibold uppercase tracking-wide text-pg-muted">
+                {t("accuracy")}
+              </div>
+              <div className="font-[family-name:var(--font-fraunces)] text-2xl font-medium text-pg-accent-deep mt-1">
                 {stats.accuracy}%
               </div>
             </div>
-            <div className="bg-white rounded-lg shadow p-4">
-              <div className="text-sm text-gray-500">{t("currentStreak")}</div>
-              <div className="text-2xl font-bold text-orange-500">
+            <div className={cardClass}>
+              <div className="text-xs font-semibold uppercase tracking-wide text-pg-muted">
+                {t("currentStreak")}
+              </div>
+              <div className="font-[family-name:var(--font-fraunces)] text-2xl font-medium text-pg-coral mt-1">
                 {stats.streak} {t("days")}
               </div>
             </div>
-            <div className="bg-white rounded-lg shadow p-4">
-              <div className="text-sm text-gray-500">{t("correct")}</div>
-              <div className="text-2xl font-bold">
+            <div className={cardClass}>
+              <div className="text-xs font-semibold uppercase tracking-wide text-pg-muted">
+                {t("correct")}
+              </div>
+              <div className="font-[family-name:var(--font-fraunces)] text-2xl font-medium text-pg-ink mt-1">
                 {stats.correct}/{stats.total}
               </div>
             </div>
           </div>
 
-          {/* By Type */}
-          <div className="bg-white rounded-lg shadow p-4">
-            <h3 className="font-semibold mb-3">{t("accuracyByType")}</h3>
+          <div className={cardClass}>
+            <h3 className="font-semibold text-pg-ink mb-3">{t("accuracyByType")}</h3>
             <div className="space-y-2">
               {Object.entries(stats.byType).map(([type, data]) => (
                 <div key={type} className="flex items-center gap-3">
-                  <span className="w-24 capitalize">{t(type as "addition" | "subtraction" | "multiplication" | "division")}</span>
-                  <div className="flex-1 bg-gray-200 rounded-full h-4">
+                  <span className="w-24 capitalize text-sm text-pg-ink">
+                    {t(type as "addition" | "subtraction" | "multiplication" | "division")}
+                  </span>
+                  <div className="flex-1 bg-pg-cream rounded-full h-3 border border-pg-line">
                     <div
-                      className="bg-indigo-500 h-4 rounded-full"
-                      style={{ width: `${data.accuracy}%` }}
+                      className="h-full rounded-full"
+                      style={{ width: `${data.accuracy}%`, background: "#6b8e4e" }}
                     />
                   </div>
-                  <span className="w-16 text-right">{data.accuracy}%</span>
-                  <span className="w-20 text-right text-sm text-gray-500">
+                  <span className="w-16 text-right text-sm font-semibold text-pg-ink">
+                    {data.accuracy}%
+                  </span>
+                  <span className="w-20 text-right text-xs text-pg-muted">
                     ({data.correct}/{data.total})
                   </span>
                 </div>
@@ -183,14 +199,14 @@ export default function MathAnalytics({ kids, defaultKidId }: Props) {
             </div>
           </div>
 
-          {/* AI Insights */}
-          <div className="bg-white rounded-lg shadow p-4">
+          <div className={cardClass}>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold">{t("aiInsights")}</h3>
+              <h3 className="font-semibold text-pg-ink">{t("aiInsights")}</h3>
               <button
                 onClick={handleAnalyze}
                 disabled={analyzing}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                className="px-4 py-2 rounded-[10px] text-white text-sm font-semibold disabled:opacity-50 transition-transform hover:scale-[1.01]"
+                style={primaryBtn}
               >
                 {analyzing ? t("analyzing") : t("analyzeBtn")}
               </button>
@@ -200,16 +216,16 @@ export default function MathAnalytics({ kids, defaultKidId }: Props) {
                 {insights.map((insight, i) => (
                   <li
                     key={i}
-                    className={`p-3 rounded-md ${
+                    className={`p-3 rounded-[10px] text-sm border ${
                       insight.type === "strength"
-                        ? "bg-green-50 text-green-800"
+                        ? "bg-[rgba(107,142,78,0.08)] border-[rgba(107,142,78,0.25)] text-pg-accent-deep"
                         : insight.type === "weakness"
-                        ? "bg-red-50 text-red-800"
+                        ? "bg-[rgba(197,84,61,0.08)] border-[rgba(197,84,61,0.25)] text-pg-coral"
                         : insight.type === "pattern"
-                        ? "bg-yellow-50 text-yellow-800"
+                        ? "bg-[rgba(212,166,116,0.12)] border-[rgba(212,166,116,0.3)] text-[#a87a3c]"
                         : insight.type === "suggestion"
-                        ? "bg-blue-50 text-blue-800"
-                        : "bg-gray-50 text-gray-800"
+                        ? "bg-[rgba(127,168,221,0.1)] border-[rgba(127,168,221,0.3)] text-[#4a6a8a]"
+                        : "bg-pg-cream border-pg-line text-pg-ink"
                     }`}
                   >
                     {insight.message}
@@ -217,41 +233,46 @@ export default function MathAnalytics({ kids, defaultKidId }: Props) {
                 ))}
               </ul>
             ) : (
-              <p className="text-gray-500">
+              <p className="text-pg-muted text-sm">
                 {t("analyzeInsightsDesc", { name: selectedKid?.name || t("unnamed") })}
               </p>
             )}
           </div>
 
-          {/* Mistake Log */}
-          <div className="bg-white rounded-lg shadow p-4">
-            <h3 className="font-semibold mb-3">{t("recentMistakes")}</h3>
+          <div className={cardClass}>
+            <h3 className="font-semibold text-pg-ink mb-3">{t("recentMistakes")}</h3>
             {attempts.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b">
-                      <th className="text-left py-2">{t("date")}</th>
-                      <th className="text-left py-2">{t("question")}</th>
-                      <th className="text-left py-2">{t("given")}</th>
-                      <th className="text-left py-2">{t("correctAnswer")}</th>
-                      <th className="text-left py-2">{t("type")}</th>
+                    <tr className="border-b border-pg-line">
+                      <th className="text-left py-2 text-xs font-bold uppercase tracking-wide text-pg-muted">
+                        {t("date")}
+                      </th>
+                      <th className="text-left py-2 text-xs font-bold uppercase tracking-wide text-pg-muted">
+                        {t("question")}
+                      </th>
+                      <th className="text-left py-2 text-xs font-bold uppercase tracking-wide text-pg-muted">
+                        {t("given")}
+                      </th>
+                      <th className="text-left py-2 text-xs font-bold uppercase tracking-wide text-pg-muted">
+                        {t("correctAnswer")}
+                      </th>
+                      <th className="text-left py-2 text-xs font-bold uppercase tracking-wide text-pg-muted">
+                        {t("type")}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {attempts.map((attempt) => (
-                      <tr key={attempt.id} className="border-b">
-                        <td className="py-2">
+                      <tr key={attempt.id} className="border-b border-[rgba(68,55,32,0.06)]">
+                        <td className="py-2 text-pg-ink">
                           {new Date(attempt.createdAt).toLocaleDateString()}
                         </td>
-                        <td className="py-2 font-mono">{attempt.question}</td>
-                        <td className="py-2 text-red-600">
-                          {attempt.givenAnswer}
-                        </td>
-                        <td className="py-2 text-green-600">
-                          {attempt.correctAnswer}
-                        </td>
-                        <td className="py-2 capitalize">
+                        <td className="py-2 font-mono text-pg-ink">{attempt.question}</td>
+                        <td className="py-2 text-pg-coral">{attempt.givenAnswer}</td>
+                        <td className="py-2 text-pg-accent-deep">{attempt.correctAnswer}</td>
+                        <td className="py-2 capitalize text-pg-muted">
                           {t(attempt.questionType as "addition" | "subtraction" | "multiplication" | "division")}
                         </td>
                       </tr>
@@ -260,12 +281,12 @@ export default function MathAnalytics({ kids, defaultKidId }: Props) {
                 </table>
               </div>
             ) : (
-              <p className="text-gray-500">{t("noMistakes")}</p>
+              <p className="text-pg-muted text-sm">{t("noMistakes")}</p>
             )}
           </div>
         </>
       ) : (
-        <p className="text-gray-500">{t("noDataAvailable")}</p>
+        <p className="text-pg-muted">{t("noDataAvailable")}</p>
       )}
     </div>
   );
