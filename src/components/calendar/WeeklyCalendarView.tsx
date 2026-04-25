@@ -892,7 +892,7 @@ export default function WeeklyCalendarView() {
           onClick={() => { setSelectedEvent(null); setIsDeleting(false); }}
         >
           <div
-            className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[80vh] overflow-auto overflow-x-hidden"
+            className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[80dvh] overflow-auto overflow-x-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -1031,7 +1031,7 @@ export default function WeeklyCalendarView() {
           onClick={() => setSelectedDayEvents(null)}
         >
           <div
-            className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[80vh] overflow-hidden flex flex-col"
+            className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[80dvh] overflow-hidden flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}

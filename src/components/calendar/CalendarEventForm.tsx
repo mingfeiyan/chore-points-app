@@ -351,7 +351,7 @@ export default function CalendarEventForm({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] flex flex-col">
+      <div className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90dvh] flex flex-col">
         <div className="flex items-center justify-between px-4 py-3 border-b flex-shrink-0">
           <h3 className={`text-lg font-semibold ${theme.title}`}>
             {event ? t("editEvent") : t("addEvent")}

@@ -113,7 +113,7 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 font-[family-name:var(--font-inter)]">
-      <div className="bg-white rounded-[14px] border border-pg-line w-full max-w-md max-h-[90vh] flex flex-col">
+      <div className="bg-white rounded-[14px] border border-pg-line w-full max-w-md max-h-[90dvh] flex flex-col">
         <div className="flex justify-between items-center px-4 sm:px-6 pt-4 sm:pt-6 pb-3 shrink-0">
           <h2 className="font-[family-name:var(--font-fraunces)] text-xl font-medium text-pg-ink">
             {chore ? t("editChore") : t("addChoreTitle")}
@@ -186,7 +186,7 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
             </div>
 
             {showIconPicker && (
-              <div className="mt-2 p-3 bg-pg-cream rounded-[10px] border border-pg-line max-h-[50vh] overflow-y-auto">
+              <div className="mt-2 p-3 bg-pg-cream rounded-[10px] border border-pg-line max-h-[50dvh] overflow-y-auto">
                 {Object.entries(iconCategories).map(([category, icons]) => (
                   <div key={category} className="mb-4">
                     <h4 className="text-xs font-bold text-pg-muted uppercase tracking-wide mb-2">
