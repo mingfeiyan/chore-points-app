@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import Coin from "@/components/v2/Coin";
-import CoinSmall from "@/components/v2/CoinSmall";
+import Coin from "@/components/v2/CoinPg";
+import CoinSmall from "@/components/v2/CoinSmallPg";
 
 export default function HomeLanding() {
   const t = useTranslations("home");
@@ -102,7 +102,7 @@ export default function HomeLanding() {
                   className="absolute -top-5 -right-5 px-4 py-2 rounded-[12px] text-sm font-semibold rotate-6 bg-white border border-pg-line text-pg-ink font-[family-name:var(--font-fraunces)]"
                   style={{ boxShadow: "0 6px 16px rgba(0,0,0,0.06)" }}
                 >
-                  ⭐ Chores done!
+                  🌿 Chores done!
                 </div>
                 <div
                   className="absolute -bottom-5 -left-6 px-4 py-2 rounded-[12px] text-sm font-semibold -rotate-6 bg-white border border-pg-line text-pg-ink font-[family-name:var(--font-fraunces)]"
@@ -129,8 +129,8 @@ export default function HomeLanding() {
           <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
             {[
               { n: 1, title: t("step1Title"), desc: t("step1Desc"), emoji: "📋" },
-              { n: 2, title: t("step2Title"), desc: t("step2Desc"), emoji: "🪙" },
-              { n: 3, title: t("step3Title"), desc: t("step3Desc"), emoji: "🎉" },
+              { n: 2, title: t("step2Title"), desc: t("step2Desc"), emoji: "💎" },
+              { n: 3, title: t("step3Title"), desc: t("step3Desc"), emoji: "🌱" },
             ].map((step) => (
               <div key={step.n} className="text-center">
                 <div className="relative w-24 h-24 mx-auto mb-6 rounded-[18px] flex items-center justify-center bg-pg-cream border border-pg-line">
@@ -241,7 +241,7 @@ export default function HomeLanding() {
                   style={{ background: "linear-gradient(160deg, #6b8e4e 0%, #4a6a32 100%)" }}
                 >
                   <div>
-                    <div className="text-xs font-semibold opacity-80">Total coins</div>
+                    <div className="text-xs font-semibold opacity-80">Total gems</div>
                     <div className="font-[family-name:var(--font-fraunces)] text-3xl font-medium tracking-tight">
                       ×312
                     </div>
