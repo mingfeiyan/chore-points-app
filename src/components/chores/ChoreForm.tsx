@@ -113,8 +113,8 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 font-[family-name:var(--font-inter)]">
-      <div className="bg-white rounded-[14px] border border-pg-line p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center mb-4">
+      <div className="bg-white rounded-[14px] border border-pg-line w-full max-w-md max-h-[90vh] flex flex-col">
+        <div className="flex justify-between items-center px-4 sm:px-6 pt-4 sm:pt-6 pb-3 shrink-0">
           <h2 className="font-[family-name:var(--font-fraunces)] text-xl font-medium text-pg-ink">
             {chore ? t("editChore") : t("addChoreTitle")}
           </h2>
@@ -138,7 +138,8 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+          <div className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 pb-4 space-y-4">
           {error && (
             <div className="bg-[rgba(197,84,61,0.08)] border border-[rgba(197,84,61,0.25)] text-pg-coral px-4 py-3 rounded-[10px] text-sm font-medium">
               {error}
@@ -247,7 +248,9 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
             <p className="mt-1 text-sm text-pg-muted">{t("pointsAwarded")}</p>
           </div>
 
-          <div className="flex space-x-3 pt-4">
+          </div>
+
+          <div className="flex space-x-3 px-4 sm:px-6 py-3 border-t border-pg-line bg-white rounded-b-[14px] shrink-0">
             <button
               type="button"
               onClick={onClose}
