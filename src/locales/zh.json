@@ -157,6 +157,19 @@
       "adding": "添加中…",
       "addFailed": "添加失败，请重试。"
     },
+    "kids": {
+      "editing": "正在编辑",
+      "saving": "保存中…",
+      "renameFailed": "重命名失败，请重试。",
+      "removeKid": "移除孩子",
+      "removing": "移除中…",
+      "removePermanently": "是的，永久移除",
+      "removeFailed": "移除失败，请重试。",
+      "confirmRemove": "移除 {name}？",
+      "removeNoActivity": "还没有任何活动记录，可以安全移除。",
+      "removeWithActivity": "此操作将永久删除 {entries} 条积分记录、{photos} 张照片、{badges} 个徽章和 {redemptions} 次奖励兑换，无法恢复。",
+      "profileOnlyHint": "仅档案——无法登录"
+    },
     "photoStorage": {
       "title": "照片存储",
       "description": "选择家庭照片的存储位置。连接你的 Google Drive 后，照片会存到你自己 Drive 的文件夹里，不经过 GemSteps 服务器。",

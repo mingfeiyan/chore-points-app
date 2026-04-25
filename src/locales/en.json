@@ -481,6 +481,19 @@
       "adding": "Adding…",
       "addFailed": "Couldn't add kid. Please try again."
     },
+    "kids": {
+      "editing": "Editing",
+      "saving": "Saving…",
+      "renameFailed": "Couldn't rename. Please try again.",
+      "removeKid": "Remove kid",
+      "removing": "Removing…",
+      "removePermanently": "Yes, remove permanently",
+      "removeFailed": "Couldn't remove. Please try again.",
+      "confirmRemove": "Remove {name}?",
+      "removeNoActivity": "They have no activity yet — safe to remove.",
+      "removeWithActivity": "This will permanently delete {entries} point entries, {photos} photos, {badges} badges, and {redemptions} reward redemptions. This cannot be undone.",
+      "profileOnlyHint": "Profile only — can't log in"
+    },
     "photoStorage": {
       "title": "Photo storage",
       "description": "Choose where your family's photos are stored. Connect your Google Drive and photos go into a folder in your own Drive — they never touch GemSteps' servers.",

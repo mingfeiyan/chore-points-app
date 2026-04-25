@@ -30,12 +30,34 @@ export default async function SettingsPage() {
           name: true,
           email: true,
           role: true,
+          _count: {
+            select: {
+              pointEntries: true,
+              photos: true,
+              badges: true,
+              achievementBadges: true,
+              requestedRedemptions: true,
+            },
+          },
         },
       },
     },
   });
 
-  const kids = family?.users.filter((u) => u.role === "KID") || [];
+  const kids =
+    family?.users
+      .filter((u) => u.role === "KID")
+      .map((u) => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        counts: {
+          pointEntries: u._count.pointEntries,
+          photos: u._count.photos,
+          badges: u._count.badges + u._count.achievementBadges,
+          redemptions: u._count.requestedRedemptions,
+        },
+      })) || [];
 
   return (
     <SettingsPageContent
