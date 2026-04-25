@@ -96,7 +96,7 @@ export default function AchievementBadgeTemplateList() {
               {/* Badge Icon */}
               <div className="flex justify-center mb-2">
                 <BadgeIcon
-                  imageUrl={template?.imageUrl}
+                  imageUrl={template?.imageUrl || badge.imageUrl}
                   emoji={template?.icon || badge.icon}
                   size="lg"
                   alt={badge.name}

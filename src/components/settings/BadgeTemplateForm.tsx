@@ -25,6 +25,7 @@ type BuiltInBadge = {
   description: string;
   descriptionZh: string;
   icon: string;
+  imageUrl?: string;
 };
 
 type Chore = {
@@ -214,7 +215,7 @@ export default function BadgeTemplateForm({
         {!isCustom && (
           <div className="flex items-center gap-3 p-3 bg-[#F9F4E8] rounded-lg mb-4">
             <BadgeIcon
-              imageUrl={imageUrl || template?.imageUrl}
+              imageUrl={imageUrl || template?.imageUrl || builtInBadge?.imageUrl}
               emoji={icon || template?.icon || displayInfo.icon}
               size="lg"
             />

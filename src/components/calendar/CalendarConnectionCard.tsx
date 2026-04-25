@@ -20,6 +20,8 @@ interface CalendarSettings {
 
 interface Props {
   onConnect: (settings: CalendarSettings) => void;
+  // Unused — kept for back-compat with the legacy CalendarView caller.
+  settings?: CalendarSettings | null;
 }
 
 const primaryBtn: React.CSSProperties = {
