@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Plus, Pencil, Trash2 } from "lucide-react";
 import ParentTabBar from "@/components/v2/ParentTabBar";
 import CalendarEventForm from "@/components/calendar/CalendarEventForm";
+import CalendarConnectionCard from "@/components/calendar/CalendarConnectionCard";
 
 // ------- Types -------
 
@@ -262,14 +263,16 @@ export default function ParentCalendar() {
           </h1>
           <p className="mt-0.5 text-sm text-pg-muted">Family calendar</p>
         </div>
-        <button
-          onClick={() => setShowEventForm(true)}
-          className="flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-semibold text-white"
-          style={{ background: "#4a6a32", boxShadow: "0 2px 0 rgba(74,106,50,0.3)" }}
-        >
-          <Plus size={16} />
-          Add event
-        </button>
+        {calendarSettings?.isConnected && (
+          <button
+            onClick={() => setShowEventForm(true)}
+            className="flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-semibold text-white"
+            style={{ background: "#4a6a32", boxShadow: "0 2px 0 rgba(74,106,50,0.3)" }}
+          >
+            <Plus size={16} />
+            Add event
+          </button>
+        )}
       </div>
 
       {/* Month nav */}
@@ -292,6 +295,18 @@ export default function ParentCalendar() {
       <div className="mt-4 px-4">
         {loading ? (
           <div className="py-12 text-center text-pg-muted">Loading...</div>
+        ) : !calendarSettings?.isConnected ? (
+          <div className="max-w-md mx-auto py-4">
+            <CalendarConnectionCard
+              onConnect={(s) => {
+                setCalendarSettings({
+                  isConnected: s.isConnected,
+                  selectedCalendarName: s.selectedCalendarName,
+                });
+                loadCalendarEvents();
+              }}
+            />
+          </div>
         ) : (
           <div className="rounded-[14px] border border-[rgba(68,55,32,0.14)] bg-white overflow-hidden">
             {/* Day headers */}
