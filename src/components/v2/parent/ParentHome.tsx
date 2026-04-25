@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { User } from "lucide-react";
+import { User, ChevronUp, ChevronDown, Settings as SettingsIcon, Check } from "lucide-react";
 import FlameIcon from "@/components/v2/FlameIcon";
 import ParentTabBar from "@/components/v2/ParentTabBar";
 import CoinSmall from "@/components/v2/CoinSmall";
@@ -11,6 +11,17 @@ import PhotoCarousel from "@/components/dashboard/PhotoCarousel";
 import { useKidMode } from "@/components/providers/KidModeProvider";
 import { toLocalDay } from "@/lib/date-utils";
 import { getSundayWeekStart } from "@/lib/week-utils";
+
+// ------- Dashboard module config -------
+// Future: add { hidden: string[] } to support show/hide, plus new module IDs.
+const MODULE_LABELS: Record<string, string> = {
+  stats: "Kid stats",
+  calendar: "Family calendar",
+  today: "Today's activity",
+  photos: "Photo gallery",
+};
+const DEFAULT_ORDER = ["stats", "calendar", "today", "photos"];
+const LAYOUT_STORAGE_KEY = "dashboardLayout:v1";
 
 // ------- Types -------
 
@@ -84,8 +95,50 @@ export default function ParentHome({ userName }: ParentHomeProps) {
   const [kids, setKids] = useState<KidWithPoints[]>([]);
   const [loading, setLoading] = useState(true);
   const [weather, setWeather] = useState<{ temp: number; icon: string; location: string } | null>(null);
+  const [order, setOrder] = useState<string[]>(DEFAULT_ORDER);
+  const [editingLayout, setEditingLayout] = useState(false);
 
   const firstName = userName?.split(" ")[0] || "there";
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(LAYOUT_STORAGE_KEY);
+      if (!stored) return;
+      const parsed = JSON.parse(stored) as { order?: string[] };
+      if (!Array.isArray(parsed.order)) return;
+      // Filter to known module ids, then append any defaults the user
+      // hasn't seen yet (so newly-added modules show up automatically).
+      const known = new Set(DEFAULT_ORDER);
+      const filtered = parsed.order.filter((id) => known.has(id));
+      const missing = DEFAULT_ORDER.filter((id) => !filtered.includes(id));
+      setOrder([...filtered, ...missing]);
+    } catch {
+      // ignore — fall back to default order
+    }
+  }, []);
+
+  const saveOrder = (next: string[]) => {
+    setOrder(next);
+    try {
+      localStorage.setItem(LAYOUT_STORAGE_KEY, JSON.stringify({ order: next, version: 1 }));
+    } catch {
+      // ignore — order still persists for the current page view
+    }
+  };
+
+  const moveUp = (idx: number) => {
+    if (idx <= 0) return;
+    const next = [...order];
+    [next[idx - 1], next[idx]] = [next[idx], next[idx - 1]];
+    saveOrder(next);
+  };
+
+  const moveDown = (idx: number) => {
+    if (idx >= order.length - 1) return;
+    const next = [...order];
+    [next[idx], next[idx + 1]] = [next[idx + 1], next[idx]];
+    saveOrder(next);
+  };
 
   const fetchData = async () => {
     try {
@@ -201,6 +254,129 @@ export default function ParentHome({ userName }: ParentHomeProps) {
   const primaryStats = primaryKid ? computeKidStats(primaryKid) : { weekTotal: 0, streak: 0 };
   const allKidStats = kids.map((k) => ({ kid: k, ...computeKidStats(k) }));
 
+  const renderStats = () => {
+    if (!primaryKid) return null;
+    if (isMultiKid) {
+      return (
+        <div className="px-7 grid grid-cols-1 md:grid-cols-2 gap-3">
+          {allKidStats.map(({ kid, weekTotal, streak }) => (
+            <div
+              key={kid.id}
+              className="bg-white rounded-xl p-4 border border-[rgba(68,55,32,0.14)]"
+              style={{ borderLeft: "3px solid #FFCB3B" }}
+            >
+              <div className="flex items-baseline justify-between mb-3">
+                <h3 className="font-[family-name:var(--font-fraunces)] text-lg font-medium text-pg-ink">
+                  {kid.name || "Kid"}
+                </h3>
+                <div className="flex items-baseline gap-1">
+                  <CoinSmall size={16} />
+                  <span className="font-[family-name:var(--font-fraunces)] text-[24px] font-medium text-pg-ink leading-none tracking-tight">
+                    {kid.totalPoints.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <div className="text-[11px] font-semibold text-pg-muted uppercase tracking-wide">This week</div>
+                  <div className="text-base font-semibold text-pg-accent-deep mt-0.5">+{weekTotal}</div>
+                </div>
+                <div>
+                  <div className="text-[11px] font-semibold text-pg-muted uppercase tracking-wide">Streak</div>
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <FlameIcon size={14} />
+                    <span className="text-base font-semibold text-[#c5543d]">{streak}</span>
+                    <span className="text-xs text-pg-muted">{streak === 1 ? "day" : "days"}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+    return (
+      <div className="px-7 grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[
+          { label: primaryKid.name || "Kid", value: primaryKid.totalPoints.toLocaleString(), sub: "total gems", tone: "#FFCB3B", showCoin: true },
+          { label: "This week", value: `+${primaryStats.weekTotal}`, sub: "gems earned", tone: "#6b8e4e", showCoin: false },
+          { label: "Streak", value: String(primaryStats.streak), sub: "days in a row", tone: "#c5543d", showCoin: false, showFlame: true },
+          { label: "Badges", value: "—", sub: "earned", tone: "#d88b8b", showCoin: false },
+        ].map((s, i) => (
+          <div
+            key={i}
+            className="bg-white rounded-xl p-4 border border-[rgba(68,55,32,0.14)]"
+            style={{ borderLeft: `3px solid ${s.tone}` }}
+          >
+            <div className="text-[11px] font-semibold text-pg-muted uppercase tracking-wide">{s.label}</div>
+            <div className="flex items-baseline gap-1.5 mt-1">
+              {s.showCoin && <CoinSmall size={20} />}
+              {"showFlame" in s && s.showFlame && <FlameIcon size={20} />}
+              <span className="font-[family-name:var(--font-fraunces)] text-[30px] font-medium text-pg-ink leading-none tracking-tight">
+                {s.value}
+              </span>
+            </div>
+            <div className="text-xs text-pg-muted mt-1">{s.sub}</div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderToday = () => (
+    <div className="px-7">
+      <div className="rounded-[14px] border border-[rgba(68,55,32,0.14)] bg-white p-4">
+        <div className="flex items-baseline justify-between mb-3">
+          <h3 className="font-[family-name:var(--font-fraunces)] text-lg font-medium text-pg-ink">
+            {isMultiKid ? "Today's activity" : `${primaryKid?.name || "Today"}`}
+          </h3>
+        </div>
+        {allTodayEntries.length === 0 ? (
+          <p className="text-sm text-pg-muted py-2">No activity yet today.</p>
+        ) : (
+          allTodayEntries.map((entry, i) => (
+            <div
+              key={entry.id}
+              className={`flex items-center gap-3 py-2 ${
+                i < allTodayEntries.length - 1 ? "border-b border-[rgba(68,55,32,0.08)]" : ""
+              }`}
+            >
+              <span className="w-14 shrink-0 text-[11px] text-pg-muted tabular-nums">
+                {formatTime(entry.createdAt)}
+              </span>
+              <span className="flex-1 text-sm font-medium text-pg-ink truncate">
+                {isMultiKid && (
+                  <span className="inline-block px-1.5 py-0.5 mr-2 text-[10px] font-bold uppercase tracking-wide rounded bg-[rgba(107,142,78,0.12)] text-pg-accent-deep">
+                    {entry.kidName}
+                  </span>
+                )}
+                {entry.chore?.title || entry.note || "Points"}
+              </span>
+              <div className="flex items-center gap-1 text-sm font-bold text-pg-accent-deep whitespace-nowrap">
+                <CoinSmall size={13} />{entry.points > 0 ? "+" : ""}{entry.points}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+
+  const renderModule = (id: string) => {
+    switch (id) {
+      case "stats":
+        return renderStats();
+      case "calendar":
+        return <div className="px-7"><WeeklyCalendarView /></div>;
+      case "today":
+        return renderToday();
+      case "photos":
+        return <div className="px-7"><PhotoCarousel /></div>;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-pg-cream pb-[110px] font-[family-name:var(--font-inter)]">
       {/* Header */}
@@ -238,70 +414,16 @@ export default function ParentHome({ userName }: ParentHomeProps) {
         )}
       </div>
 
-      {/* Stats — single-kid families keep the 4-tile row; multi-kid families
-          get a compact card per kid so all are visible at once. */}
-      {primaryKid && !loading && !isMultiKid && (
-        <div className="mt-5 px-7 grid grid-cols-2 md:grid-cols-4 gap-3">
-          {[
-            { label: primaryKid.name || "Kid", value: primaryKid.totalPoints.toLocaleString(), sub: "total gems", tone: "#FFCB3B", showCoin: true },
-            { label: "This week", value: `+${primaryStats.weekTotal}`, sub: "gems earned", tone: "#6b8e4e", showCoin: false },
-            { label: "Streak", value: String(primaryStats.streak), sub: "days in a row", tone: "#c5543d", showCoin: false, showFlame: true },
-            { label: "Badges", value: "—", sub: "earned", tone: "#d88b8b", showCoin: false },
-          ].map((s, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-xl p-4 border border-[rgba(68,55,32,0.14)]"
-              style={{ borderLeft: `3px solid ${s.tone}` }}
-            >
-              <div className="text-[11px] font-semibold text-pg-muted uppercase tracking-wide">{s.label}</div>
-              <div className="flex items-baseline gap-1.5 mt-1">
-                {s.showCoin && <CoinSmall size={20} />}
-                {"showFlame" in s && s.showFlame && <FlameIcon size={20} />}
-                <span className="font-[family-name:var(--font-fraunces)] text-[30px] font-medium text-pg-ink leading-none tracking-tight">
-                  {s.value}
-                </span>
-              </div>
-              <div className="text-xs text-pg-muted mt-1">{s.sub}</div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {isMultiKid && !loading && (
-        <div className="mt-5 px-7 grid grid-cols-1 md:grid-cols-2 gap-3">
-          {allKidStats.map(({ kid, weekTotal, streak }) => (
-            <div
-              key={kid.id}
-              className="bg-white rounded-xl p-4 border border-[rgba(68,55,32,0.14)]"
-              style={{ borderLeft: "3px solid #FFCB3B" }}
-            >
-              <div className="flex items-baseline justify-between mb-3">
-                <h3 className="font-[family-name:var(--font-fraunces)] text-lg font-medium text-pg-ink">
-                  {kid.name || "Kid"}
-                </h3>
-                <div className="flex items-baseline gap-1">
-                  <CoinSmall size={16} />
-                  <span className="font-[family-name:var(--font-fraunces)] text-[24px] font-medium text-pg-ink leading-none tracking-tight">
-                    {kid.totalPoints.toLocaleString()}
-                  </span>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <div className="text-[11px] font-semibold text-pg-muted uppercase tracking-wide">This week</div>
-                  <div className="text-base font-semibold text-pg-accent-deep mt-0.5">+{weekTotal}</div>
-                </div>
-                <div>
-                  <div className="text-[11px] font-semibold text-pg-muted uppercase tracking-wide">Streak</div>
-                  <div className="flex items-center gap-1 mt-0.5">
-                    <FlameIcon size={14} />
-                    <span className="text-base font-semibold text-[#c5543d]">{streak}</span>
-                    <span className="text-xs text-pg-muted">{streak === 1 ? "day" : "days"}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+      {/* Edit-layout toggle */}
+      {!loading && (
+        <div className="px-7 mt-4 flex justify-end">
+          <button
+            onClick={() => setEditingLayout((v) => !v)}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-pg-muted hover:text-pg-ink transition-colors"
+          >
+            {editingLayout ? <Check size={14} /> : <SettingsIcon size={14} />}
+            {editingLayout ? "Done" : "Edit layout"}
+          </button>
         </div>
       )}
 
@@ -309,54 +431,49 @@ export default function ParentHome({ userName }: ParentHomeProps) {
         <div className="py-12 text-center text-pg-muted">Loading...</div>
       )}
 
-      {/* Family Calendar */}
-      <div className="mt-5 px-7">
-        <WeeklyCalendarView />
-      </div>
-
-      {/* Today's activity + Photo side by side on desktop */}
-      <div className="mt-5 px-7 grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Today's activity */}
-        {allTodayEntries.length > 0 && (
-          <div>
-            <div className="rounded-[14px] border border-[rgba(68,55,32,0.14)] bg-white p-4">
-              <div className="flex items-baseline justify-between mb-3">
-                <h3 className="font-[family-name:var(--font-fraunces)] text-lg font-medium text-pg-ink">
-                  {isMultiKid ? "Today's activity" : `${primaryKid?.name} today`}
-                </h3>
-              </div>
-              {allTodayEntries.map((entry, i) => (
-                <div
-                  key={entry.id}
-                  className={`flex items-center gap-3 py-2 ${
-                    i < allTodayEntries.length - 1 ? "border-b border-[rgba(68,55,32,0.08)]" : ""
-                  }`}
-                >
-                  <span className="w-14 shrink-0 text-[11px] text-pg-muted tabular-nums">
-                    {formatTime(entry.createdAt)}
+      {!loading &&
+        order.map((id, idx) => {
+          const content = renderModule(id);
+          if (!content) return null;
+          return (
+            <div key={id} className="mt-5">
+              {editingLayout && (
+                <div className="px-7 mb-2 flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wide text-pg-muted">
+                    {MODULE_LABELS[id] || id}
                   </span>
-                  <span className="flex-1 text-sm font-medium text-pg-ink truncate">
-                    {isMultiKid && (
-                      <span className="inline-block px-1.5 py-0.5 mr-2 text-[10px] font-bold uppercase tracking-wide rounded bg-[rgba(107,142,78,0.12)] text-pg-accent-deep">
-                        {entry.kidName}
-                      </span>
-                    )}
-                    {entry.chore?.title || entry.note || "Points"}
-                  </span>
-                  <div className="flex items-center gap-1 text-sm font-bold text-pg-accent-deep whitespace-nowrap">
-                    <CoinSmall size={13} />{entry.points > 0 ? "+" : ""}{entry.points}
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => moveUp(idx)}
+                      disabled={idx === 0}
+                      className="p-1.5 rounded-lg border border-pg-line bg-white text-pg-ink disabled:opacity-30 hover:bg-pg-cream"
+                      aria-label="Move up"
+                    >
+                      <ChevronUp size={16} />
+                    </button>
+                    <button
+                      onClick={() => moveDown(idx)}
+                      disabled={idx === order.length - 1}
+                      className="p-1.5 rounded-lg border border-pg-line bg-white text-pg-ink disabled:opacity-30 hover:bg-pg-cream"
+                      aria-label="Move down"
+                    >
+                      <ChevronDown size={16} />
+                    </button>
                   </div>
                 </div>
-              ))}
+              )}
+              <div
+                className={
+                  editingLayout
+                    ? "mx-4 px-3 py-2 rounded-[14px] border-2 border-dashed border-pg-line"
+                    : ""
+                }
+              >
+                {content}
+              </div>
             </div>
-          </div>
-        )}
-
-        {/* Photo Gallery */}
-        <div>
-          <PhotoCarousel />
-        </div>
-      </div>
+          );
+        })}
 
       <ParentTabBar />
     </div>
