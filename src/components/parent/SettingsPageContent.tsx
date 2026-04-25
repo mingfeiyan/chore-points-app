@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import FamilyInviteCode from "@/components/family/FamilyInviteCode";
 import BadgeManagementTabs from "@/components/settings/BadgeManagementTabs";
@@ -67,6 +69,36 @@ export default function SettingsPageContent({ familyName, inviteCode, kids }: Pr
         {/* Badge Management */}
         <div className="bg-white rounded-[14px] border border-[rgba(68,55,32,0.14)] p-5">
           <BadgeManagementTabs />
+        </div>
+
+        {/* Learning Center */}
+        <div className="bg-white rounded-[14px] border border-[rgba(68,55,32,0.14)] p-5">
+          <h2 className="text-base font-semibold text-pg-ink mb-1">
+            Learning Center
+          </h2>
+          <p className="text-xs text-pg-muted mb-4">
+            Configure what your kids learn and review their progress.
+          </p>
+          <div className="divide-y divide-[rgba(68,55,32,0.08)]">
+            {[
+              { href: "/sight-words", title: "Sight words", desc: "Manage the word list" },
+              { href: "/learn/settings", title: "Math settings", desc: "Operators, ranges, difficulty" },
+              { href: "/learn/questions", title: "Math schedule", desc: "Schedule daily question sets" },
+              { href: "/learn/progress", title: "Math progress", desc: "Per-kid accuracy and history" },
+            ].map((row) => (
+              <Link
+                key={row.href}
+                href={row.href}
+                className="flex items-center justify-between py-3 hover:bg-pg-cream rounded-lg -mx-2 px-2 transition-colors"
+              >
+                <div>
+                  <div className="text-sm font-semibold text-pg-ink">{row.title}</div>
+                  <div className="text-xs text-pg-muted mt-0.5">{row.desc}</div>
+                </div>
+                <ChevronRight size={18} className="text-pg-muted shrink-0" />
+              </Link>
+            ))}
+          </div>
         </div>
 
         <SignOutCard />

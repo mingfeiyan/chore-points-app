@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/lib/permissions";
 import { prisma } from "@/lib/db";
 import ScheduleMathQuestions from "@/components/learn/ScheduleMathQuestions";
+import ParentTabBar from "@/components/v2/ParentTabBar";
 
 export default async function ScheduleQuestionsPage() {
   const session = await getSession();
@@ -32,10 +33,11 @@ export default async function ScheduleQuestionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-[110px]">
       <div className="px-4 sm:px-6 lg:px-8 py-8">
         <ScheduleMathQuestions kids={kids} />
       </div>
+      <ParentTabBar />
     </div>
   );
 }
