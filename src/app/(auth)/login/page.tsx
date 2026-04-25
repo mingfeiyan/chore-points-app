@@ -56,61 +56,24 @@ export default function LoginPage() {
   };
 
   const inputClass =
-    "mt-1 block w-full px-4 py-3 rounded-2xl text-base focus:outline-none transition-shadow";
-  const inputStyle: React.CSSProperties = {
-    background: "white",
-    border: "1px solid var(--ca-divider)",
-    color: "var(--ca-ink)",
-    fontFamily: "var(--font-nunito), sans-serif",
-    boxShadow: "inset 0 1px 0 rgba(0,0,0,0.02)",
-  };
+    "mt-1 block w-full px-4 py-3 rounded-[10px] border border-pg-line bg-white text-pg-ink text-base focus:outline-none focus:border-pg-accent transition-colors";
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center px-4 py-10"
-      style={{
-        background:
-          "radial-gradient(ellipse at top, var(--ca-gold-glow) 0%, transparent 55%), var(--ca-cream)",
-        fontFamily: "var(--font-inter), system-ui, sans-serif",
-      }}
-    >
-      <div
-        className="w-full max-w-md rounded-[28px] p-8 sm:p-10"
-        style={{
-          background: "white",
-          border: "1px solid var(--ca-divider)",
-          boxShadow: "0 20px 60px rgba(26,24,19,0.08)",
-        }}
-      >
+    <div className="min-h-screen bg-pg-cream flex items-center justify-center px-4 py-10 font-[family-name:var(--font-inter)]">
+      <div className="w-full max-w-md rounded-[14px] border border-pg-line bg-white p-8 sm:p-10">
         <div className="text-center">
           <Link href="/" className="inline-flex flex-col items-center">
-            <Coin size={64} />
-            <span
-              className="mt-3 text-2xl font-extrabold"
-              style={{ fontFamily: "var(--font-baloo-2), sans-serif", color: "var(--ca-ink)" }}
-            >
+            <Coin size={56} />
+            <span className="mt-3 font-[family-name:var(--font-fraunces)] text-2xl font-medium text-pg-ink">
               {tNav("appName")}
             </span>
           </Link>
-          <p
-            className="mt-2 text-sm"
-            style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
-          >
-            {t("signInToAccount")}
-          </p>
+          <p className="mt-2 text-sm text-pg-muted">{t("signInToAccount")}</p>
         </div>
 
         <div className="mt-8 space-y-5">
           {error && (
-            <div
-              className="px-4 py-3 rounded-2xl text-sm font-semibold"
-              style={{
-                background: "rgba(246,105,81,0.1)",
-                border: "1px solid rgba(246,105,81,0.25)",
-                color: "#b23a25",
-                fontFamily: "var(--font-nunito), sans-serif",
-              }}
-            >
+            <div className="px-4 py-3 rounded-[10px] border border-[rgba(197,84,61,0.25)] bg-[rgba(197,84,61,0.08)] text-sm font-medium text-pg-coral">
               {error}
             </div>
           )}
@@ -119,13 +82,7 @@ export default function LoginPage() {
             type="button"
             onClick={handleGoogleSignIn}
             disabled={googleLoading || loading}
-            className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-2xl text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{
-              background: "white",
-              border: "1.5px solid var(--ca-divider)",
-              color: "var(--ca-ink)",
-              fontFamily: "var(--font-nunito), sans-serif",
-            }}
+            className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-[10px] border border-pg-line bg-white text-sm font-semibold text-pg-ink transition-colors hover:bg-pg-cream disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <GoogleLogo />
             {googleLoading ? t("signingIn") : t("continueWithGoogle")}
@@ -133,20 +90,10 @@ export default function LoginPage() {
 
           <div className="relative py-1">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full" style={{ borderTop: "1px solid var(--ca-divider)" }} />
+              <div className="w-full border-t border-pg-line" />
             </div>
-            <div className="relative flex justify-center text-xs">
-              <span
-                className="px-3"
-                style={{
-                  background: "white",
-                  color: "var(--ca-muted)",
-                  fontFamily: "var(--font-nunito), sans-serif",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                }}
-              >
+            <div className="relative flex justify-center text-[11px]">
+              <span className="bg-white px-3 font-bold uppercase tracking-wide text-pg-muted">
                 {t("orContinueWith")}
               </span>
             </div>
@@ -154,11 +101,7 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-bold"
-                style={{ color: "var(--ca-ink)", fontFamily: "var(--font-nunito), sans-serif" }}
-              >
+              <label htmlFor="email" className="block text-sm font-semibold text-pg-ink">
                 {t("email")}
               </label>
               <input
@@ -168,16 +111,11 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className={inputClass}
-                style={inputStyle}
               />
             </div>
 
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-bold"
-                style={{ color: "var(--ca-ink)", fontFamily: "var(--font-nunito), sans-serif" }}
-              >
+              <label htmlFor="password" className="block text-sm font-semibold text-pg-ink">
                 {t("password")}
               </label>
               <input
@@ -187,20 +125,14 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className={inputClass}
-                style={inputStyle}
               />
             </div>
 
             <button
               type="submit"
               disabled={loading || googleLoading}
-              className="w-full flex justify-center items-center py-3.5 px-4 rounded-2xl text-base font-extrabold transition-transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-              style={{
-                background: "linear-gradient(180deg, var(--ca-gold) 0%, #e5ad0a 100%)",
-                color: "var(--ca-ink)",
-                boxShadow: "0 5px 0 var(--ca-gold-deep), 0 10px 20px rgba(178,123,0,0.25)",
-                fontFamily: "var(--font-baloo-2), sans-serif",
-              }}
+              className="w-full flex justify-center items-center py-3 px-4 rounded-[10px] text-base font-semibold text-white transition-transform hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              style={{ background: "#4a6a32", boxShadow: "0 2px 0 rgba(74,106,50,0.3)" }}
             >
               {loading ? t("signingIn") : t("signIn")}
             </button>
@@ -210,16 +142,9 @@ export default function LoginPage() {
             <AgreeNotice />
           </div>
 
-          <div
-            className="text-center text-sm pt-2"
-            style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
-          >
+          <div className="text-center text-sm pt-2 text-pg-muted">
             <span>{t("dontHaveAccount")} </span>
-            <Link
-              href="/signup"
-              className="font-extrabold"
-              style={{ color: "var(--ca-cobalt-deep)" }}
-            >
+            <Link href="/signup" className="font-semibold text-pg-accent-deep hover:underline">
               {t("signUp")}
             </Link>
           </div>

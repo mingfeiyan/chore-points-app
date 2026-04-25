@@ -6,18 +6,15 @@ import { useTranslations } from "next-intl";
 export default function AgreeNotice() {
   const tHome = useTranslations("home");
   return (
-    <p
-      className="text-center text-xs"
-      style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
-    >
+    <p className="text-center text-xs text-pg-muted">
       {tHome.rich("agreeNotice", {
         terms: (chunks) => (
-          <Link href="/terms" className="font-bold" style={{ color: "var(--ca-cobalt-deep)" }}>
+          <Link href="/terms" className="font-semibold text-pg-accent-deep hover:underline">
             {chunks}
           </Link>
         ),
         privacy: (chunks) => (
-          <Link href="/privacy" className="font-bold" style={{ color: "var(--ca-cobalt-deep)" }}>
+          <Link href="/privacy" className="font-semibold text-pg-accent-deep hover:underline">
             {chunks}
           </Link>
         ),

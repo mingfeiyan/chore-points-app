@@ -55,7 +55,6 @@ export default function SignupPage() {
       return;
     }
 
-    // Parent needs either invite code OR registration secret
     if (mode === "parent" && !inviteCode.trim() && !registrationSecret.trim()) {
       setError(t("codeRequired"));
       return;
@@ -85,7 +84,6 @@ export default function SignupPage() {
         return;
       }
 
-      // Auto sign in after successful signup
       const result = await signIn("credentials", {
         email,
         password,
@@ -105,51 +103,18 @@ export default function SignupPage() {
     }
   };
 
-  const pageBg: React.CSSProperties = {
-    background:
-      "radial-gradient(ellipse at top, var(--ca-gold-glow) 0%, transparent 55%), var(--ca-cream)",
-    fontFamily: "var(--font-inter), system-ui, sans-serif",
-  };
-  const cardStyle: React.CSSProperties = {
-    background: "white",
-    border: "1px solid var(--ca-divider)",
-    boxShadow: "0 20px 60px rgba(26,24,19,0.08)",
-  };
-
-  const inputClass =
-    "mt-1 block w-full px-4 py-3 rounded-2xl text-base focus:outline-none transition-shadow";
-  const inputStyle: React.CSSProperties = {
-    background: "white",
-    border: "1px solid var(--ca-divider)",
-    color: "var(--ca-ink)",
-    fontFamily: "var(--font-nunito), sans-serif",
-    boxShadow: "inset 0 1px 0 rgba(0,0,0,0.02)",
-  };
-  const labelStyle: React.CSSProperties = {
-    color: "var(--ca-ink)",
-    fontFamily: "var(--font-nunito), sans-serif",
-  };
-
   if (mode === "choose") {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 py-10" style={pageBg}>
-        <div className="w-full max-w-md rounded-[28px] p-8 sm:p-10" style={cardStyle}>
+      <div className="min-h-screen bg-pg-cream flex items-center justify-center px-4 py-10 font-[family-name:var(--font-inter)]">
+        <div className="w-full max-w-md rounded-[14px] border border-pg-line bg-white p-8 sm:p-10">
           <div className="text-center">
             <Link href="/" className="inline-flex flex-col items-center">
-              <Coin size={64} />
-              <span
-                className="mt-3 text-2xl font-extrabold"
-                style={{ fontFamily: "var(--font-baloo-2), sans-serif", color: "var(--ca-ink)" }}
-              >
+              <Coin size={56} />
+              <span className="mt-3 font-[family-name:var(--font-fraunces)] text-2xl font-medium text-pg-ink">
                 {tNav("appName")}
               </span>
             </Link>
-            <p
-              className="mt-2 text-sm"
-              style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
-            >
-              {t("howSignUp")}
-            </p>
+            <p className="mt-2 text-sm text-pg-muted">{t("howSignUp")}</p>
           </div>
 
           <div className="mt-8 space-y-4">
@@ -157,13 +122,7 @@ export default function SignupPage() {
               type="button"
               onClick={handleGoogleSignUp}
               disabled={googleLoading}
-              className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-2xl text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{
-                background: "white",
-                border: "1.5px solid var(--ca-divider)",
-                color: "var(--ca-ink)",
-                fontFamily: "var(--font-nunito), sans-serif",
-              }}
+              className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-[10px] border border-pg-line bg-white text-sm font-semibold text-pg-ink transition-colors hover:bg-pg-cream disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <GoogleLogo />
               {googleLoading ? t("signingIn") : t("continueWithGoogle")}
@@ -171,20 +130,10 @@ export default function SignupPage() {
 
             <div className="relative py-1">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full" style={{ borderTop: "1px solid var(--ca-divider)" }} />
+                <div className="w-full border-t border-pg-line" />
               </div>
-              <div className="relative flex justify-center text-xs">
-                <span
-                  className="px-3"
-                  style={{
-                    background: "white",
-                    color: "var(--ca-muted)",
-                    fontFamily: "var(--font-nunito), sans-serif",
-                    fontWeight: 700,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                  }}
-                >
+              <div className="relative flex justify-center text-[11px]">
+                <span className="bg-white px-3 font-bold uppercase tracking-wide text-pg-muted">
                   {t("orContinueWith")}
                 </span>
               </div>
@@ -192,61 +141,31 @@ export default function SignupPage() {
 
             <button
               onClick={() => setMode("parent")}
-              className="w-full flex items-center gap-4 p-5 rounded-2xl text-left transition-colors"
-              style={{
-                background: "var(--ca-tile-teal)",
-                border: "1.5px solid transparent",
-              }}
+              className="w-full flex items-center gap-4 p-5 rounded-[14px] border border-pg-line bg-white text-left transition-colors hover:bg-pg-cream"
             >
-              <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
-                style={{ background: "white" }}
-              >
+              <div className="w-12 h-12 rounded-[10px] flex items-center justify-center text-2xl flex-shrink-0 bg-pg-cream border border-pg-line">
                 👨‍👩‍👧
               </div>
               <div>
-                <div
-                  className="text-base font-extrabold"
-                  style={{ fontFamily: "var(--font-baloo-2), sans-serif", color: "var(--ca-ink)" }}
-                >
+                <div className="font-[family-name:var(--font-fraunces)] text-lg font-medium text-pg-ink">
                   {t("imParent")}
                 </div>
-                <div
-                  className="text-sm mt-0.5"
-                  style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
-                >
-                  {t("createFamily")}
-                </div>
+                <div className="text-sm mt-0.5 text-pg-muted">{t("createFamily")}</div>
               </div>
             </button>
 
             <button
               onClick={() => setMode("kid")}
-              className="w-full flex items-center gap-4 p-5 rounded-2xl text-left transition-colors"
-              style={{
-                background: "var(--ca-tile-butter)",
-                border: "1.5px solid transparent",
-              }}
+              className="w-full flex items-center gap-4 p-5 rounded-[14px] border border-pg-line bg-white text-left transition-colors hover:bg-pg-cream"
             >
-              <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
-                style={{ background: "white" }}
-              >
+              <div className="w-12 h-12 rounded-[10px] flex items-center justify-center text-2xl flex-shrink-0 bg-pg-cream border border-pg-line">
                 🧒
               </div>
               <div>
-                <div
-                  className="text-base font-extrabold"
-                  style={{ fontFamily: "var(--font-baloo-2), sans-serif", color: "var(--ca-ink)" }}
-                >
+                <div className="font-[family-name:var(--font-fraunces)] text-lg font-medium text-pg-ink">
                   {t("imKid")}
                 </div>
-                <div
-                  className="text-sm mt-0.5"
-                  style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
-                >
-                  {t("joinWithCode")}
-                </div>
+                <div className="text-sm mt-0.5 text-pg-muted">{t("joinWithCode")}</div>
               </div>
             </button>
           </div>
@@ -255,16 +174,9 @@ export default function SignupPage() {
             <AgreeNotice />
           </div>
 
-          <div
-            className="text-center text-sm mt-3"
-            style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
-          >
+          <div className="text-center text-sm mt-3 text-pg-muted">
             <span>{t("alreadyHaveAccount")} </span>
-            <Link
-              href="/login"
-              className="font-extrabold"
-              style={{ color: "var(--ca-cobalt-deep)" }}
-            >
+            <Link href="/login" className="font-semibold text-pg-accent-deep hover:underline">
               {t("signIn")}
             </Link>
           </div>
@@ -274,24 +186,19 @@ export default function SignupPage() {
   }
 
   const isKid = mode === "kid";
-  const primaryBg = isKid
-    ? "linear-gradient(180deg, var(--ca-mint) 0%, #2ca46a 100%)"
-    : "linear-gradient(180deg, var(--ca-gold) 0%, #e5ad0a 100%)";
-  const primaryShadow = isKid
-    ? "0 5px 0 #1f7a4a, 0 10px 20px rgba(31,122,74,0.25)"
-    : "0 5px 0 var(--ca-gold-deep), 0 10px 20px rgba(178,123,0,0.25)";
-  const primaryTextColor = isKid ? "white" : "var(--ca-ink)";
+
+  const inputClass =
+    "mt-1 block w-full px-4 py-3 rounded-[10px] border border-pg-line bg-white text-pg-ink text-base focus:outline-none focus:border-pg-accent transition-colors";
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-10" style={pageBg}>
-      <div className="w-full max-w-md rounded-[28px] p-8 sm:p-10" style={cardStyle}>
+    <div className="min-h-screen bg-pg-cream flex items-center justify-center px-4 py-10 font-[family-name:var(--font-inter)]">
+      <div className="w-full max-w-md rounded-[14px] border border-pg-line bg-white p-8 sm:p-10">
         <button
           onClick={() => {
             setMode("choose");
             setError("");
           }}
-          className="inline-flex items-center gap-1.5 text-sm font-bold"
-          style={{ color: "var(--ca-cobalt-deep)", fontFamily: "var(--font-nunito), sans-serif" }}
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-pg-accent-deep hover:underline"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
@@ -300,47 +207,36 @@ export default function SignupPage() {
         </button>
 
         <div className="mt-4 text-center">
-          <Coin size={56} />
-          <h2
-            className="mt-3 text-2xl font-extrabold"
-            style={{ fontFamily: "var(--font-baloo-2), sans-serif", color: "var(--ca-ink)" }}
-          >
-            {isKid ? t("kidSignUp") : t("parentSignUp")}
+          <Coin size={48} />
+          <h2 className="mt-3 font-[family-name:var(--font-fraunces)] text-2xl font-medium text-pg-ink">
+            {isKid ? (
+              <>
+                Join the <em className="italic text-pg-accent-deep">family</em>
+              </>
+            ) : (
+              <>
+                Create your <em className="italic text-pg-accent-deep">family</em>
+              </>
+            )}
           </h2>
-          <p
-            className="mt-1 text-sm"
-            style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
-          >
+          <p className="mt-1 text-sm text-pg-muted">
             {isKid ? t("joinFamily") : t("createAccount")}
           </p>
         </div>
 
         <form className="mt-7 space-y-5" onSubmit={handleSubmit}>
           {error && (
-            <div
-              className="px-4 py-3 rounded-2xl text-sm font-semibold"
-              style={{
-                background: "rgba(246,105,81,0.1)",
-                border: "1px solid rgba(246,105,81,0.25)",
-                color: "#b23a25",
-                fontFamily: "var(--font-nunito), sans-serif",
-              }}
-            >
+            <div className="px-4 py-3 rounded-[10px] border border-[rgba(197,84,61,0.25)] bg-[rgba(197,84,61,0.08)] text-sm font-medium text-pg-coral">
               {error}
             </div>
           )}
 
           <div>
-            <label htmlFor="inviteCode" className="block text-sm font-bold" style={labelStyle}>
+            <label htmlFor="inviteCode" className="block text-sm font-semibold text-pg-ink">
               {t("inviteCode")}{" "}
-              {isKid && <span style={{ color: "var(--ca-coral)" }}>*</span>}
+              {isKid && <span className="text-pg-coral">*</span>}
               {!isKid && (
-                <span
-                  className="ml-1 text-xs"
-                  style={{ color: "var(--ca-muted)", fontWeight: 600 }}
-                >
-                  (optional)
-                </span>
+                <span className="ml-1 text-xs font-medium text-pg-muted">(optional)</span>
               )}
             </label>
             <input
@@ -351,24 +247,17 @@ export default function SignupPage() {
               onChange={(e) => setInviteCode(e.target.value)}
               placeholder={t("inviteCodeHelper")}
               className={`${inputClass} font-mono tracking-wider`}
-              style={inputStyle}
             />
-            <p
-              className="mt-1.5 text-xs"
-              style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
-            >
-              {t("inviteCodeHelper")}
-            </p>
+            <p className="mt-1.5 text-xs text-pg-muted">{t("inviteCodeHelper")}</p>
           </div>
 
           {!isKid && !inviteCode.trim() && (
             <div>
               <label
                 htmlFor="registrationSecret"
-                className="block text-sm font-bold"
-                style={labelStyle}
+                className="block text-sm font-semibold text-pg-ink"
               >
-                {t("registrationCode")} <span style={{ color: "var(--ca-coral)" }}>*</span>
+                {t("registrationCode")} <span className="text-pg-coral">*</span>
               </label>
               <input
                 id="registrationSecret"
@@ -378,19 +267,13 @@ export default function SignupPage() {
                 onChange={(e) => setRegistrationSecret(e.target.value)}
                 placeholder={t("registrationCode")}
                 className={inputClass}
-                style={inputStyle}
               />
-              <p
-                className="mt-1.5 text-xs"
-                style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
-              >
-                {t("registrationCodeHelper")}
-              </p>
+              <p className="mt-1.5 text-xs text-pg-muted">{t("registrationCodeHelper")}</p>
             </div>
           )}
 
           <div>
-            <label htmlFor="name" className="block text-sm font-bold" style={labelStyle}>
+            <label htmlFor="name" className="block text-sm font-semibold text-pg-ink">
               {t("name")}
             </label>
             <input
@@ -399,13 +282,12 @@ export default function SignupPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className={inputClass}
-              style={inputStyle}
             />
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-bold" style={labelStyle}>
-              {t("email")} <span style={{ color: "var(--ca-coral)" }}>*</span>
+            <label htmlFor="email" className="block text-sm font-semibold text-pg-ink">
+              {t("email")} <span className="text-pg-coral">*</span>
             </label>
             <input
               id="email"
@@ -414,13 +296,12 @@ export default function SignupPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className={inputClass}
-              style={inputStyle}
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-bold" style={labelStyle}>
-              {t("password")} <span style={{ color: "var(--ca-coral)" }}>*</span>
+            <label htmlFor="password" className="block text-sm font-semibold text-pg-ink">
+              {t("password")} <span className="text-pg-coral">*</span>
             </label>
             <input
               id="password"
@@ -429,17 +310,15 @@ export default function SignupPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className={inputClass}
-              style={inputStyle}
             />
           </div>
 
           <div>
             <label
               htmlFor="confirmPassword"
-              className="block text-sm font-bold"
-              style={labelStyle}
+              className="block text-sm font-semibold text-pg-ink"
             >
-              {t("confirmPassword")} <span style={{ color: "var(--ca-coral)" }}>*</span>
+              {t("confirmPassword")} <span className="text-pg-coral">*</span>
             </label>
             <input
               id="confirmPassword"
@@ -448,20 +327,14 @@ export default function SignupPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className={inputClass}
-              style={inputStyle}
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex justify-center items-center py-3.5 px-4 rounded-2xl text-base font-extrabold transition-transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-            style={{
-              background: primaryBg,
-              color: primaryTextColor,
-              boxShadow: primaryShadow,
-              fontFamily: "var(--font-baloo-2), sans-serif",
-            }}
+            className="w-full flex justify-center items-center py-3 px-4 rounded-[10px] text-base font-semibold text-white transition-transform hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            style={{ background: "#4a6a32", boxShadow: "0 2px 0 rgba(74,106,50,0.3)" }}
           >
             {loading ? t("creatingAccount") : isKid ? t("joinFamilyButton") : t("signUp")}
           </button>
@@ -470,16 +343,9 @@ export default function SignupPage() {
             <AgreeNotice />
           </div>
 
-          <div
-            className="text-center text-sm pt-1"
-            style={{ color: "var(--ca-muted)", fontFamily: "var(--font-nunito), sans-serif" }}
-          >
+          <div className="text-center text-sm pt-1 text-pg-muted">
             <span>{t("alreadyHaveAccount")} </span>
-            <Link
-              href="/login"
-              className="font-extrabold"
-              style={{ color: "var(--ca-cobalt-deep)" }}
-            >
+            <Link href="/login" className="font-semibold text-pg-accent-deep hover:underline">
               {t("signIn")}
             </Link>
           </div>
