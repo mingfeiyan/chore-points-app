@@ -103,23 +103,28 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* iOS Safari gives native date/time inputs a content-based min-width
-   (placeholder text + chevron) that overflows their parent even with
-   w-full set. Constraining max-width / box-sizing on the outer plus
-   min-width: 0 on the inner ::-webkit-date-and-time-value pseudo —
-   which is iOS's actual culprit — fixes the bleed without touching
-   display/height (which would interact with the form's explicit
-   h-11 on iOS WebKit). */
+/* iOS Safari gives native date/time inputs a content-based intrinsic
+   width (placeholder format + decoration) that overflows the parent
+   even when w-full / max-width: 100% is set, because the value lives
+   in shadow-DOM pseudo-elements with their own default min-width.
+   Strip the native chrome with appearance: none so the input lays out
+   like a plain text field — the native picker (wheel modal on tap)
+   still works; only the inline decoration goes away. */
 input[type="date"],
 input[type="time"],
 input[type="datetime-local"],
 input[type="month"],
 input[type="week"] {
+  -webkit-appearance: none;
+  appearance: none;
   min-width: 0;
   max-width: 100%;
   box-sizing: border-box;
 }
 
+/* Belt-and-suspenders: also pin the inner value pseudo so any version
+   of iOS Safari that still respects this selector won't blow out the
+   outer width. */
 input[type="date"]::-webkit-date-and-time-value,
 input[type="time"]::-webkit-date-and-time-value,
 input[type="datetime-local"]::-webkit-date-and-time-value,
