@@ -13,13 +13,18 @@ import { toLocalDay } from "@/lib/date-utils";
 import { getSundayWeekStart } from "@/lib/week-utils";
 
 // ------- Dashboard module config -------
-// Future: add { hidden: string[] } to support show/hide, plus new module IDs.
+// Future: add { hidden: string[], widths: Record<id, "half" | "full"> } to
+// the saved layout shape so users can choose per-module width too.
 const MODULE_LABELS: Record<string, string> = {
   stats: "Kid stats",
   calendar: "Family calendar",
   today: "Today's activity",
   photos: "Photo gallery",
 };
+// Modules listed here render at half-width on lg+ screens. Others are full.
+// Adjacent half-width modules pair side-by-side via flex-wrap; a half next
+// to a full simply leaves blank space — the user can reorder to fix that.
+const HALF_WIDTH_MODULES: Set<string> = new Set(["today", "photos"]);
 const DEFAULT_ORDER = ["stats", "calendar", "today", "photos"];
 const LAYOUT_STORAGE_KEY = "dashboardLayout:v1";
 
@@ -258,7 +263,7 @@ export default function ParentHome({ userName }: ParentHomeProps) {
     if (!primaryKid) return null;
     if (isMultiKid) {
       return (
-        <div className="px-7 grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {allKidStats.map(({ kid, weekTotal, streak }) => (
             <div
               key={kid.id}
@@ -296,7 +301,7 @@ export default function ParentHome({ userName }: ParentHomeProps) {
       );
     }
     return (
-      <div className="px-7 grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: primaryKid.name || "Kid", value: primaryKid.totalPoints.toLocaleString(), sub: "total gems", tone: "#FFCB3B", showCoin: true },
           { label: "This week", value: `+${primaryStats.weekTotal}`, sub: "gems earned", tone: "#6b8e4e", showCoin: false },
@@ -324,7 +329,7 @@ export default function ParentHome({ userName }: ParentHomeProps) {
   };
 
   const renderToday = () => (
-    <div className="px-7">
+    <div>
       <div className="rounded-[14px] border border-[rgba(68,55,32,0.14)] bg-white p-4">
         <div className="flex items-baseline justify-between mb-3">
           <h3 className="font-[family-name:var(--font-fraunces)] text-lg font-medium text-pg-ink">
@@ -367,11 +372,11 @@ export default function ParentHome({ userName }: ParentHomeProps) {
       case "stats":
         return renderStats();
       case "calendar":
-        return <div className="px-7"><WeeklyCalendarView /></div>;
+        return <WeeklyCalendarView />;
       case "today":
         return renderToday();
       case "photos":
-        return <div className="px-7"><PhotoCarousel /></div>;
+        return <PhotoCarousel />;
       default:
         return null;
     }
@@ -431,49 +436,57 @@ export default function ParentHome({ userName }: ParentHomeProps) {
         <div className="py-12 text-center text-pg-muted">Loading...</div>
       )}
 
-      {!loading &&
-        order.map((id, idx) => {
-          const content = renderModule(id);
-          if (!content) return null;
-          return (
-            <div key={id} className="mt-5">
-              {editingLayout && (
-                <div className="px-7 mb-2 flex items-center justify-between">
-                  <span className="text-[11px] font-bold uppercase tracking-wide text-pg-muted">
-                    {MODULE_LABELS[id] || id}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => moveUp(idx)}
-                      disabled={idx === 0}
-                      className="p-1.5 rounded-lg border border-pg-line bg-white text-pg-ink disabled:opacity-30 hover:bg-pg-cream"
-                      aria-label="Move up"
-                    >
-                      <ChevronUp size={16} />
-                    </button>
-                    <button
-                      onClick={() => moveDown(idx)}
-                      disabled={idx === order.length - 1}
-                      className="p-1.5 rounded-lg border border-pg-line bg-white text-pg-ink disabled:opacity-30 hover:bg-pg-cream"
-                      aria-label="Move down"
-                    >
-                      <ChevronDown size={16} />
-                    </button>
+      {!loading && (
+        <div className="px-7 mt-5 flex flex-wrap gap-5">
+          {order.map((id, idx) => {
+            const content = renderModule(id);
+            if (!content) return null;
+            const isHalf = HALF_WIDTH_MODULES.has(id);
+            const widthClass = isHalf ? "w-full lg:w-[calc(50%-10px)]" : "w-full";
+            return (
+              <div key={id} className={widthClass}>
+                {editingLayout && (
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-[11px] font-bold uppercase tracking-wide text-pg-muted">
+                      {MODULE_LABELS[id] || id}
+                      {isHalf && (
+                        <span className="ml-2 normal-case text-pg-muted/70">· half-width</span>
+                      )}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => moveUp(idx)}
+                        disabled={idx === 0}
+                        className="p-1.5 rounded-lg border border-pg-line bg-white text-pg-ink disabled:opacity-30 hover:bg-pg-cream"
+                        aria-label="Move up"
+                      >
+                        <ChevronUp size={16} />
+                      </button>
+                      <button
+                        onClick={() => moveDown(idx)}
+                        disabled={idx === order.length - 1}
+                        className="p-1.5 rounded-lg border border-pg-line bg-white text-pg-ink disabled:opacity-30 hover:bg-pg-cream"
+                        aria-label="Move down"
+                      >
+                        <ChevronDown size={16} />
+                      </button>
+                    </div>
                   </div>
+                )}
+                <div
+                  className={
+                    editingLayout
+                      ? "p-3 rounded-[14px] border-2 border-dashed border-pg-line"
+                      : ""
+                  }
+                >
+                  {content}
                 </div>
-              )}
-              <div
-                className={
-                  editingLayout
-                    ? "mx-4 px-3 py-2 rounded-[14px] border-2 border-dashed border-pg-line"
-                    : ""
-                }
-              >
-                {content}
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+      )}
 
       <ParentTabBar />
     </div>
