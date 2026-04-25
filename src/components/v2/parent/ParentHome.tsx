@@ -168,21 +168,20 @@ export default function ParentHome({ userName }: ParentHomeProps) {
   };
 
   const primaryKid = kids[0];
+  const isMultiKid = kids.length > 1;
 
   const weekStart = getSundayWeekStart(new Date());
-  const weekTotal = primaryKid
-    ? primaryKid.allEntries
-        .filter((e) => {
-          const d = new Date(e.date || e.createdAt);
-          return d >= weekStart && e.points > 0;
-        })
-        .reduce((s, e) => s + e.points, 0)
-    : 0;
 
-  const streakCount = (() => {
-    if (!primaryKid) return 0;
+  function computeKidStats(kid: KidWithPoints): { weekTotal: number; streak: number } {
+    const weekTotal = kid.allEntries
+      .filter((e) => {
+        const d = new Date(e.date || e.createdAt);
+        return d >= weekStart && e.points > 0;
+      })
+      .reduce((s, e) => s + e.points, 0);
+
     const dayTotals: Record<string, number> = {};
-    for (const e of primaryKid.allEntries) {
+    for (const e of kid.allEntries) {
       if (e.points > 0) {
         const ds = toLocalDay(new Date(e.date || e.createdAt));
         dayTotals[ds] = (dayTotals[ds] || 0) + e.points;
@@ -196,8 +195,11 @@ export default function ParentHome({ userName }: ParentHomeProps) {
       else if (i > 0) break;
       d.setDate(d.getDate() - 1);
     }
-    return streak;
-  })();
+    return { weekTotal, streak };
+  }
+
+  const primaryStats = primaryKid ? computeKidStats(primaryKid) : { weekTotal: 0, streak: 0 };
+  const allKidStats = kids.map((k) => ({ kid: k, ...computeKidStats(k) }));
 
   return (
     <div className="min-h-screen bg-pg-cream pb-[110px] font-[family-name:var(--font-inter)]">
@@ -218,26 +220,32 @@ export default function ParentHome({ userName }: ParentHomeProps) {
           {getGreeting()}, <em className="italic text-pg-accent-deep">{firstName}</em>
         </h1>
 
-        {/* View as Kid — full width on mobile */}
-        {primaryKid && (
-          <button
-            onClick={() => handleViewAsKid(primaryKid)}
-            className="mt-3 w-full sm:w-auto flex items-center justify-center gap-2 rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-white"
-            style={{ background: "#6b8e4e", boxShadow: "0 2px 0 rgba(74,106,50,0.4)" }}
-          >
-            <User size={16} />
-            View as {primaryKid.name || "Kid"}
-          </button>
+        {/* View as Kid — one button per kid */}
+        {kids.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {kids.map((kid) => (
+              <button
+                key={kid.id}
+                onClick={() => handleViewAsKid(kid)}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-white"
+                style={{ background: "#6b8e4e", boxShadow: "0 2px 0 rgba(74,106,50,0.4)" }}
+              >
+                <User size={16} />
+                View as {kid.name || "Kid"}
+              </button>
+            ))}
+          </div>
         )}
       </div>
 
-      {/* Stats row */}
-      {primaryKid && !loading && (
+      {/* Stats — single-kid families keep the 4-tile row; multi-kid families
+          get a compact card per kid so all are visible at once. */}
+      {primaryKid && !loading && !isMultiKid && (
         <div className="mt-5 px-7 grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
             { label: primaryKid.name || "Kid", value: primaryKid.totalPoints.toLocaleString(), sub: "total gems", tone: "#FFCB3B", showCoin: true },
-            { label: "This week", value: `+${weekTotal}`, sub: "gems earned", tone: "#6b8e4e", showCoin: false },
-            { label: "Streak", value: String(streakCount), sub: "days in a row", tone: "#c5543d", showCoin: false, showFlame: true },
+            { label: "This week", value: `+${primaryStats.weekTotal}`, sub: "gems earned", tone: "#6b8e4e", showCoin: false },
+            { label: "Streak", value: String(primaryStats.streak), sub: "days in a row", tone: "#c5543d", showCoin: false, showFlame: true },
             { label: "Badges", value: "—", sub: "earned", tone: "#d88b8b", showCoin: false },
           ].map((s, i) => (
             <div
@@ -254,6 +262,44 @@ export default function ParentHome({ userName }: ParentHomeProps) {
                 </span>
               </div>
               <div className="text-xs text-pg-muted mt-1">{s.sub}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {isMultiKid && !loading && (
+        <div className="mt-5 px-7 grid grid-cols-1 md:grid-cols-2 gap-3">
+          {allKidStats.map(({ kid, weekTotal, streak }) => (
+            <div
+              key={kid.id}
+              className="bg-white rounded-xl p-4 border border-[rgba(68,55,32,0.14)]"
+              style={{ borderLeft: "3px solid #FFCB3B" }}
+            >
+              <div className="flex items-baseline justify-between mb-3">
+                <h3 className="font-[family-name:var(--font-fraunces)] text-lg font-medium text-pg-ink">
+                  {kid.name || "Kid"}
+                </h3>
+                <div className="flex items-baseline gap-1">
+                  <CoinSmall size={16} />
+                  <span className="font-[family-name:var(--font-fraunces)] text-[24px] font-medium text-pg-ink leading-none tracking-tight">
+                    {kid.totalPoints.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <div className="text-[11px] font-semibold text-pg-muted uppercase tracking-wide">This week</div>
+                  <div className="text-base font-semibold text-pg-accent-deep mt-0.5">+{weekTotal}</div>
+                </div>
+                <div>
+                  <div className="text-[11px] font-semibold text-pg-muted uppercase tracking-wide">Streak</div>
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <FlameIcon size={14} />
+                    <span className="text-base font-semibold text-[#c5543d]">{streak}</span>
+                    <span className="text-xs text-pg-muted">{streak === 1 ? "day" : "days"}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -276,7 +322,7 @@ export default function ParentHome({ userName }: ParentHomeProps) {
             <div className="rounded-[14px] border border-[rgba(68,55,32,0.14)] bg-white p-4">
               <div className="flex items-baseline justify-between mb-3">
                 <h3 className="font-[family-name:var(--font-fraunces)] text-lg font-medium text-pg-ink">
-                  {primaryKid?.name} today
+                  {isMultiKid ? "Today's activity" : `${primaryKid?.name} today`}
                 </h3>
               </div>
               {allTodayEntries.map((entry, i) => (
@@ -289,10 +335,15 @@ export default function ParentHome({ userName }: ParentHomeProps) {
                   <span className="w-14 shrink-0 text-[11px] text-pg-muted tabular-nums">
                     {formatTime(entry.createdAt)}
                   </span>
-                  <span className="flex-1 text-sm font-medium text-pg-ink">
+                  <span className="flex-1 text-sm font-medium text-pg-ink truncate">
+                    {isMultiKid && (
+                      <span className="inline-block px-1.5 py-0.5 mr-2 text-[10px] font-bold uppercase tracking-wide rounded bg-[rgba(107,142,78,0.12)] text-pg-accent-deep">
+                        {entry.kidName}
+                      </span>
+                    )}
                     {entry.chore?.title || entry.note || "Points"}
                   </span>
-                  <div className="flex items-center gap-1 text-sm font-bold text-pg-accent-deep">
+                  <div className="flex items-center gap-1 text-sm font-bold text-pg-accent-deep whitespace-nowrap">
                     <CoinSmall size={13} />{entry.points > 0 ? "+" : ""}{entry.points}
                   </div>
                 </div>
