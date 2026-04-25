@@ -21,7 +21,6 @@ type ChoreFormProps = {
   onSuccess: (chore: Chore) => void;
 };
 
-// Organized emoji icons for chores (game-style categories)
 const iconCategories = {
   "Cleaning": ["🧹", "🌀", "🪣", "✨", "🧺", "🧽", "🫧", "💫", "🧴"],
   "Dishes": ["🍽️", "🫧", "💨", "🗄️"],
@@ -39,6 +38,16 @@ const iconCategories = {
   "Power-ups": ["🎁", "⭐", "🌟", "➕", "⚡", "🏆", "💪", "🔥", "🎯", "🚀", "💎"],
   "Self-care": ["🦷", "💇", "🧼", "🙌", "💅"],
   "Time": ["🌅", "🌆", "🌙", "📅", "🗓️", "🔄"],
+};
+
+const inputClass =
+  "w-full px-3 py-2 rounded-[10px] border border-pg-line bg-white text-pg-ink focus:outline-none focus:border-pg-accent transition-colors";
+
+const labelClass = "block text-sm font-semibold text-pg-ink mb-1";
+
+const primaryBtn: React.CSSProperties = {
+  background: "#4a6a32",
+  boxShadow: "0 2px 0 rgba(74,106,50,0.3)",
 };
 
 export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps) {
@@ -103,15 +112,15 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 font-[family-name:var(--font-inter)]">
+      <div className="bg-white rounded-[14px] border border-pg-line p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-900">
+          <h2 className="font-[family-name:var(--font-fraunces)] text-xl font-medium text-pg-ink">
             {chore ? t("editChore") : t("addChoreTitle")}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-pg-muted hover:text-pg-ink"
           >
             <svg
               className="w-6 h-6"
@@ -131,16 +140,13 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            <div className="bg-[rgba(197,84,61,0.08)] border border-[rgba(197,84,61,0.25)] text-pg-coral px-4 py-3 rounded-[10px] text-sm font-medium">
               {error}
             </div>
           )}
 
           <div>
-            <label
-              htmlFor="title"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
+            <label htmlFor="title" className={labelClass}>
               {t("choreName")}
             </label>
             <input
@@ -150,19 +156,17 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g., Wash dishes, Take out trash"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className={inputClass}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t("iconLabel")}
-            </label>
+            <label className={labelClass}>{t("iconLabel")}</label>
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setShowIconPicker(!showIconPicker)}
-                className="w-14 h-14 text-3xl border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors flex items-center justify-center"
+                className="w-14 h-14 text-3xl border-2 border-dashed border-pg-line rounded-[10px] hover:border-pg-accent hover:bg-[rgba(107,142,78,0.06)] transition-colors flex items-center justify-center"
               >
                 {icon || "➕"}
               </button>
@@ -170,21 +174,21 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
                 <button
                   type="button"
                   onClick={() => setIcon("")}
-                  className="text-sm text-gray-500 hover:text-red-500"
+                  className="text-sm text-pg-muted hover:text-pg-coral"
                 >
                   {t("clear")}
                 </button>
               )}
-              <span className="text-sm text-gray-500 ml-2">
+              <span className="text-sm text-pg-muted ml-2">
                 {icon ? t("clickToChange") : t("clickToPick")}
               </span>
             </div>
 
             {showIconPicker && (
-              <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200 max-h-[50vh] overflow-y-auto">
+              <div className="mt-2 p-3 bg-pg-cream rounded-[10px] border border-pg-line max-h-[50vh] overflow-y-auto">
                 {Object.entries(iconCategories).map(([category, icons]) => (
                   <div key={category} className="mb-4">
-                    <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                    <h4 className="text-xs font-bold text-pg-muted uppercase tracking-wide mb-2">
                       {category}
                     </h4>
                     <div className="grid grid-cols-6 sm:grid-cols-8 gap-1">
@@ -196,8 +200,10 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
                             setIcon(emoji);
                             setShowIconPicker(false);
                           }}
-                          className={`text-xl sm:text-2xl p-2 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 sm:p-1.5 rounded hover:bg-blue-100 transition-colors flex items-center justify-center ${
-                            icon === emoji ? "bg-blue-200 ring-2 ring-blue-500" : ""
+                          className={`text-xl sm:text-2xl p-2 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 sm:p-1.5 rounded-[8px] hover:bg-[rgba(107,142,78,0.12)] transition-colors flex items-center justify-center ${
+                            icon === emoji
+                              ? "bg-[rgba(107,142,78,0.2)] ring-2 ring-pg-accent"
+                              : ""
                           }`}
                         >
                           {emoji}
@@ -206,8 +212,8 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
                     </div>
                   </div>
                 ))}
-                <div className="mt-3 pt-3 border-t border-gray-200">
-                  <label className="block text-xs text-gray-500 mb-1">
+                <div className="mt-3 pt-3 border-t border-pg-line">
+                  <label className="block text-xs text-pg-muted mb-1">
                     {t("orTypeEmoji")}
                   </label>
                   <input
@@ -215,22 +221,17 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
                     value={icon}
                     onChange={(e) => setIcon(e.target.value)}
                     placeholder="Type or paste an emoji"
-                    className="w-full px-3 py-2 min-h-[44px] text-lg border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className={`${inputClass} text-lg`}
                     maxLength={4}
                   />
                 </div>
               </div>
             )}
-            <p className="mt-1 text-xs text-gray-500">
-              {t("iconHelp")}
-            </p>
+            <p className="mt-1 text-xs text-pg-muted">{t("iconHelp")}</p>
           </div>
 
           <div>
-            <label
-              htmlFor="defaultPoints"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
+            <label htmlFor="defaultPoints" className={labelClass}>
               {t("defaultPoints")}
             </label>
             <input
@@ -241,25 +242,24 @@ export default function ChoreForm({ chore, onClose, onSuccess }: ChoreFormProps)
               value={defaultPoints}
               onChange={(e) => setDefaultPoints(e.target.value)}
               placeholder="e.g., 10"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className={inputClass}
             />
-            <p className="mt-1 text-sm text-gray-500">
-              {t("pointsAwarded")}
-            </p>
+            <p className="mt-1 text-sm text-pg-muted">{t("pointsAwarded")}</p>
           </div>
 
           <div className="flex space-x-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 min-h-[44px] border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium"
+              className="flex-1 px-4 py-2 min-h-[44px] border border-pg-line rounded-[10px] text-pg-ink hover:bg-pg-cream font-semibold text-sm"
             >
               {tCommon("cancel")}
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 py-2 min-h-[44px] bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 min-h-[44px] text-white rounded-[10px] font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-transform hover:scale-[1.01]"
+              style={primaryBtn}
             >
               {loading ? t("saving") : chore ? t("update") : t("create")}
             </button>

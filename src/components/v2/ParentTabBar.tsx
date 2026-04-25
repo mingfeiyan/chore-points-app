@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, BookOpen, Calendar, Gift, Settings } from "lucide-react";
+import { Home, BookOpen, Calendar, Gift, Settings, ClipboardList } from "lucide-react";
 
 const tabs = [
   { label: "Home", href: "/dashboard", icon: Home },
+  { label: "Chores", href: "/chores", icon: ClipboardList },
   { label: "Ledger", href: "/ledger", icon: BookOpen },
   { label: "Reward", href: "/rewards", icon: Gift },
   { label: "Calendar", href: "/calendar", icon: Calendar },
