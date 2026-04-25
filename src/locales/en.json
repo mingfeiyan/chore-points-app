@@ -475,6 +475,12 @@
       "signOut": "Sign out",
       "signingOut": "Signing out…"
     },
+    "addKid": {
+      "addKid": "Add kid",
+      "namePlaceholder": "Kid's name",
+      "adding": "Adding…",
+      "addFailed": "Couldn't add kid. Please try again."
+    },
     "photoStorage": {
       "title": "Photo storage",
       "description": "Choose where your family's photos are stored. Connect your Google Drive and photos go into a folder in your own Drive — they never touch GemSteps' servers.",

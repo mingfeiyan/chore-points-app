@@ -5,6 +5,7 @@ import FamilyInviteCode from "@/components/family/FamilyInviteCode";
 import BadgeManagementTabs from "@/components/settings/BadgeManagementTabs";
 import PhotoStorageCard from "@/components/settings/PhotoStorageCard";
 import SignOutCard from "@/components/settings/SignOutCard";
+import AddKidInline from "@/components/settings/AddKidInline";
 import ParentTabBar from "@/components/v2/ParentTabBar";
 
 type Kid = {
@@ -54,23 +55,29 @@ export default function SettingsPageContent({ familyName, inviteCode, kids }: Pr
             {/* Family Members */}
             <div className="py-3 border-b border-[rgba(68,55,32,0.08)]">
               <div className="text-xs font-medium text-pg-muted uppercase tracking-wide mb-2">{t("familyMembers")}</div>
-              {kids.length === 0 ? (
-                <p className="text-pg-muted text-sm">{tParent("noKidsYet")}</p>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {kids.map((kid) => (
-                    <span
-                      key={kid.id}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(107,142,78,0.1)] text-pg-accent-deep rounded-full text-sm font-medium"
-                    >
-                      <span className="w-5 h-5 rounded-full bg-pg-accent text-white flex items-center justify-center text-[10px] font-bold">
-                        {(kid.name || kid.email)[0].toUpperCase()}
+              <div className="flex flex-wrap gap-2 items-center">
+                {kids.length === 0 ? (
+                  <p className="text-pg-muted text-sm">{tParent("noKidsYet")}</p>
+                ) : (
+                  kids.map((kid) => {
+                    const display = kid.name || kid.email;
+                    const isSyntheticEmail = kid.email.endsWith("@local.gemsteps.app");
+                    return (
+                      <span
+                        key={kid.id}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(107,142,78,0.1)] text-pg-accent-deep rounded-full text-sm font-medium"
+                        title={isSyntheticEmail ? "Profile only — can't log in" : kid.email}
+                      >
+                        <span className="w-5 h-5 rounded-full bg-pg-accent text-white flex items-center justify-center text-[10px] font-bold">
+                          {(display)[0].toUpperCase()}
+                        </span>
+                        {isSyntheticEmail ? (kid.name || "Kid") : display}
                       </span>
-                      {kid.name || kid.email}
-                    </span>
-                  ))}
-                </div>
-              )}
+                    );
+                  })
+                )}
+                <AddKidInline />
+              </div>
             </div>
 
             {/* Invite Code */}

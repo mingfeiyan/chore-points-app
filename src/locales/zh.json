@@ -151,6 +151,12 @@
       "signOut": "退出登录",
       "signingOut": "退出中…"
     },
+    "addKid": {
+      "addKid": "添加孩子",
+      "namePlaceholder": "孩子的名字",
+      "adding": "添加中…",
+      "addFailed": "添加失败，请重试。"
+    },
     "photoStorage": {
       "title": "照片存储",
       "description": "选择家庭照片的存储位置。连接你的 Google Drive 后，照片会存到你自己 Drive 的文件夹里，不经过 GemSteps 服务器。",
