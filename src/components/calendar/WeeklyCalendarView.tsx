@@ -28,11 +28,15 @@ function toLocalDateString(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-// Family member color mapping (Paper Garden theme) — uses inline styles for rgba backgrounds
-const FAMILY_MEMBERS = [
-  { name: "Jasper", color: "text-[#7b6bad]", dotColor: "bg-[#b49ef0]", style: { backgroundColor: "rgba(180,158,240,0.15)" } as React.CSSProperties },
-  { name: "Mingfei", color: "text-[#4a6a32]", dotColor: "bg-[#9bbf7a]", style: { backgroundColor: "rgba(155,191,122,0.15)" } as React.CSSProperties },
-  { name: "Yue", color: "text-[#a05555]", dotColor: "bg-[#d88b8b]", style: { backgroundColor: "rgba(216,139,139,0.15)" } as React.CSSProperties },
+// Paper Garden color palette — cycled through to assign each family member
+// a distinct color. Order matches buildFamilyMembers() callers.
+const MEMBER_PALETTE = [
+  { color: "text-[#7b6bad]", dotColor: "bg-[#b49ef0]", style: { backgroundColor: "rgba(180,158,240,0.15)" } as React.CSSProperties },
+  { color: "text-[#4a6a32]", dotColor: "bg-[#9bbf7a]", style: { backgroundColor: "rgba(155,191,122,0.15)" } as React.CSSProperties },
+  { color: "text-[#a05555]", dotColor: "bg-[#d88b8b]", style: { backgroundColor: "rgba(216,139,139,0.15)" } as React.CSSProperties },
+  { color: "text-[#a87a3c]", dotColor: "bg-[#d4a674]", style: { backgroundColor: "rgba(212,166,116,0.15)" } as React.CSSProperties },
+  { color: "text-[#3d6e6e]", dotColor: "bg-[#7bc1c1]", style: { backgroundColor: "rgba(123,193,193,0.15)" } as React.CSSProperties },
+  { color: "text-[#a85577]", dotColor: "bg-[#dba2bf]", style: { backgroundColor: "rgba(219,162,191,0.15)" } as React.CSSProperties },
 ];
 
 const DEFAULT_COLOR = { color: "text-[#4a6a8a]", dotColor: "bg-[#7fa8dd]", style: { backgroundColor: "rgba(127,168,221,0.15)" } as React.CSSProperties };
@@ -90,8 +94,34 @@ export default function WeeklyCalendarView() {
     modalGoogleLink: "text-[#857d68] hover:text-[#2f2a1f]",
   };
 
-  const familyMembers = FAMILY_MEMBERS;
+  const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const defaultColor = DEFAULT_COLOR;
+
+  useEffect(() => {
+    const loadMembers = async () => {
+      try {
+        const [kidsRes, parentsRes] = await Promise.all([
+          fetch("/api/family/kids"),
+          fetch("/api/family/parents"),
+        ]);
+        const kidsData = await kidsRes.json();
+        const parentsData = await parentsRes.json();
+        const names: string[] = [];
+        if (kidsRes.ok && Array.isArray(kidsData.kids)) {
+          for (const k of kidsData.kids) names.push((k.name || k.email).split(" ")[0]);
+        }
+        if (parentsRes.ok && Array.isArray(parentsData.parents)) {
+          for (const p of parentsData.parents) names.push((p.name || p.email).split(" ")[0]);
+        }
+        setFamilyMembers(
+          names.map((name, i) => ({ name, ...MEMBER_PALETTE[i % MEMBER_PALETTE.length] }))
+        );
+      } catch (err) {
+        console.error("Failed to load family members:", err);
+      }
+    };
+    loadMembers();
+  }, []);
 
   const [settings, setSettings] = useState<CalendarSettings | null>(null);
   const [events, setEvents] = useState<CalendarEvent[]>([]);

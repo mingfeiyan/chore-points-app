@@ -27,13 +27,23 @@ function toLocalDateString(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-// Family members for event assignment
-const FAMILY_MEMBERS = ["Jasper", "Mingfei", "Yue"];
+// Paper Garden palette — each family member gets the next color in the cycle.
+const MEMBER_PALETTE: { activeClass: string; bg: string }[] = [
+  { activeClass: "border-[#b49ef0] text-[#7b6bad]", bg: "rgba(180,158,240,0.15)" },
+  { activeClass: "border-[#9bbf7a] text-[#4a6a32]", bg: "rgba(155,191,122,0.15)" },
+  { activeClass: "border-[#d88b8b] text-[#a05555]", bg: "rgba(216,139,139,0.15)" },
+  { activeClass: "border-[#d4a674] text-[#a87a3c]", bg: "rgba(212,166,116,0.15)" },
+  { activeClass: "border-[#7bc1c1] text-[#3d6e6e]", bg: "rgba(123,193,193,0.15)" },
+  { activeClass: "border-[#dba2bf] text-[#a85577]", bg: "rgba(219,162,191,0.15)" },
+];
 
 // Detect family member from event title and return member name and clean title
-function parseMemberFromTitle(title: string): { member: string; cleanTitle: string } {
+function parseMemberFromTitle(
+  title: string,
+  members: string[]
+): { member: string; cleanTitle: string } {
   const lowerTitle = title.toLowerCase();
-  for (const member of FAMILY_MEMBERS) {
+  for (const member of members) {
     const lowerMember = member.toLowerCase();
     // Check for patterns like "Jasper - Event" or "Jasper: Event" or "Jasper's Event"
     const patterns = [
@@ -133,13 +143,33 @@ export default function CalendarEventForm({
     errorBg: "bg-[rgba(197,84,61,0.08)] border border-[rgba(197,84,61,0.2)] text-[#c5543d]",
     memberNone: "bg-[rgba(68,55,32,0.06)] border-[#4a6a32] text-[#4a6a32]",
     memberNoneInactive: "bg-white border-[rgba(68,55,32,0.14)] text-[#857d68] hover:border-[rgba(68,55,32,0.25)]",
-    memberJasper: "border-[#b49ef0] text-[#7b6bad]",
-    memberJasperBg: "rgba(180,158,240,0.15)",
-    memberMingfei: "border-[#9bbf7a] text-[#4a6a32]",
-    memberMingfeiBg: "rgba(155,191,122,0.15)",
-    memberYue: "border-[#d88b8b] text-[#a05555]",
-    memberYueBg: "rgba(216,139,139,0.15)",
   };
+
+  const [familyMembers, setFamilyMembers] = useState<string[]>([]);
+
+  useEffect(() => {
+    const loadMembers = async () => {
+      try {
+        const [kidsRes, parentsRes] = await Promise.all([
+          fetch("/api/family/kids"),
+          fetch("/api/family/parents"),
+        ]);
+        const kidsData = await kidsRes.json();
+        const parentsData = await parentsRes.json();
+        const names: string[] = [];
+        if (kidsRes.ok && Array.isArray(kidsData.kids)) {
+          for (const k of kidsData.kids) names.push((k.name || k.email).split(" ")[0]);
+        }
+        if (parentsRes.ok && Array.isArray(parentsData.parents)) {
+          for (const p of parentsData.parents) names.push((p.name || p.email).split(" ")[0]);
+        }
+        setFamilyMembers(names);
+      } catch (err) {
+        console.error("Failed to load family members:", err);
+      }
+    };
+    loadMembers();
+  }, []);
 
   const [summary, setSummary] = useState("");
   const [selectedMember, setSelectedMember] = useState("");
@@ -171,7 +201,7 @@ export default function CalendarEventForm({
   useEffect(() => {
     if (event) {
       // Parse member from existing title
-      const { member, cleanTitle } = parseMemberFromTitle(event.summary);
+      const { member, cleanTitle } = parseMemberFromTitle(event.summary, familyMembers);
       setSummary(cleanTitle);
       setSelectedMember(member);
       setDescription(event.description || "");
@@ -216,7 +246,7 @@ export default function CalendarEventForm({
       setDuration(60);
       setSelectedMember("");
     }
-  }, [event, selectedDate]);
+  }, [event, selectedDate, familyMembers]);
 
   // Handle start date change - update end date to maintain the same day gap
   const handleStartDateChange = (newStartDate: string) => {
@@ -372,12 +402,8 @@ export default function CalendarEventForm({
               >
                 {t("noAssignment")}
               </button>
-              {FAMILY_MEMBERS.map((member) => {
-                const memberTheme = member === "Jasper"
-                  ? { active: theme.memberJasper, bg: theme.memberJasperBg }
-                  : member === "Mingfei"
-                  ? { active: theme.memberMingfei, bg: theme.memberMingfeiBg }
-                  : { active: theme.memberYue, bg: theme.memberYueBg };
+              {familyMembers.map((member, i) => {
+                const memberTheme = MEMBER_PALETTE[i % MEMBER_PALETTE.length];
                 return (
                 <button
                   key={member}
@@ -385,10 +411,10 @@ export default function CalendarEventForm({
                   onClick={() => setSelectedMember(member)}
                   className={`px-3 py-1.5 text-sm rounded-full border transition ${
                     selectedMember === member
-                      ? memberTheme.active
+                      ? memberTheme.activeClass
                       : theme.memberNoneInactive
                   }`}
-                  style={selectedMember === member && memberTheme.bg ? { backgroundColor: memberTheme.bg } : undefined}
+                  style={selectedMember === member ? { backgroundColor: memberTheme.bg } : undefined}
                 >
                   {member}
                 </button>

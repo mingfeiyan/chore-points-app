@@ -13,6 +13,12 @@ interface Kid {
   email: string;
 }
 
+interface Parent {
+  id: string;
+  name: string | null;
+  email: string;
+}
+
 interface CalendarEvent {
   id: string;
   summary: string;
@@ -82,6 +88,7 @@ export default function ParentCalendar() {
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
   const [kids, setKids] = useState<Kid[]>([]);
+  const [parents, setParents] = useState<Parent[]>([]);
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
   const [calendarSettings, setCalendarSettings] = useState<CalendarSettings | null>(null);
   const [loading, setLoading] = useState(true);
@@ -140,15 +147,19 @@ export default function ParentCalendar() {
     setViewMonth(today.getMonth());
   };
 
-  // Load kids + points
+  // Load family members (kids + parents) for legend and event coloring
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       try {
-        const kidsRes = await fetch("/api/family/kids");
+        const [kidsRes, parentsRes] = await Promise.all([
+          fetch("/api/family/kids"),
+          fetch("/api/family/parents"),
+        ]);
         const kidsData = await kidsRes.json();
-        if (!kidsRes.ok || !Array.isArray(kidsData.kids)) return;
-        setKids(kidsData.kids);
+        const parentsData = await parentsRes.json();
+        if (kidsRes.ok && Array.isArray(kidsData.kids)) setKids(kidsData.kids);
+        if (parentsRes.ok && Array.isArray(parentsData.parents)) setParents(parentsData.parents);
       } catch (err) {
         console.error("Failed to load data:", err);
       } finally {
@@ -185,12 +196,11 @@ export default function ParentCalendar() {
     loadCalendarEvents();
   }, [loadCalendarEvents]);
 
-  // Family members for legend + color matching: kids + parents
-  // Kids come from API, parents are the logged-in user + partner
+  // Family members for legend + color matching: kids first, then parents.
+  // Names come from the family API so the legend reflects the actual family.
   const familyNames: string[] = [
     ...kids.map((k) => (k.name || k.email).split(" ")[0]),
-    "Mingfei",
-    "Yue",
+    ...parents.map((p) => (p.name || p.email).split(" ")[0]),
   ];
 
   // Build month grid (6 weeks × 7 days = 42 cells)
