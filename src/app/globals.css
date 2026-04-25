@@ -104,11 +104,12 @@ body {
 }
 
 /* iOS Safari gives native date/time inputs a content-based min-width
-   (roughly placeholder text + chevron) that overflows their parent
-   even with w-full set. The outer min-width / max-width / width fix
-   handles most browsers; the inner ::-webkit-date-and-time-value rule
-   covers iOS Safari's case where the inner pseudo-element has its own
-   default min-width that pushes the outer input wider. */
+   (placeholder text + chevron) that overflows their parent even with
+   w-full set. Constraining max-width / box-sizing on the outer plus
+   min-width: 0 on the inner ::-webkit-date-and-time-value pseudo —
+   which is iOS's actual culprit — fixes the bleed without touching
+   display/height (which would interact with the form's explicit
+   h-11 on iOS WebKit). */
 input[type="date"],
 input[type="time"],
 input[type="datetime-local"],
@@ -116,9 +117,7 @@ input[type="month"],
 input[type="week"] {
   min-width: 0;
   max-width: 100%;
-  width: 100%;
   box-sizing: border-box;
-  display: block;
 }
 
 input[type="date"]::-webkit-date-and-time-value,
@@ -126,7 +125,6 @@ input[type="time"]::-webkit-date-and-time-value,
 input[type="datetime-local"]::-webkit-date-and-time-value,
 input[type="month"]::-webkit-date-and-time-value,
 input[type="week"]::-webkit-date-and-time-value {
-  text-align: left;
   min-width: 0;
 }
 
