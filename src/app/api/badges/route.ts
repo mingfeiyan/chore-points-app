@@ -54,11 +54,23 @@ export async function GET(req: Request) {
         .map((t) => [t.choreId!, t])
     );
 
-    // Hidden sets: only filter for KIDs. Parents always see all badges
-    // in Settings → Badge Management (otherwise they couldn't unhide).
+    // Tri-state visibility for kids. Parents always see everything in
+    // Settings → Badge Management. hidden wins if both hidden+forceShow
+    // are set on the same template.
     const hiddenAchievementIds = new Set(
       allTemplates
         .filter((t) => t.type === "achievement" && t.builtInBadgeId && t.hidden)
+        .map((t) => t.builtInBadgeId!)
+    );
+    const forceShowAchievementIds = new Set(
+      allTemplates
+        .filter(
+          (t) =>
+            t.type === "achievement" &&
+            t.builtInBadgeId &&
+            t.forceShow &&
+            !t.hidden
+        )
         .map((t) => t.builtInBadgeId!)
     );
     const hiddenChoreIds = new Set(
@@ -175,6 +187,8 @@ export async function GET(req: Request) {
       }
     }
     const isVisibleByProgress = (badgeId: string): boolean => {
+      // Parent's force-show toggle bypasses the tier gate entirely.
+      if (forceShowAchievementIds.has(badgeId)) return true;
       const def = getAchievementBadgeById(badgeId);
       if (!def?.category || !def.tier) return true; // standalone
       if (def.tier === 1) return true; // entry-level always shows

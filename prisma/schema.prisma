@@ -545,10 +545,14 @@ model BadgeTemplate {
 
   ruleConfig Json? // For custom badges: rule configuration
   isActive   Boolean @default(true)
-  // When true, this badge is hidden from kids (parents still see it in
-  // Badge Management). Lets parents stage rollout — e.g. don't show a
-  // 10000-point milestone to a kid who just started.
+  // Visibility for kids. The two flags combine into a tri-state:
+  //   hidden=false, forceShow=false → AUTO (progressive disclosure)
+  //   hidden=true                   → HIDDEN (override, kid never sees)
+  //   forceShow=true                → SHOWN (override, bypasses tier gate)
+  // hidden takes precedence if both are true. Parents always see every
+  // badge in Settings → Badge Management regardless.
   hidden     Boolean @default(false)
+  forceShow  Boolean @default(false)
 
   createdById String
   createdBy   User   @relation("BadgeTemplateCreatedBy", fields: [createdById], references: [id])

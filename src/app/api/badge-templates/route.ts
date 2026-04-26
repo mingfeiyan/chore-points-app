@@ -54,6 +54,7 @@ export async function POST(req: Request) {
       icon,
       ruleConfig,
       hidden,
+      forceShow,
     } = body;
 
     // Validate type
@@ -111,6 +112,7 @@ export async function POST(req: Request) {
         icon: icon || null,
         ruleConfig: ruleConfig || null,
         hidden: hidden === true,
+        forceShow: forceShow === true,
         createdById: session.user.id,
         updatedById: session.user.id,
       },

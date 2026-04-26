@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useLocale } from "next-intl";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Sparkles } from "lucide-react";
 import { ACHIEVEMENT_BADGES } from "@/lib/achievement-badges";
 import BadgeIcon from "@/components/badges/BadgeIcon";
 import BadgeTemplateForm from "./BadgeTemplateForm";
@@ -19,7 +19,28 @@ type BadgeTemplate = {
   imageUrl: string | null;
   icon: string | null;
   hidden?: boolean;
+  forceShow?: boolean;
 };
+
+type Visibility = "auto" | "shown" | "hidden";
+
+const visibilityOf = (t: BadgeTemplate | undefined): Visibility => {
+  if (t?.hidden) return "hidden";
+  if (t?.forceShow) return "shown";
+  return "auto";
+};
+
+const nextVisibility = (v: Visibility): Visibility => {
+  // Auto → Shown (force-show) → Hidden → Auto
+  if (v === "auto") return "shown";
+  if (v === "shown") return "hidden";
+  return "auto";
+};
+
+const visibilityFlags = (v: Visibility) => ({
+  hidden: v === "hidden",
+  forceShow: v === "shown",
+});
 
 export default function AchievementBadgeTemplateList() {
   const [templates, setTemplates] = useState<BadgeTemplate[]>([]);
@@ -64,17 +85,18 @@ export default function AchievementBadgeTemplateList() {
     setSelectedBadge(null);
   };
 
-  const handleToggleVisibility = async (
+  const handleCycleVisibility = async (
     badgeId: string,
     template: BadgeTemplate | undefined
   ) => {
-    const nextHidden = !(template?.hidden ?? false);
+    const next = nextVisibility(visibilityOf(template));
+    const flags = visibilityFlags(next);
     try {
       if (template) {
         await fetch(`/api/badge-templates/${template.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ hidden: nextHidden }),
+          body: JSON.stringify(flags),
         });
       } else {
         await fetch(`/api/badge-templates`, {
@@ -83,13 +105,13 @@ export default function AchievementBadgeTemplateList() {
           body: JSON.stringify({
             type: "achievement",
             builtInBadgeId: badgeId,
-            hidden: nextHidden,
+            ...flags,
           }),
         });
       }
       fetchTemplates();
     } catch (error) {
-      console.error("Failed to toggle badge visibility:", error);
+      console.error("Failed to cycle badge visibility:", error);
     }
   };
 
@@ -112,32 +134,55 @@ export default function AchievementBadgeTemplateList() {
         {ACHIEVEMENT_BADGES.map((badge) => {
           const template = getTemplateForBadge(badge.id);
           const hasCustomization = !!template?.imageUrl;
-          const isHidden = template?.hidden === true;
+          const visibility = visibilityOf(template);
+
+          const tileClass =
+            visibility === "hidden"
+              ? "border-dashed border-[rgba(68,55,32,0.25)] bg-[rgba(68,55,32,0.04)] opacity-70"
+              : visibility === "shown"
+              ? "border-[#a87a3c] bg-[rgba(212,166,116,0.08)]"
+              : hasCustomization
+              ? "border-[#6b8e4e] bg-[rgba(107,142,78,0.06)]"
+              : "border-[rgba(68,55,32,0.14)] bg-white";
+
+          const VisIcon =
+            visibility === "hidden"
+              ? EyeOff
+              : visibility === "shown"
+              ? Sparkles
+              : Eye;
+
+          const visTooltip =
+            visibility === "hidden"
+              ? "Hidden from kids — click for Auto"
+              : visibility === "shown"
+              ? "Force-shown to kids — click to Hide"
+              : "Auto (progressive) — click to Force-show";
+
+          const subText =
+            visibility === "hidden"
+              ? "Hidden from kids"
+              : visibility === "shown"
+              ? "Force-shown to kids"
+              : template?.description ||
+                (locale === "zh" ? badge.descriptionZh : badge.description);
 
           return (
             <div
               key={badge.id}
-              className={`relative p-4 rounded-lg border-2 text-left transition-all ${
-                isHidden
-                  ? "border-dashed border-[rgba(68,55,32,0.25)] bg-[rgba(68,55,32,0.04)] opacity-70"
-                  : hasCustomization
-                  ? "border-[#6b8e4e] bg-[rgba(107,142,78,0.06)]"
-                  : "border-[rgba(68,55,32,0.14)] bg-white"
-              }`}
+              className={`relative p-4 rounded-lg border-2 text-left transition-all ${tileClass}`}
             >
-              {/* Visibility toggle */}
               <button
                 type="button"
-                onClick={() => handleToggleVisibility(badge.id, template)}
-                aria-label={isHidden ? "Show to kids" : "Hide from kids"}
-                title={isHidden ? "Show to kids" : "Hide from kids"}
+                onClick={() => handleCycleVisibility(badge.id, template)}
+                aria-label={visTooltip}
+                title={visTooltip}
                 className="absolute top-1 right-1 p-1 rounded-md text-pg-muted hover:text-pg-ink hover:bg-pg-cream transition-colors"
               >
-                {isHidden ? <EyeOff size={14} /> : <Eye size={14} />}
+                <VisIcon size={14} />
               </button>
 
-              {/* Custom-image indicator */}
-              {hasCustomization && !isHidden && (
+              {hasCustomization && visibility !== "hidden" && (
                 <div className="absolute top-1 left-1 w-2 h-2 bg-[#6b8e4e] rounded-full" />
               )}
 
@@ -158,10 +203,7 @@ export default function AchievementBadgeTemplateList() {
                   {template?.name || (locale === "zh" ? badge.nameZh : badge.name)}
                 </div>
                 <div className="text-xs text-[#857d68] text-center truncate mt-1">
-                  {isHidden
-                    ? "Hidden from kids"
-                    : template?.description ||
-                      (locale === "zh" ? badge.descriptionZh : badge.description)}
+                  {subText}
                 </div>
               </button>
             </div>
