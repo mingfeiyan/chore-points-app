@@ -35,13 +35,12 @@ export async function GET(
       ? Math.min(MAX_THUMB, Math.max(MIN_THUMB, parseInt(thumbParam, 10) || 0))
       : null;
 
-    // Single query proves four things at once:
-    //   1. Photo or PointEntry in this family references this file (authz)
-    //   2. If viewer is a KID, it belongs to them (cross-kid filter)
-    //   3. The family's Drive connection state (token + folder)
-    // PointEntry photos don't have a Photo row of their own — the Award-
-    // for-Chore form writes photoUrl straight to the entry — so we also
-    // look through PointEntry.photoUrl for the proxy URL.
+    // Authz: confirm some record in the family references this file. Kid-
+    // scoped tables (photos, pointEntries) get the kid filter so kids can
+    // only fetch their own. Family-wide assets (rewards, sight words,
+    // badge templates) are visible to every family member, since these
+    // are configuration the parent edits and everyone in the family sees.
+    // Also picks up the family's Drive connection state in the same query.
     const proxyUrl = `/api/drive/file/${driveFileId}`;
     const kidFilter = isKid ? { kidId: session.user.id } : {};
     const family = await prisma.family.findUnique({
@@ -59,11 +58,30 @@ export async function GET(
           select: { id: true },
           take: 1,
         },
+        rewards: {
+          where: { imageUrl: proxyUrl },
+          select: { id: true },
+          take: 1,
+        },
+        sightWords: {
+          where: { imageUrl: proxyUrl },
+          select: { id: true },
+          take: 1,
+        },
+        badgeTemplates: {
+          where: { imageUrl: proxyUrl },
+          select: { id: true },
+          take: 1,
+        },
       },
     });
     if (
       !family ||
-      (family.photos.length === 0 && family.pointEntries.length === 0)
+      (family.photos.length === 0 &&
+        family.pointEntries.length === 0 &&
+        family.rewards.length === 0 &&
+        family.sightWords.length === 0 &&
+        family.badgeTemplates.length === 0)
     ) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
