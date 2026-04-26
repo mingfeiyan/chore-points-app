@@ -189,35 +189,32 @@ export default function BadgeImageUpload({
     }
   };
 
-  // Show cropper modal
+  const primaryBtn: React.CSSProperties = {
+    background: "#4a6a32",
+    boxShadow: "0 2px 0 rgba(74,106,50,0.3)",
+  };
+
+  // Cropper modal
   if (showCropper && imageSrc) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-auto">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 font-[family-name:var(--font-inter)]">
+        <div className="bg-white rounded-[14px] border border-pg-line p-6 w-full max-w-2xl max-h-[90dvh] overflow-auto">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-gray-900">Crop Image</h2>
+            <h2 className="font-[family-name:var(--font-fraunces)] text-xl font-medium text-pg-ink">
+              Crop image
+            </h2>
             <button
               onClick={handleCancelCrop}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-pg-muted hover:text-pg-ink"
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+            <div className="bg-[rgba(197,84,61,0.08)] border border-[rgba(197,84,61,0.25)] text-pg-coral px-4 py-3 rounded-[10px] text-sm font-medium mb-4">
               {error}
             </div>
           )}
@@ -234,13 +231,13 @@ export default function BadgeImageUpload({
                 ref={imgRef}
                 src={imageSrc}
                 alt="Crop preview"
-                className="max-h-[50vh]"
+                className="max-h-[50dvh]"
                 onLoad={onImageLoad}
               />
             </ReactCrop>
           </div>
 
-          <p className="text-sm text-gray-500 text-center mb-4">
+          <p className="text-sm text-pg-muted text-center mb-4">
             Drag to adjust the crop area. The image will be cropped to a circle.
           </p>
 
@@ -248,7 +245,7 @@ export default function BadgeImageUpload({
             <button
               type="button"
               onClick={handleCancelCrop}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium"
+              className="flex-1 px-4 py-2 min-h-[44px] border border-pg-line rounded-[10px] text-pg-ink hover:bg-pg-cream font-semibold text-sm"
             >
               {tCommon("cancel")}
             </button>
@@ -256,9 +253,10 @@ export default function BadgeImageUpload({
               type="button"
               onClick={handleCropComplete}
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 min-h-[44px] text-white rounded-[10px] font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-transform hover:scale-[1.01]"
+              style={primaryBtn}
             >
-              {loading ? "Uploading..." : "Apply Crop"}
+              {loading ? "Uploading..." : "Apply crop"}
             </button>
           </div>
         </div>
@@ -268,12 +266,12 @@ export default function BadgeImageUpload({
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
+      <label className="block text-sm font-semibold text-pg-ink mb-1">
         {label}
       </label>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded mb-2 text-sm">
+        <div className="bg-[rgba(197,84,61,0.08)] border border-[rgba(197,84,61,0.25)] text-pg-coral px-4 py-2 rounded-[10px] mb-2 text-sm font-medium">
           {error}
         </div>
       )}
@@ -292,12 +290,12 @@ export default function BadgeImageUpload({
           <img
             src={imageUrl}
             alt="Badge preview"
-            className="w-24 h-24 object-cover rounded-full border-2 border-purple-200"
+            className="w-24 h-24 object-cover rounded-full border-2 border-[rgba(107,142,78,0.35)]"
           />
           <button
             type="button"
             onClick={handleRemoveImage}
-            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+            className="absolute -top-2 -right-2 bg-pg-coral text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:opacity-90"
           >
             &times;
           </button>
@@ -306,10 +304,10 @@ export default function BadgeImageUpload({
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="flex flex-col items-center justify-center w-24 h-24 border-2 border-dashed border-gray-300 rounded-full cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-colors"
+          className="flex flex-col items-center justify-center w-24 h-24 border-2 border-dashed border-pg-line rounded-full cursor-pointer hover:border-pg-accent hover:bg-[rgba(107,142,78,0.06)] transition-colors"
         >
           <svg
-            className="w-8 h-8 text-gray-400"
+            className="w-8 h-8 text-pg-muted"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -323,7 +321,7 @@ export default function BadgeImageUpload({
           </svg>
         </button>
       )}
-      <p className="mt-1 text-xs text-gray-500">
+      <p className="mt-1 text-xs text-pg-muted">
         Upload a custom image (optional)
       </p>
     </div>
