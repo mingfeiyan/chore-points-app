@@ -30,22 +30,43 @@ export async function GET(req: Request) {
       whereClause.kidId = kidId;
     }
 
-    // Fetch badge templates for the family (for custom images)
-    const badgeTemplates = await prisma.badgeTemplate.findMany({
-      where: { familyId: session.user.familyId!, isActive: true },
+    // Fetch all badge templates for the family. We use all of them to
+    // build the `hidden` filter — `hidden` is independent of `isActive`
+    // (a template can be inactive but still mark the badge as hidden, or
+    // active without hiding) — but we only apply image/name overrides
+    // from active templates.
+    const allTemplates = await prisma.badgeTemplate.findMany({
+      where: { familyId: session.user.familyId! },
     });
 
-    // Create lookup maps for templates
+    const activeTemplates = allTemplates.filter((t) => t.isActive);
+
+    // Create lookup maps for templates (image/name overrides come only
+    // from active templates).
     const achievementTemplateMap = new Map(
-      badgeTemplates
+      activeTemplates
         .filter((t) => t.type === "achievement" && t.builtInBadgeId)
         .map((t) => [t.builtInBadgeId!, t])
     );
     const choreTemplateMap = new Map(
-      badgeTemplates
+      activeTemplates
         .filter((t) => t.type === "chore_level" && t.choreId)
         .map((t) => [t.choreId!, t])
     );
+
+    // Hidden sets: only filter for KIDs. Parents always see all badges
+    // in Settings → Badge Management (otherwise they couldn't unhide).
+    const hiddenAchievementIds = new Set(
+      allTemplates
+        .filter((t) => t.type === "achievement" && t.builtInBadgeId && t.hidden)
+        .map((t) => t.builtInBadgeId!)
+    );
+    const hiddenChoreIds = new Set(
+      allTemplates
+        .filter((t) => t.type === "chore_level" && t.choreId && t.hidden)
+        .map((t) => t.choreId!)
+    );
+    const isKid = session.user.role === Role.KID;
 
     const badges = await prisma.badge.findMany({
       where: whereClause,
@@ -138,10 +159,24 @@ export async function GET(req: Request) {
       };
     });
 
+    // For kids, drop badges the parent has hidden. Custom-award badges
+    // (AI-generated) don't have a template and are never filtered.
+    const visibleBadges = isKid
+      ? enrichedBadges.filter((b) => !hiddenChoreIds.has(b.choreId))
+      : enrichedBadges;
+    const visibleAchievementBadges = isKid
+      ? enrichedAchievementBadges.filter(
+          (b) => b.isCustomAward || !hiddenAchievementIds.has(b.badgeId)
+        )
+      : enrichedAchievementBadges;
+    const visibleAllAchievementBadges = isKid
+      ? allAchievementBadges.filter((b) => !hiddenAchievementIds.has(b.id))
+      : allAchievementBadges;
+
     return NextResponse.json({
-      badges: enrichedBadges,
-      achievementBadges: enrichedAchievementBadges,
-      allAchievementBadges,
+      badges: visibleBadges,
+      achievementBadges: visibleAchievementBadges,
+      allAchievementBadges: visibleAllAchievementBadges,
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Something went wrong";

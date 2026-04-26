@@ -53,6 +53,7 @@ export async function POST(req: Request) {
       imageUrl,
       icon,
       ruleConfig,
+      hidden,
     } = body;
 
     // Validate type
@@ -109,6 +110,7 @@ export async function POST(req: Request) {
         imageUrl: imageUrl || null,
         icon: icon || null,
         ruleConfig: ruleConfig || null,
+        hidden: hidden === true,
         createdById: session.user.id,
         updatedById: session.user.id,
       },

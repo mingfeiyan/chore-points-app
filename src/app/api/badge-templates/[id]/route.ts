@@ -35,6 +35,7 @@ export async function PUT(req: Request, { params }: { params: Params }) {
       icon,
       ruleConfig,
       isActive,
+      hidden,
     } = body;
 
     const template = await prisma.badgeTemplate.update({
@@ -48,6 +49,7 @@ export async function PUT(req: Request, { params }: { params: Params }) {
         icon: icon !== undefined ? icon : existing.icon,
         ruleConfig: ruleConfig !== undefined ? ruleConfig : existing.ruleConfig,
         isActive: isActive !== undefined ? isActive : existing.isActive,
+        hidden: hidden !== undefined ? hidden : existing.hidden,
         updatedById: session.user.id,
       },
       include: {
