@@ -50,6 +50,7 @@ interface KidWithPoints extends Kid {
   todayDelta: number;
   todayEntries: PointEntry[];
   allEntries: PointEntry[];
+  badgesThisWeek: number;
 }
 
 interface ParentHomeProps {
@@ -151,14 +152,32 @@ export default function ParentHome({ userName }: ParentHomeProps) {
       const kidsData = await kidsRes.json();
       if (!kidsRes.ok || !Array.isArray(kidsData.kids)) return;
 
+      // Compute the start of this week (Sunday) once for badge counting.
+      const weekStart = getSundayWeekStart(new Date());
+
       const enriched: KidWithPoints[] = await Promise.all(
         kidsData.kids.map(async (kid: Kid) => {
-          const pointsRes = await fetch(`/api/points?kidId=${kid.id}`);
+          const [pointsRes, badgesRes] = await Promise.all([
+            fetch(`/api/points?kidId=${kid.id}`),
+            fetch(`/api/badges?kidId=${kid.id}`),
+          ]);
           const pointsData = await pointsRes.json();
           const entries: PointEntry[] = pointsData.entries || [];
 
           const todayEntries = entries.filter((e) => isToday(e.createdAt || e.date));
           const todayDelta = todayEntries.reduce((s, e) => s + e.points, 0);
+
+          // achievementBadges from /api/badges already includes built-in
+          // achievements AND custom AI-generated chore badges (which are
+          // stored as AchievementBadge rows with the custom-award- prefix).
+          let badgesThisWeek = 0;
+          if (badgesRes.ok) {
+            const badgesData = await badgesRes.json();
+            const earned: { earnedAt?: string }[] = badgesData.achievementBadges || [];
+            badgesThisWeek = earned.filter(
+              (b) => b.earnedAt && new Date(b.earnedAt) >= weekStart
+            ).length;
+          }
 
           return {
             ...kid,
@@ -166,6 +185,7 @@ export default function ParentHome({ userName }: ParentHomeProps) {
             todayDelta,
             todayEntries,
             allEntries: entries,
+            badgesThisWeek,
           };
         })
       );
@@ -306,7 +326,7 @@ export default function ParentHome({ userName }: ParentHomeProps) {
           { label: primaryKid.name || "Kid", value: primaryKid.totalPoints.toLocaleString(), sub: "total gems", tone: "#FFCB3B", showCoin: true },
           { label: "This week", value: `+${primaryStats.weekTotal}`, sub: "gems earned", tone: "#6b8e4e", showCoin: false },
           { label: "Streak", value: String(primaryStats.streak), sub: "days in a row", tone: "#c5543d", showCoin: false, showFlame: true },
-          { label: "Badges", value: "—", sub: "earned", tone: "#d88b8b", showCoin: false },
+          { label: "Badges", value: String(primaryKid.badgesThisWeek), sub: "earned this week", tone: "#d88b8b", showCoin: false },
         ].map((s, i) => (
           <div
             key={i}
