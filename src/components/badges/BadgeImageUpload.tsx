@@ -88,33 +88,64 @@ export default function BadgeImageUpload({
     });
   };
 
-  const getCroppedImg = useCallback(async (): Promise<Blob | null> => {
-    if (!imgRef.current || !completedCrop) return null;
-
+  // Resolve a pixel-unit crop from the live image element + current crop
+  // state. Avoids the timing gap between onImageLoad and ReactCrop's first
+  // onComplete (which only fires after a manual drag), and also handles the
+  // case where the image element resized after the initial seed.
+  const resolvePixelCrop = (): PixelCrop | null => {
     const image = imgRef.current;
+    if (!image) return null;
+
+    const displayedWidth = image.width;
+    const displayedHeight = image.height;
+    if (!displayedWidth || !displayedHeight) return null;
+
+    if (
+      completedCrop &&
+      completedCrop.width > 0 &&
+      completedCrop.height > 0 &&
+      completedCrop.x >= 0 &&
+      completedCrop.y >= 0 &&
+      completedCrop.x + completedCrop.width <= displayedWidth + 1 &&
+      completedCrop.y + completedCrop.height <= displayedHeight + 1
+    ) {
+      return completedCrop;
+    }
+
+    if (!crop || !crop.width || !crop.height) return null;
+    const isPercent = crop.unit === "%";
+    return {
+      unit: "px",
+      x: isPercent ? (crop.x / 100) * displayedWidth : crop.x,
+      y: isPercent ? (crop.y / 100) * displayedHeight : crop.y,
+      width: isPercent ? (crop.width / 100) * displayedWidth : crop.width,
+      height: isPercent ? (crop.height / 100) * displayedHeight : crop.height,
+    };
+  };
+
+  const getCroppedImg = useCallback(async (): Promise<Blob | null> => {
+    const image = imgRef.current;
+    if (!image) return null;
+
     const naturalWidth = image.naturalWidth;
     const naturalHeight = image.naturalHeight;
     const displayedWidth = image.width;
     const displayedHeight = image.height;
-
-    if (
-      !naturalWidth || !naturalHeight ||
-      !displayedWidth || !displayedHeight ||
-      completedCrop.width <= 0 || completedCrop.height <= 0
-    ) {
+    if (!naturalWidth || !naturalHeight || !displayedWidth || !displayedHeight) {
       return null;
     }
+
+    const pxCrop = resolvePixelCrop();
+    if (!pxCrop || pxCrop.width <= 0 || pxCrop.height <= 0) return null;
 
     const scaleX = naturalWidth / displayedWidth;
     const scaleY = naturalHeight / displayedHeight;
 
-    const sx = completedCrop.x * scaleX;
-    const sy = completedCrop.y * scaleY;
-    const sw = completedCrop.width * scaleX;
-    const sh = completedCrop.height * scaleY;
+    const sx = pxCrop.x * scaleX;
+    const sy = pxCrop.y * scaleY;
+    const sw = pxCrop.width * scaleX;
+    const sh = pxCrop.height * scaleY;
 
-    // Canvas is sized in source-pixel space so the saved JPEG keeps the
-    // original resolution instead of being downscaled to the displayed size.
     const canvas = document.createElement("canvas");
     canvas.width = Math.max(1, Math.round(sw));
     canvas.height = Math.max(1, Math.round(sh));
@@ -125,9 +156,22 @@ export default function BadgeImageUpload({
     ctx.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
 
     return new Promise((resolve) => {
-      canvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.92);
+      canvas.toBlob(
+        (blob) => {
+          // Sanity check — toBlob can return ~empty blobs for tainted /
+          // misconfigured canvases, which would upload as broken images.
+          if (!blob || blob.size < 200) {
+            resolve(null);
+          } else {
+            resolve(blob);
+          }
+        },
+        "image/jpeg",
+        0.92
+      );
     });
-  }, [completedCrop]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [completedCrop, crop]);
 
   const handleCropComplete = async () => {
     if (!completedCrop) {
