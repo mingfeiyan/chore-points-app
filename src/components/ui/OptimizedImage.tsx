@@ -55,9 +55,13 @@ export default function OptimizedImage({
   // gallery bandwidth ~50× compared to streaming the full 5MB original
   // for every tile. Vercel Blob URLs are unaffected — next/image's
   // remotePatterns config handles their optimization already.
+  // We request 2× the displayed CSS width so retina screens render crisp;
+  // next/image does the same for blob URLs via its srcset, but the Drive
+  // proxy is a single redirect so we encode the device-pixel intent here.
+  // The proxy clamps to its MAX_THUMB (1600) on its end.
   const isDriveProxy = src.startsWith("/api/drive/");
   const resolvedSrc = isDriveProxy
-    ? `${src}${src.includes("?") ? "&" : "?"}thumb=${config.width}`
+    ? `${src}${src.includes("?") ? "&" : "?"}thumb=${config.width * 2}`
     : src;
 
   if (error) {
