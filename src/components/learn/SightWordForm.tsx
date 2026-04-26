@@ -2,7 +2,12 @@
 
 import { useState, useRef, useCallback } from "react";
 import { useTranslations } from "next-intl";
-import ReactCrop, { type Crop, type PixelCrop } from "react-image-crop";
+import ReactCrop, {
+  centerCrop,
+  makeAspectCrop,
+  type Crop,
+  type PixelCrop,
+} from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 
 type SightWord = {
@@ -71,40 +76,60 @@ export default function SightWordForm({
     reader.readAsDataURL(file);
   };
 
+  const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const { naturalWidth, naturalHeight, width, height } = e.currentTarget;
+    if (!naturalWidth || !naturalHeight) return;
+    const initial = centerCrop(
+      makeAspectCrop({ unit: "%", width: 80 }, 1, naturalWidth, naturalHeight),
+      naturalWidth,
+      naturalHeight
+    );
+    setCrop(initial);
+    setCompletedCrop({
+      unit: "px",
+      x: (initial.x / 100) * width,
+      y: (initial.y / 100) * height,
+      width: (initial.width / 100) * width,
+      height: (initial.height / 100) * height,
+    });
+  };
+
   const getCroppedImg = useCallback(async (): Promise<Blob | null> => {
     if (!imgRef.current || !completedCrop) return null;
 
     const image = imgRef.current;
-    const canvas = document.createElement("canvas");
-    const scaleX = image.naturalWidth / image.width;
-    const scaleY = image.naturalHeight / image.height;
+    const naturalWidth = image.naturalWidth;
+    const naturalHeight = image.naturalHeight;
+    const displayedWidth = image.width;
+    const displayedHeight = image.height;
 
-    canvas.width = completedCrop.width;
-    canvas.height = completedCrop.height;
+    if (
+      !naturalWidth || !naturalHeight ||
+      !displayedWidth || !displayedHeight ||
+      completedCrop.width <= 0 || completedCrop.height <= 0
+    ) {
+      return null;
+    }
+
+    const scaleX = naturalWidth / displayedWidth;
+    const scaleY = naturalHeight / displayedHeight;
+
+    const sx = completedCrop.x * scaleX;
+    const sy = completedCrop.y * scaleY;
+    const sw = completedCrop.width * scaleX;
+    const sh = completedCrop.height * scaleY;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(sw));
+    canvas.height = Math.max(1, Math.round(sh));
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
 
-    ctx.drawImage(
-      image,
-      completedCrop.x * scaleX,
-      completedCrop.y * scaleY,
-      completedCrop.width * scaleX,
-      completedCrop.height * scaleY,
-      0,
-      0,
-      completedCrop.width,
-      completedCrop.height
-    );
+    ctx.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
 
     return new Promise((resolve) => {
-      canvas.toBlob(
-        (blob) => {
-          resolve(blob);
-        },
-        "image/jpeg",
-        0.9
-      );
+      canvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.92);
     });
   }, [completedCrop]);
 
@@ -244,7 +269,13 @@ export default function SightWordForm({
               onComplete={(c) => setCompletedCrop(c)}
               aspect={1}
             >
-              <img ref={imgRef} src={imageSrc} alt="Crop preview" className="max-h-[50dvh]" />
+              <img
+                ref={imgRef}
+                src={imageSrc}
+                alt="Crop preview"
+                className="max-h-[50dvh]"
+                onLoad={onImageLoad}
+              />
             </ReactCrop>
           </div>
 

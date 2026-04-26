@@ -2,7 +2,12 @@
 
 import { useState, useRef, useCallback } from "react";
 import { useTranslations } from "next-intl";
-import ReactCrop, { type Crop, type PixelCrop } from "react-image-crop";
+import ReactCrop, {
+  centerCrop,
+  makeAspectCrop,
+  type Crop,
+  type PixelCrop,
+} from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 
 type BadgeImageUploadProps = {
@@ -60,40 +65,67 @@ export default function BadgeImageUpload({
     reader.readAsDataURL(file);
   };
 
+  const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const { naturalWidth, naturalHeight, width, height } = e.currentTarget;
+    if (!naturalWidth || !naturalHeight) return;
+    // Initialize crop centered with 80% of the smaller dimension so the
+    // square always fits inside the image regardless of orientation.
+    const initial = centerCrop(
+      makeAspectCrop({ unit: "%", width: 80 }, 1, naturalWidth, naturalHeight),
+      naturalWidth,
+      naturalHeight
+    );
+    setCrop(initial);
+    // Seed completedCrop in display pixels so Apply Crop works even if the
+    // user never drags. Without this, ReactCrop only emits onComplete after
+    // a manual interaction and we'd produce a zero-area canvas.
+    setCompletedCrop({
+      unit: "px",
+      x: (initial.x / 100) * width,
+      y: (initial.y / 100) * height,
+      width: (initial.width / 100) * width,
+      height: (initial.height / 100) * height,
+    });
+  };
+
   const getCroppedImg = useCallback(async (): Promise<Blob | null> => {
     if (!imgRef.current || !completedCrop) return null;
 
     const image = imgRef.current;
-    const canvas = document.createElement("canvas");
-    const scaleX = image.naturalWidth / image.width;
-    const scaleY = image.naturalHeight / image.height;
+    const naturalWidth = image.naturalWidth;
+    const naturalHeight = image.naturalHeight;
+    const displayedWidth = image.width;
+    const displayedHeight = image.height;
 
-    canvas.width = completedCrop.width;
-    canvas.height = completedCrop.height;
+    if (
+      !naturalWidth || !naturalHeight ||
+      !displayedWidth || !displayedHeight ||
+      completedCrop.width <= 0 || completedCrop.height <= 0
+    ) {
+      return null;
+    }
+
+    const scaleX = naturalWidth / displayedWidth;
+    const scaleY = naturalHeight / displayedHeight;
+
+    const sx = completedCrop.x * scaleX;
+    const sy = completedCrop.y * scaleY;
+    const sw = completedCrop.width * scaleX;
+    const sh = completedCrop.height * scaleY;
+
+    // Canvas is sized in source-pixel space so the saved JPEG keeps the
+    // original resolution instead of being downscaled to the displayed size.
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(sw));
+    canvas.height = Math.max(1, Math.round(sh));
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
 
-    ctx.drawImage(
-      image,
-      completedCrop.x * scaleX,
-      completedCrop.y * scaleY,
-      completedCrop.width * scaleX,
-      completedCrop.height * scaleY,
-      0,
-      0,
-      completedCrop.width,
-      completedCrop.height
-    );
+    ctx.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
 
     return new Promise((resolve) => {
-      canvas.toBlob(
-        (blob) => {
-          resolve(blob);
-        },
-        "image/jpeg",
-        0.9
-      );
+      canvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.92);
     });
   }, [completedCrop]);
 
@@ -203,6 +235,7 @@ export default function BadgeImageUpload({
                 src={imageSrc}
                 alt="Crop preview"
                 className="max-h-[50vh]"
+                onLoad={onImageLoad}
               />
             </ReactCrop>
           </div>
