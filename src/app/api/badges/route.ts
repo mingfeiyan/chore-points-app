@@ -159,18 +159,46 @@ export async function GET(req: Request) {
       };
     });
 
-    // For kids, drop badges the parent has hidden. Custom-award badges
-    // (AI-generated) don't have a template and are never filtered.
+    // Progressive disclosure: within each category (streak / milestone /
+    // variety / weekly), a kid only sees the next-tier badge after
+    // they've earned the previous tier. Tier-1 badges are always visible
+    // so brand-new kids have something to chase. Standalone badges (no
+    // category/tier) are always visible.
+    const maxEarnedTierByCategory: Record<string, number> = {};
+    for (const earned of achievementBadges) {
+      const def = getAchievementBadgeById(earned.badgeId);
+      if (def?.category && def.tier) {
+        maxEarnedTierByCategory[def.category] = Math.max(
+          maxEarnedTierByCategory[def.category] || 0,
+          def.tier
+        );
+      }
+    }
+    const isVisibleByProgress = (badgeId: string): boolean => {
+      const def = getAchievementBadgeById(badgeId);
+      if (!def?.category || !def.tier) return true; // standalone
+      if (def.tier === 1) return true; // entry-level always shows
+      const maxEarned = maxEarnedTierByCategory[def.category] || 0;
+      return def.tier <= maxEarned + 1;
+    };
+
+    // For kids, drop badges the parent has hidden, then apply progressive
+    // disclosure for tiered badges. Custom-award badges (AI-generated)
+    // don't have a template or a tier and are never filtered.
     const visibleBadges = isKid
       ? enrichedBadges.filter((b) => !hiddenChoreIds.has(b.choreId))
       : enrichedBadges;
     const visibleAchievementBadges = isKid
       ? enrichedAchievementBadges.filter(
-          (b) => b.isCustomAward || !hiddenAchievementIds.has(b.badgeId)
+          (b) =>
+            b.isCustomAward ||
+            (!hiddenAchievementIds.has(b.badgeId) && isVisibleByProgress(b.badgeId))
         )
       : enrichedAchievementBadges;
     const visibleAllAchievementBadges = isKid
-      ? allAchievementBadges.filter((b) => !hiddenAchievementIds.has(b.id))
+      ? allAchievementBadges.filter(
+          (b) => !hiddenAchievementIds.has(b.id) && isVisibleByProgress(b.id)
+        )
       : allAchievementBadges;
 
     return NextResponse.json({
