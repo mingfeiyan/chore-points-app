@@ -330,35 +330,40 @@ export default function BadgeImageUpload({
       />
 
       {imageUrl ? (
-        <div className="relative inline-block">
-          <img
-            src={imageUrl}
-            alt="Badge preview"
-            className="w-24 h-24 object-cover rounded-full border-2 border-[rgba(107,142,78,0.35)] bg-pg-cream"
-            onError={(e) => {
-              // Surface load failures explicitly. Without this the broken
-              // <img> just renders alt text in the upper-left, which looks
-              // like a styling bug even though it's a load failure.
-              const img = e.currentTarget;
-              img.style.display = "none";
-              const fallback = img.nextElementSibling as HTMLElement | null;
-              if (fallback) fallback.style.display = "flex";
-              console.error("Badge preview failed to load:", img.src);
-            }}
-          />
-          <div
-            style={{ display: "none" }}
-            className="w-24 h-24 rounded-full border-2 border-pg-coral bg-[rgba(197,84,61,0.08)] items-center justify-center text-[10px] font-semibold text-pg-coral text-center px-2"
-          >
-            Image failed to load
+        <div className="inline-block">
+          <div className="relative inline-block">
+            <img
+              src={imageUrl}
+              alt="Badge preview"
+              className="w-24 h-24 object-cover rounded-full border-2 border-[rgba(107,142,78,0.35)] bg-pg-cream"
+              onError={(e) => {
+                const img = e.currentTarget;
+                img.dataset.failed = "1";
+                img.style.display = "none";
+                const fallback = img.nextElementSibling as HTMLElement | null;
+                if (fallback) fallback.style.display = "flex";
+                console.error("Badge preview failed to load:", img.src);
+              }}
+            />
+            <div
+              style={{ display: "none" }}
+              className="w-24 h-24 rounded-full border-2 border-pg-coral bg-[rgba(197,84,61,0.08)] items-center justify-center text-[10px] font-semibold text-pg-coral text-center px-2"
+            >
+              Image failed to load
+            </div>
+            <button
+              type="button"
+              onClick={handleRemoveImage}
+              className="absolute -top-2 -right-2 bg-pg-coral text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:opacity-90"
+            >
+              &times;
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={handleRemoveImage}
-            className="absolute -top-2 -right-2 bg-pg-coral text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:opacity-90"
-          >
-            &times;
-          </button>
+          {/* Surface the URL so we can debug load failures without DevTools.
+              Long URLs wrap; truncated for layout but selectable. */}
+          <p className="mt-2 max-w-[16rem] text-[10px] text-pg-muted break-all font-mono">
+            {imageUrl}
+          </p>
         </div>
       ) : (
         <button
