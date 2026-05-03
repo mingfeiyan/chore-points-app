@@ -186,6 +186,14 @@ export default function ParentCalendar() {
         if (res.ok) {
           const data = await res.json();
           setCalendarEvents(data.events || []);
+        } else if (res.status === 401 || res.status === 403) {
+          // OAuth refresh died on the server; flip the local view to
+          // disconnected so CalendarConnectionCard surfaces the reauth
+          // button instead of an empty grid.
+          setCalendarSettings((prev) =>
+            prev ? { ...prev, isConnected: false } : null
+          );
+          setCalendarEvents([]);
         }
       }
     } catch {
