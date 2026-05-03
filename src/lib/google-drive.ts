@@ -3,7 +3,10 @@ import { getValidAccessToken } from "./google-calendar";
 const DRIVE_API = "https://www.googleapis.com/drive/v3";
 const DRIVE_UPLOAD_API = "https://www.googleapis.com/upload/drive/v3";
 
-export type DriveErrorResponse = { status: number; body: { error: string } };
+export type DriveErrorResponse = {
+  status: number;
+  body: { error: string; needsReauthorize?: boolean };
+};
 
 export function classifyDriveError(err: unknown): DriveErrorResponse | null {
   const raw = err instanceof Error ? err.message : String(err);
@@ -16,11 +19,21 @@ export function classifyDriveError(err: unknown): DriveErrorResponse | null {
       },
     };
   }
-  if (raw.includes("No Google account") || raw.includes("No refresh token")) {
+  // Refresh-token death surfaces three ways: the helper throws "No Google
+  // account" / "No refresh token" before calling Google, or Google itself
+  // rejects the refresh with invalid_grant (wrapped as "Failed to refresh
+  // token: ..."). All three mean the user has to re-consent.
+  if (
+    raw.includes("No Google account") ||
+    raw.includes("No refresh token") ||
+    raw.includes("Failed to refresh token") ||
+    raw.includes("invalid_grant")
+  ) {
     return {
-      status: 502,
+      status: 401,
       body: {
-        error: "Google Drive connection has expired. Reconnect in settings.",
+        error: "Google Drive authorization expired. Please reconnect in Settings.",
+        needsReauthorize: true,
       },
     };
   }

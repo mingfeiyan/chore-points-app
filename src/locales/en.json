@@ -505,6 +505,8 @@
       "connectDrive": "Connect Google Drive",
       "connecting": "Connecting…",
       "connectHint": "You'll re-authorize Google (the app needs the Drive permission) and we'll create a \"GemSteps - <family>\" folder inside your Drive.",
+      "reconnectDrive": "Reconnect Google",
+      "reconnectHint": "Re-consent with the same Google account if photos stop loading or uploads fail.",
       "disconnectDrive": "Disconnect Google Drive",
       "disconnecting": "Disconnecting…",
       "disconnectHint": "Your existing Drive folder and photos stay in your Drive; GemSteps just stops using them for new uploads.",

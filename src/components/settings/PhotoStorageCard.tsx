@@ -48,7 +48,14 @@ export default function PhotoStorageCard() {
     try {
       const res = await fetch("/api/drive/connect", { method: "POST" });
       const data = await res.json();
-      if (res.status === 409 && data.needsReauthorize) {
+      // 409 fires when the Google account row lacks the drive.file scope
+      // (first-time grant). 401 fires when the refresh token has been
+      // revoked or expired (classifyDriveError on the server). Both
+      // require the same Google re-consent loop.
+      if (
+        (res.status === 409 || res.status === 401) &&
+        data.needsReauthorize
+      ) {
         if (fromReauthorize) {
           setError(t("reauthorizeFailed"));
           setBusy(false);
@@ -147,14 +154,27 @@ export default function PhotoStorageCard() {
 
       {isDrive && (
         <>
-          <button
-            type="button"
-            onClick={handleDisconnect}
-            disabled={busy}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 border border-[rgba(68,55,32,0.14)] text-pg-ink rounded-lg hover:bg-pg-cream transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {busy ? t("disconnecting") : t("disconnectDrive")}
-          </button>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <button
+              type="button"
+              title={t("reconnectHint")}
+              onClick={() =>
+                signIn("google", { callbackUrl: "/settings?pendingDrive=1" })
+              }
+              disabled={busy}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 border border-[rgba(68,55,32,0.14)] text-pg-ink rounded-lg hover:bg-pg-cream transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {t("reconnectDrive")}
+            </button>
+            <button
+              type="button"
+              onClick={handleDisconnect}
+              disabled={busy}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 border border-[rgba(68,55,32,0.14)] text-pg-ink rounded-lg hover:bg-pg-cream transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {busy ? t("disconnecting") : t("disconnectDrive")}
+            </button>
+          </div>
           <p className="text-xs text-pg-muted mt-3">{t("disconnectHint")}</p>
         </>
       )}

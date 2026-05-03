@@ -181,6 +181,8 @@
       "connectDrive": "连接 Google Drive",
       "connecting": "连接中…",
       "connectHint": "你将重新授权 Google（应用需要 Drive 权限），我们会在你的 Drive 中创建一个 \"GemSteps - <家庭>\" 文件夹。",
+      "reconnectDrive": "重新连接 Google",
+      "reconnectHint": "如果照片无法加载或上传失败，请使用同一个 Google 账号重新授权。",
       "disconnectDrive": "断开 Google Drive",
       "disconnecting": "断开中…",
       "disconnectHint": "你 Drive 中的文件夹和照片会保留，GemSteps 只是不再用它来保存新上传。",
